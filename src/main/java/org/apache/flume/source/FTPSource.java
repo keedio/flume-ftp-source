@@ -174,10 +174,28 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     } else  { //known file
                         long dif = aFile.getSize() - sizeFileList.get(aFile.getName());
                         if (dif > 0 ){ //known and modified
-                            InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                            final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                            final long prevSize = sizeFileList.get(aFile.getName());
                             sizeFileList.put(aFile.getName(), aFile.getSize()); //save new size
                             log.info("modified: " + aFile.getName() + " , dif " + dif + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
-                            inputStream.close();
+                            Thread threadOldFile = new Thread( new Runnable(){
+                                    @Override
+                                    public void run(){
+                                        try {
+                                            inputStream.skip(prevSize);
+                                            byte[] bytesArray = new byte[4096];
+                                            while ((inputStream.read(bytesArray)) > 0) {
+                                                processMessage(bytesArray);
+                                            }
+                                            inputStream.close();
+                                           
+                                        } catch(IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                                    threadOldFile.setName("hiloOldFile_" + aFile.getName());
+                                    threadOldFile.start();
                             boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
                         }
