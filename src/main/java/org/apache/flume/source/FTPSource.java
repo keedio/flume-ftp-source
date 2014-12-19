@@ -19,6 +19,10 @@
 package org.apache.flume.source;
 
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -39,6 +43,8 @@ import java.io.IOException;
 
 
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -57,8 +63,13 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     @Override
     public void configure(Context context) {            
-           ftpSourceUtils = new FTPSourceUtils(context);
-           ftpSourceUtils.connectToserver();
+       ftpSourceUtils = new FTPSourceUtils(context);
+       ftpSourceUtils.connectToserver();
+       try {
+            sizeFileList = loadMap("hasmap.ser");
+       } catch(IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+       }
     }
     
     /*
@@ -94,6 +105,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
     @Override
     public void stop() {
+        saveMap(sizeFileList);
             try {
                 if (ftpSourceUtils.getFtpClient().isConnected()) {
                     ftpSourceUtils.getFtpClient().logout();
@@ -207,7 +219,32 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         } //el listado no es vacío
     }//fin de método
     
-   
     
+   /*
+    @void Serialize hashmap
+    */
+    public void saveMap(HashMap<String, Long> map){
+        try { 
+            FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(map);
+            out.close();
+        } catch(FileNotFoundException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+    }
+    
+    /*
+    @return HashMap<File,Long> objects
+    */
+    public HashMap<String,Long> loadMap(String name) throws ClassNotFoundException, IOException{
+        FileInputStream map = new FileInputStream(name);
+        ObjectInputStream in = new ObjectInputStream(map);
+        HashMap hasMap = (HashMap)in.readObject();
+        in.close();
+        return hasMap;
+    } 
     
 } //end of class
