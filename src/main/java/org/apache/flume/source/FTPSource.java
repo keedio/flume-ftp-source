@@ -149,21 +149,36 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     if (!(sizeFileList.containsKey(aFile.getName()))){ //new file
                         sizeFileList.put(aFile.getName(), aFile.getSize());
                         log.info("discovered: " + aFile.getName() + "," + " ," + sizeFileList.size() + " , Actual "  + aFile.getSize());
-                        InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
-                        byte[] bytesArray = new byte[4096];
-                        while ((inputStream.read(bytesArray)) > 0) {
-                            processMessage(bytesArray);
-                        }
-                        inputStream.close();
+                        final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                        Thread threadNewFile = new Thread( new Runnable(){
+                                    @Override
+                                    public void run(){
+                                        try {
+                                            
+                                            byte[] bytesArray = new byte[4096];
+                                            while ((inputStream.read(bytesArray)) > 0) {
+                                                processMessage(bytesArray);
+                                            }
+                                            inputStream.close();
+                                           
+                                        } catch(IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+                                    threadNewFile.setName("hiloNewFile_" + aFile.getName());
+                                    threadNewFile.start();
+                        //inputStream.close();
                         boolean success = ftpClient.completePendingCommand();
                         continue;
                     } else  { //known file
-                        //InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                         long dif = aFile.getSize() - sizeFileList.get(aFile.getName());
                         if (dif > 0 ){ //known and modified
+                            InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             sizeFileList.put(aFile.getName(), aFile.getSize()); //save new size
                             log.info("modified: " + aFile.getName() + " , dif " + dif + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
-                            //inputStream.close();
+                            inputStream.close();
+                            boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
                         }
                         continue;
