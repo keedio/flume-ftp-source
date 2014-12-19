@@ -52,10 +52,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     private HashMap<String, Long> sizeFileList = new HashMap<>();
-    private HashMap<String, Long> markFileList = new HashMap<>();
-    private HashMap<String, Boolean> channelList = new HashMap<>();
-    private HashSet<String> deletedFiles = new HashSet<>();
-    private final int CHUNKSIZE = 1024;
+   
     private FTPSourceUtils ftpSourceUtils;
     
     @Override
