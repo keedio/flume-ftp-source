@@ -167,7 +167,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     public void run(){
                                         try {
                                             
-                                            byte[] bytesArray = new byte[4096];
+                                            byte[] bytesArray = new byte[1024];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
                                             }
@@ -195,7 +195,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     public void run(){
                                         try {
                                             inputStream.skip(prevSize);
-                                            byte[] bytesArray = new byte[4096];
+                                            byte[] bytesArray = new byte[1024];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
                                             }
