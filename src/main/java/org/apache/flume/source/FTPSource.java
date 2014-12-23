@@ -154,7 +154,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             for (FTPFile aFile : subFiles) {
                 String currentFileName = aFile.getName();
                 if (currentFileName.equals(".") || currentFileName.equals("..")) {
-                    // skip parent directory and directory itself
+                    System.out.println("skip parent directory and directory itself");
                     continue;
                 }
                 
@@ -191,8 +191,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         //inputStream.close();
                         boolean success = ftpClient.completePendingCommand();
                         continue;
-                    } else  { //known file
-                        
+                    } else  { //known file                        
                         long dif = aFile.getSize() - sizeFileList.get(aFile.getName());
                         if (dif > 0 ){ //known and modified
                             final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
@@ -220,8 +219,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                             boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
                         }
-                        
-                        continue;
+                        //System.out.println(dirToList);
+                        ftpClient.changeWorkingDirectory(parentDir);
+                       continue;
                     }
                 } 
                 
