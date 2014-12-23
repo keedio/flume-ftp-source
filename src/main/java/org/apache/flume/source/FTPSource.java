@@ -60,6 +60,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     private HashMap<String, Long> sizeFileList = new HashMap<>();
+    private HashSet<String> existFileList = new HashSet<>();
     private final int CHUNKSIZE = 1024;   
     private FTPSourceUtils ftpSourceUtils;
     
@@ -81,10 +82,13 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        log.info("ejecuta process");
        try {
            //String dirToList = "/home/mortadelo/ftp";
-           listDirectory(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
+           listDirectory(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);           
        } catch(IOException e){
            e.printStackTrace();
        }
+       cleanList(sizeFileList);
+        existFileList.clear();
+       
        
        //discoverElements();
        
@@ -139,6 +143,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     
     public void listDirectory(FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
+        
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
             dirToList += "/" + currentDir;
@@ -160,6 +165,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     continue;
                 } else { //aFile is a regular file
                     ftpClient.changeWorkingDirectory(dirToList);
+                    this.existFileList.add(aFile.getName());
                     if (!(sizeFileList.containsKey(aFile.getName()))){ //new file
                         sizeFileList.put(aFile.getName(), aFile.getSize());
                         log.info("discovered: " + aFile.getName() + "," + " ," + sizeFileList.size() + " , Actual "  + aFile.getSize());
@@ -205,8 +211,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                             inputStream.close();
                                            
                                         } catch(IOException e) {
-                                            e.printStackTrace();
-                                        }
+                                            e.printStackTrace();                                            
+                                        } 
                                     }
                                 });
                                     threadOldFile.setName("hiloOldFile_" + aFile.getName());
@@ -252,8 +258,62 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     } 
     
     
-   
+   /*
+    fill list con actual elements
+    */
+//   public void fillList(FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
+//        this.existFileList.clear();
+//        String dirToList = parentDir;
+//        if (!currentDir.equals("")) {
+//            dirToList += "/" + currentDir;
+//        }
+//        FTPFile[] subFiles = ftpClient.listFiles(dirToList);
+//        if (subFiles != null && subFiles.length > 0) {
+//            
+//            for (FTPFile aFile : subFiles) {
+//                String currentFileName = aFile.getName();
+//                if (currentFileName.equals(".") || currentFileName.equals("..")) {
+//                    // skip parent directory and directory itself
+//                    continue;
+//                }
+//                
+//                if (aFile.isDirectory()) {
+//                    System.out.println("[" + aFile.getName() + "]");
+//                    ftpClient.changeWorkingDirectory(aFile.getName());
+//                    listDirectory(ftpClient, dirToList, aFile.getName(), level + 1);
+//                    continue;
+//                } else { //aFile is a regular file
+//                    ftpClient.changeWorkingDirectory(dirToList);
+//                        this.existFileList.add(aFile.getName());
+//                        boolean success = ftpClient.completePendingCommand();
+//                        continue;
+//                    } 
+//            } //fin de bucle
+//        } //el listado no es vacío
+//    }//fin de método
     
+   
+//   
+//   public void checkFileExits(){
+//       for (String fileName : sizeFileList.keySet()){
+//           if (!(existFileList.contains(fileName))){
+//               sizeFileList.remove(fileName);
+//           }
+//       }
+//   }
+   
+   /*
+    @void, delete file from hashmaps if deleted from ftp
+    */
+    public void cleanList(HashMap<String,Long> map) {
+          for (Iterator<String> iter=map.keySet().iterator();iter.hasNext();) {
+          final String fileName = iter.next();
+          if (!(existFileList.contains(fileName))){ 
+              iter.remove();
+          }
+        }
+    }
+   
     
     
 } //end of class
