@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
 
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -52,13 +53,14 @@ import org.apache.commons.net.ftp.FTPFile;
 
 
 /*
- * @author Luis Lazaro
+ * @author Luis Lazaro // lalazaro@keedio.com
+    KEEDIO
  */
 public class FTPSource extends AbstractSource implements Configurable, PollableSource {
     
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     private HashMap<String, Long> sizeFileList = new HashMap<>();
-   
+    private final int CHUNKSIZE = 1024;   
     private FTPSourceUtils ftpSourceUtils;
     
     @Override
@@ -167,7 +169,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     public void run(){
                                         try {
                                             
-                                            byte[] bytesArray = new byte[1024];
+                                            byte[] bytesArray = new byte[CHUNKSIZE];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
                                             }
@@ -184,6 +186,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         boolean success = ftpClient.completePendingCommand();
                         continue;
                     } else  { //known file
+                        
                         long dif = aFile.getSize() - sizeFileList.get(aFile.getName());
                         if (dif > 0 ){ //known and modified
                             final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
@@ -195,7 +198,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     public void run(){
                                         try {
                                             inputStream.skip(prevSize);
-                                            byte[] bytesArray = new byte[1024];
+                                            byte[] bytesArray = new byte[CHUNKSIZE];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
                                             }
@@ -211,6 +214,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                             boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
                         }
+                        
                         continue;
                     }
                 } 
@@ -246,5 +250,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         in.close();
         return hasMap;
     } 
+    
+    
+   
+    
+    
     
 } //end of class
