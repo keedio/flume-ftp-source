@@ -258,7 +258,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     }
     
     /*
-    @return HashMap<File,Long> objects
+    @return HashMap<String,Long> objects
     */
     public HashMap<String,Long> loadMap(String name) throws ClassNotFoundException, IOException{
         FileInputStream map = new FileInputStream(name);
