@@ -60,6 +60,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     private HashMap<String, Long> sizeFileList = new HashMap<>();
+    private HashMap<String, Long> markFileList = new HashMap<>();
     private HashSet<String> existFileList = new HashSet<>();
     private final int CHUNKSIZE = 1024;   //event size in bytes
     private FTPSourceUtils ftpSourceUtils;
@@ -208,6 +209,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                             byte[] bytesArray = new byte[CHUNKSIZE];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
+                                                //markFileList.put(dirToList + "/" + aFile.getName(), inputStream.);
                                             }
                                             inputStream.close();
                                            
@@ -232,7 +234,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                         try {
                                             inputStream.skip(prevSize);
                                             byte[] bytesArray = new byte[CHUNKSIZE];
-                                            while ((inputStream.read(bytesArray)) > 0) {
+                                            while ((inputStream.read(bytesArray)) > 0) {                                                
                                                 processMessage(bytesArray);
                                             }
                                             inputStream.close();
@@ -243,6 +245,32 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     }
                                 });
                                     threadOldFile.setName("hiloOldFile_" + aFile.getName());
+                                    threadOldFile.start();
+                            boolean success = ftpClient.completePendingCommand(); //wlways
+                            continue;
+                        } else 
+                        if (dif == 0 && aFile.getSize() > markFileList.get(dirToList + "/" + aFile.getName()) ){ //was not discovered at all
+                            final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                            final long prevSize = markFileList.get(dirToList + "/" + aFile.getName());
+                            sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
+                            log.info("resuming: " + dirToList + "/" + aFile.getName() + " , remaining: " + (aFile.getSize() - prevSize) + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
+                            Thread threadOldFile = new Thread( new Runnable(){
+                                    @Override
+                                    public void run(){
+                                        try {
+                                            inputStream.skip(prevSize);
+                                            byte[] bytesArray = new byte[CHUNKSIZE];
+                                            while ((inputStream.read(bytesArray)) > 0) {
+                                                processMessage(bytesArray);
+                                            }
+                                            inputStream.close();
+                                           
+                                        } catch(IOException e) {
+                                            e.printStackTrace();                                            
+                                        } 
+                                    }
+                                });
+                                    threadOldFile.setName("hiloReFile_" + aFile.getName());
                                     threadOldFile.start();
                             boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
