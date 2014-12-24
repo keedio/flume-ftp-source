@@ -71,6 +71,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        ftpSourceUtils.connectToserver();
        try {
             sizeFileList = loadMap("hasmap.ser");
+            eventCount = loadCount("eventCount.ser");
        } catch(IOException | ClassNotFoundException e) {
             e.printStackTrace();
        }
@@ -92,6 +93,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        cleanList(sizeFileList);
        existFileList.clear();
        saveMap(sizeFileList);
+       saveCount(eventCount);
        
         try 
         {  
@@ -294,8 +296,33 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         return hasMap;
     } 
     
-    
+    /*
+    @void serialize long count
+    */
+    public void saveCount(long count){
+        try {
+            FileOutputStream fileOut = new FileOutputStream("eventCount.ser");
+            ObjectOutputStream out = new ObjectOutputStream(fileOut);
+            out.writeObject(count);
+            out.close();
+        } catch(FileNotFoundException e){
+            e.printStackTrace();
+        } catch (IOException e){
+            e.printStackTrace();
+        } 
+    }
  
+    /*
+    @return long count
+    */
+    public long loadCount(String name) throws ClassNotFoundException, IOException{
+        FileInputStream number = new FileInputStream(name);
+        ObjectInputStream in = new ObjectInputStream(number);
+        long count = (long)in.readObject();
+        in.close();
+        return count;
+    } 
+    
    
    /*
     @void, delete file from hashmaps if deleted from ftp
