@@ -164,10 +164,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     continue;
                 } else if (aFile.isFile()) { //aFile is a regular file
                     ftpClient.changeWorkingDirectory(dirToList);
-                    this.existFileList.add(ftpSourceUtils.getFtpClient().printWorkingDirectory() + "/" + aFile.getName());
-                    if (!(sizeFileList.containsKey(ftpSourceUtils.getFtpClient().printWorkingDirectory() + "/" + aFile.getName()))){ //new file
-                        sizeFileList.put(ftpSourceUtils.getFtpClient().printWorkingDirectory() + "/" + aFile.getName(), aFile.getSize());
-                        log.info("discovered: " + aFile.getName() + "," + " ," + sizeFileList.size() + " , Actual "  + aFile.getSize());
+                    existFileList.add(dirToList + "/" + aFile.getName());
+                    if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
+                        sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
+                        log.info("discovered: " + dirToList + "/" + aFile.getName() + "," + " ," + sizeFileList.size() + " , Actual "  + aFile.getSize());
                         final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                         Thread threadNewFile = new Thread( new Runnable(){
                                     @Override
@@ -192,12 +192,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         ftpClient.changeWorkingDirectory(dirToList);
                         continue;
                     } else  { //known file                        
-                        long dif = aFile.getSize() - sizeFileList.get(ftpSourceUtils.getFtpClient().printWorkingDirectory() + "/" + aFile.getName());
+                        long dif = aFile.getSize() - sizeFileList.get(dirToList + "/" + aFile.getName());
                         if (dif > 0 ){ //known and modified
                             final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
-                            final long prevSize = sizeFileList.get(aFile.getName());
-                            sizeFileList.put(ftpSourceUtils.getFtpClient().printWorkingDirectory() + "/" + aFile.getName(), aFile.getSize()); //save new size
-                            log.info("modified: " + aFile.getName() + " , dif " + dif + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
+                            final long prevSize = sizeFileList.get(dirToList + "/" + aFile.getName());
+                            sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
+                            log.info("modified: " + dirToList + "/" + aFile.getName() + " , dif " + dif + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
                             Thread threadOldFile = new Thread( new Runnable(){
                                     @Override
                                     public void run(){
@@ -219,6 +219,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                             boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
                         }
+                        
                         //System.out.println(dirToList);
                         ftpClient.changeWorkingDirectory(parentDir);
                        continue;
