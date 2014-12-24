@@ -19,7 +19,7 @@
 package org.apache.flume.source;
 
 
-import java.io.File;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -218,11 +218,36 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     threadOldFile.start();
                             boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
+                        } else
+                        if (dif < 0 ){ //known and full modified
+                            final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                            final long prevSize = 0;
+                            sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
+                            log.info("full modified: " + dirToList + "/" + aFile.getName() + " , dif " + dif + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
+                            Thread threadOldFile = new Thread( new Runnable(){
+                                    @Override
+                                    public void run(){
+                                        try {
+                                            inputStream.skip(prevSize);
+                                            byte[] bytesArray = new byte[CHUNKSIZE];
+                                            while ((inputStream.read(bytesArray)) > 0) {
+                                                processMessage(bytesArray);
+                                            }
+                                            inputStream.close();
+                                           
+                                        } catch(IOException e) {
+                                            e.printStackTrace();                                            
+                                        } 
+                                    }
+                                });
+                                    threadOldFile.setName("hiloOldFile_" + aFile.getName());
+                                    threadOldFile.start();
+                            boolean success = ftpClient.completePendingCommand(); //wlways
+                            continue;
                         }
-                        
                         //System.out.println(dirToList);
                         ftpClient.changeWorkingDirectory(parentDir);
-                       continue;
+                        continue;
                     }
                 } else if (aFile.isSymbolicLink()) {
                     log.info(aFile.getName() + " is a link of " + aFile.getLink() + " access denied" );
