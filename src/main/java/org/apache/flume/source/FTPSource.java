@@ -71,7 +71,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        ftpSourceUtils = new FTPSourceUtils(context);
        ftpSourceUtils.connectToserver();
        try {
-            sizeFileList = loadMap("hasmap.ser");
+            sizeFileList = loadMap("1hasmap.ser");
+            markFileList = loadMap("2hasmap.ser");
             eventCount = loadCount("eventCount.ser");
        } catch(IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -93,7 +94,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        }
        cleanList(sizeFileList);
        existFileList.clear();
-       saveMap(sizeFileList);
+       saveMap(sizeFileList,1);
+       saveMap(markFileList,2);
        saveCount(eventCount);
        
         try 
@@ -115,7 +117,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
     @Override
     public void stop() {
-        saveMap(sizeFileList);
+        saveMap(sizeFileList,1);
+        saveMap(markFileList,2);
+        saveCount(eventCount);
             try {
                 if (ftpSourceUtils.getFtpClient().isConnected()) {
                     ftpSourceUtils.getFtpClient().logout();
@@ -168,6 +172,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 } else if (aFile.isFile()) { //aFile is a regular file
                     ftpClient.changeWorkingDirectory(dirToList);
                     existFileList.add(dirToList + "/" + aFile.getName());
+                    final String fileName = dirToList + "/" + aFile.getName();
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                         log.info("discovered: " + dirToList + "/" + aFile.getName() + "," + " ," + sizeFileList.size() + " , Actual "  + aFile.getSize());
@@ -176,10 +181,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     @Override
                                     public void run(){
                                         try {
-                                            
+                                            int count = 0;
                                             byte[] bytesArray = new byte[CHUNKSIZE];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
+                                                count++;
+                                                markFileList.put(fileName, (long)count * CHUNKSIZE);
                                             }
                                             inputStream.close();
                                            
@@ -209,7 +216,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                             byte[] bytesArray = new byte[CHUNKSIZE];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
-                                                //markFileList.put(dirToList + "/" + aFile.getName(), inputStream.);
                                             }
                                             inputStream.close();
                                            
@@ -259,9 +265,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     public void run(){
                                         try {
                                             inputStream.skip(prevSize);
+                                            int count = 0;
                                             byte[] bytesArray = new byte[CHUNKSIZE];
                                             while ((inputStream.read(bytesArray)) > 0) {
                                                 processMessage(bytesArray);
+                                                count++;
+                                                markFileList.put(fileName, prevSize + (long)count * CHUNKSIZE);
                                             }
                                             inputStream.close();
                                            
@@ -300,9 +309,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
    /*
     @void Serialize hashmap
     */
-    public void saveMap(HashMap<String, Long> map){
+    public void saveMap(HashMap<String, Long> map, int num){
         try { 
-            FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
+            FileOutputStream fileOut = new FileOutputStream(num + "hasmap.ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(map);
             out.close();
