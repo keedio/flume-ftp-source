@@ -43,9 +43,12 @@ import java.io.IOException;
 
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Iterator;
+import java.io.File;
+import java.io.BufferedOutputStream;
 
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -62,7 +65,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private HashMap<String, Long> sizeFileList = new HashMap<>();
     private HashMap<String, Long> markFileList = new HashMap<>();
     private HashSet<String> existFileList = new HashSet<>();
-    private final int CHUNKSIZE = 8192;   //event size in bytes
+    private final int CHUNKSIZE = 4096;   //event size in bytes
     private FTPSourceUtils ftpSourceUtils;
     private long eventCount = 0;
     
@@ -148,7 +151,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     
     
-    public void discoverElements( FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
+    public void discoverElements( final FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
         
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
@@ -178,19 +181,24 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                         log.info("discovered: " + dirToList + "/" + aFile.getName() + "," + " ," + sizeFileList.size() + " , Actual "  + aFile.getSize());
-                        final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                        
                         Thread threadNewFile = new Thread( new Runnable(){
                                     @Override
                                     public void run(){
                                         try {
+                                            File downloadFile2 = new File("/var/log/flume-ftp/fichero.log");
+                                             OutputStream outputStream2 = new BufferedOutputStream(new FileOutputStream(downloadFile2));
+                                              InputStream  inputStream = ftpClient.retrieveFileStream(fileName);                                           
                                             int count = 0;
-                                            byte[] bytesArray = new byte[CHUNKSIZE];
-                                            while ((inputStream.read(bytesArray)) > 0) {
-                                                processMessage(bytesArray);
+                                            byte[] data = new byte[CHUNKSIZE];
+                                            while ((inputStream.read(data)) !=  -1) {
+                                                processMessage(data);
+                                                outputStream2.write(data);
                                                 count++;
                                                 markFileList.put(longFileName, (long)count * CHUNKSIZE);
                                             }
                                            inputStream.close();
+                                           ftpClient.completePendingCommand();
                                            
                                         } catch(IOException e) {
                                             e.printStackTrace();
@@ -199,9 +207,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                 });
                                     threadNewFile.setName("hiloNewFile_" + aFile.getName());
                                     threadNewFile.start();
-                        boolean success = ftpClient.completePendingCommand();
+                        //boolean success = ftpClient.completePendingCommand();
                         ftpClient.changeWorkingDirectory(dirToList);
-                        continue;
+                        //continue;
                     } else  { //known file                        
                         long dif = aFile.getSize() - sizeFileList.get(dirToList + "/" + aFile.getName());
                         if (dif > 0 ){ //known and modified
@@ -222,7 +230,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                            
                                         } catch(IOException e) {
                                             e.printStackTrace();                                            
-                                        } 
+                                        }  
                                     }
                                 });
                                     threadOldFile.setName("hiloOldFile_" + aFile.getName());
