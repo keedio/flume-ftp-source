@@ -189,16 +189,21 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                             File downloadFile2 = new File("/var/log/flume-ftp/fichero.log");
                                              OutputStream outputStream2 = new BufferedOutputStream(new FileOutputStream(downloadFile2));
                                               InputStream  inputStream = ftpClient.retrieveFileStream(fileName);                                           
-                                            int count = 0;
-                                            byte[] data = new byte[CHUNKSIZE];
-                                            while ((inputStream.read(data)) !=  -1) {
-                                                processMessage(data);
-                                                outputStream2.write(data);
-                                                count++;
-                                                markFileList.put(longFileName, (long)count * CHUNKSIZE);
+                                            byte[] bytesArray = new byte[4096];
+                                             int bytesRead = -1;
+                                            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                                               
+                                               processMessage(bytesArray);
+                                               // outputStream2.write(bytesArray, 0, bytesRead); //works well
+                                                 outputStream2.write(bytesArray); //---> fail
                                             }
-                                           inputStream.close();
-                                           ftpClient.completePendingCommand();
+                                             
+                                           boolean  success = ftpClient.completePendingCommand();
+                                            if (success) {
+                                                System.out.println("File #2 has been downloaded successfully.");
+                                            }
+                                            outputStream2.close();
+                                            inputStream.close();
                                            
                                         } catch(IOException e) {
                                             e.printStackTrace();
