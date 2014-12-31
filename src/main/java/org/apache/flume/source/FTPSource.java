@@ -52,7 +52,7 @@ import java.util.Iterator;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
-
+@SuppressWarnings("CallToPrintStackTrace")
 /*
  * @author Luis Lazaro // lalazaro@keedio.com
     KEEDIO
@@ -212,20 +212,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         } else
                         if (dif < 0 ){ //known and full modified
                             existFileList.remove(dirToList + "/" + aFile.getName());
-//                            final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
-//                            final long prevSize = 0;
-//                            sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
-//                           
-//                            Thread threadOldFile = new Thread( new Runnable(){
-//                                    @Override
-//                                    public void run(){
-//                                       
-//                                        readStream(inputStream, "full modified: " + fileName, prevSize );
-//                                    }
-//                                });
-//                                    threadOldFile.setName("hiloOldFile_" + aFile.getName());
-//                                    threadOldFile.start();
-                            //boolean success = ftpClient.completePendingCommand(); //wlways
                             continue;
                         }
                         //System.out.println(dirToList);
@@ -326,7 +312,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     read retrieved stream from ftpclient into byte[] and process
     @return void
     */
-    @SuppressWarnings("CallToPrintStackTrace")
+    
     public void readStream(InputStream inputStream, String infoEvent, long position){
         log.info( infoEvent  + " ," + sizeFileList.size());
         try {      
