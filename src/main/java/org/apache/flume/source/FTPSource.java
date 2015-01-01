@@ -84,10 +84,11 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     @Override
     public PollableSource.Status process() throws EventDeliveryException {
        
-       try {
-                    log.info("data processed: " + eventCount/1024  + " MBytes" + " actual dir " + ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +
-                        sizeFileList.size());
-                    discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);           
+            try {
+                  log.info("data processed: " + eventCount/1024  + " MBytes" + " actual dir " + 
+                          ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +
+                  sizeFileList.size());
+                  discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);           
                 } catch(IOException e){
                     e.printStackTrace();
                 }
@@ -179,8 +180,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
-                        //log.info("discovered: " + dirToList + "/" + aFile.getName() + "," + " ," + sizeFileList.size() + " , Actual "  + aFile.getSize());
                         final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                        if (inputStream != null) {
                         Thread threadNewFile = new Thread( new Runnable(){
                                     @Override
                                     public void run(){
@@ -189,16 +190,23 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                 });
                                     threadNewFile.setName("hiloNewFile_" + aFile.getName());
                                     threadNewFile.start();
-                        boolean success = ftpClient.completePendingCommand();
+                        boolean success = ftpClient.completePendingCommand();                        
+                        } else {
+                            log.info("failed retrieving stream from file :" + fileName);
+                            existFileList.remove(dirToList + "/" + aFile.getName());
+                            cleanList(sizeFileList);
+                        }
                         ftpClient.changeWorkingDirectory(dirToList);
                         continue;
+                        
+                        
                     } else  { //known file                        
                         long dif = aFile.getSize() - sizeFileList.get(dirToList + "/" + aFile.getName());
                         if (dif > 0 ){ //known and modified
                             final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             final long prevSize = sizeFileList.get(dirToList + "/" + aFile.getName());
                             sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
-                            //log.info("modified: " + dirToList + "/" + aFile.getName() + " , dif " + dif + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
+                            if (inputStream != null) {
                             Thread threadOldFile = new Thread( new Runnable(){
                                     @Override
                                     public void run(){
@@ -208,13 +216,17 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     threadOldFile.setName("hiloOldFile_" + aFile.getName());
                                     threadOldFile.start();
                             boolean success = ftpClient.completePendingCommand(); //wlways
+                            } else {
+                            log.info("failed retrieving stream from file modified :" + fileName);
+                            }
+                            ftpClient.changeWorkingDirectory(dirToList);
                             continue;
                         } else
                         if (dif < 0 ){ //known and full modified
                             existFileList.remove(dirToList + "/" + aFile.getName());
+                            saveMap(sizeFileList);
                             continue;
                         }
-                        //System.out.println(dirToList);
                         ftpClient.changeWorkingDirectory(parentDir);
                         continue;
                     }
@@ -316,24 +328,23 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     public void readStream(InputStream inputStream, String infoEvent, long position){
         log.info( infoEvent  + " ," + sizeFileList.size());
         try {      
-                    inputStream.skip(position);
-                    byte[] bytesArray = new byte[CHUNKSIZE];
-                    int bytesRead = -1;
-                    while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                        ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE);
-                        baostream.write(bytesArray, 0, bytesRead);
-                        byte[] data = baostream.toByteArray();
-                        processMessage(data);
-                    }
-                    inputStream.close();
-                    Thread.sleep(200);
-
+                inputStream.skip(position);
+                byte[] bytesArray = new byte[CHUNKSIZE];
+                int bytesRead = -1;
+                while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                    ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE);
+                    baostream.write(bytesArray, 0, bytesRead);
+                    byte[] data = baostream.toByteArray();
+                    processMessage(data);
+                }
+                inputStream.close();
+                Thread.sleep(200);
+                //saveMap(sizeFileList); //ralentiza el proceso
             } catch(IOException e ) {
                 e.printStackTrace();
             } catch (InterruptedException e){
                 e.printStackTrace();
             }
-        
     }
     
     
