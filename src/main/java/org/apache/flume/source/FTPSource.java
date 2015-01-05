@@ -180,6 +180,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
+                        saveMap(sizeFileList);
                         final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                         if (inputStream != null) {
                         Thread threadNewFile = new Thread( new Runnable(){
@@ -206,6 +207,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                             final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             final long prevSize = sizeFileList.get(dirToList + "/" + aFile.getName());
                             sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
+                            saveMap(sizeFileList);
                             if (inputStream != null) {
                             Thread threadOldFile = new Thread( new Runnable(){
                                     @Override
@@ -338,13 +340,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     processMessage(data);
                 }
                 inputStream.close();
-                Thread.sleep(200);
-                //saveMap(sizeFileList); //ralentiza el proceso
+                //Thread.sleep(200);
             } catch(IOException e ) {
                 e.printStackTrace();
-            } catch (InterruptedException e){
-                e.printStackTrace();
-            }
+            } //catch (InterruptedException e){
+//                e.printStackTrace();
+//            }
     }
     
     
