@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.io.File;
 import java.io.BufferedOutputStream;
@@ -54,7 +55,7 @@ import java.io.BufferedOutputStream;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
-
+@SuppressWarnings("CallToPrintStackTrace")
 /*
  * @author Luis Lazaro // lalazaro@keedio.com
     KEEDIO
@@ -63,7 +64,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     private HashMap<String, Long> sizeFileList = new HashMap<>();
-    private HashMap<String, Long> markFileList = new HashMap<>();
     private HashSet<String> existFileList = new HashSet<>();
     private final int CHUNKSIZE = 4096;   //event size in bytes
     private FTPSourceUtils ftpSourceUtils;
@@ -74,8 +74,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        ftpSourceUtils = new FTPSourceUtils(context);
        ftpSourceUtils.connectToserver();
        try {
-            sizeFileList = loadMap("1hasmap.ser");
-            markFileList = loadMap("2hasmap.ser");
+            sizeFileList = loadMap("hasmap.ser");
             eventCount = loadCount("eventCount.ser");
        } catch(IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -85,8 +84,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     /*
     @enum Status , process source configured from context
     */
+    @Override
     public PollableSource.Status process() throws EventDeliveryException {
        
+<<<<<<< HEAD
        try {
            log.info("data processed: " + eventCount/CHUNKSIZE  + " MBytes" + " actual dir " + ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +
                sizeFileList.size());
@@ -100,7 +101,23 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        saveMap(sizeFileList,1);
        saveMap(markFileList,2);
        saveCount(eventCount);
+=======
+            try {
+                  log.info("data processed: " + eventCount/1024  + " MBytes" + " actual dir " + 
+                          ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +
+                  sizeFileList.size());
+                  discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);           
+                } catch(IOException e){
+                    e.printStackTrace();
+                }
+>>>>>>> origin/flume_ftp_dev
        
+                cleanList(sizeFileList);
+                existFileList.clear();
+                
+                saveMap(sizeFileList);
+                saveCount(eventCount);
+
         try 
         {  
             Thread.sleep(10000);				
@@ -120,8 +137,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
     @Override
     public void stop() {
-        saveMap(sizeFileList,1);
-        saveMap(markFileList,2);
+        saveMap(sizeFileList);
         saveCount(eventCount);
             try {
                 if (ftpSourceUtils.getFtpClient().isConnected()) {
@@ -142,7 +158,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         eventCount++;
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
-        Map<String, String> headers =  new HashMap<String, String>();  
+        Map<String, String> headers =  new HashMap<>();  
         headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
         event.setBody(message);
         event.setHeaders(headers);
@@ -150,8 +166,17 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     }
     
     
+<<<<<<< HEAD
     
     public void discoverElements( final FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
+=======
+    /*
+    discoverElements: find files to process them
+    @return void 
+    */
+    @SuppressWarnings("UnnecessaryContinue")
+    public void discoverElements( FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
+>>>>>>> origin/flume_ftp_dev
         
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
@@ -177,6 +202,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     final String longFileName = dirToList + "/" + aFile.getName();
                     final String fileName = aFile.getName();
                     existFileList.add(dirToList + "/" + aFile.getName());
+<<<<<<< HEAD
                     
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
@@ -208,23 +234,51 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                         } catch(IOException e) {
                                             e.printStackTrace();
                                         }
+=======
+                    final String fileName = aFile.getName();
+                    
+                    if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
+                        sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
+                        saveMap(sizeFileList);
+                        final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                        if (inputStream != null) {
+                        Thread threadNewFile = new Thread( new Runnable(){
+                                    @Override
+                                    public void run(){
+                                       readStream(inputStream, "discovered: " + fileName, 0 );
+>>>>>>> origin/flume_ftp_dev
                                     }
                                 });
                                     threadNewFile.setName("hiloNewFile_" + aFile.getName());
                                     threadNewFile.start();
+<<<<<<< HEAD
                         //boolean success = ftpClient.completePendingCommand();
                         ftpClient.changeWorkingDirectory(dirToList);
                         //continue;
+=======
+                        boolean success = ftpClient.completePendingCommand();                        
+                        } else {
+                            log.info("failed retrieving stream from file :" + fileName);
+                            existFileList.remove(dirToList + "/" + aFile.getName());
+                            cleanList(sizeFileList);
+                        }
+                        ftpClient.changeWorkingDirectory(dirToList);
+                        continue;
+                        
+                        
+>>>>>>> origin/flume_ftp_dev
                     } else  { //known file                        
                         long dif = aFile.getSize() - sizeFileList.get(dirToList + "/" + aFile.getName());
                         if (dif > 0 ){ //known and modified
                             final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             final long prevSize = sizeFileList.get(dirToList + "/" + aFile.getName());
                             sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
-                            log.info("modified: " + dirToList + "/" + aFile.getName() + " , dif " + dif + " ," + sizeFileList.size() + " , new size "  + aFile.getSize());
+                            saveMap(sizeFileList);
+                            if (inputStream != null) {
                             Thread threadOldFile = new Thread( new Runnable(){
                                     @Override
                                     public void run(){
+<<<<<<< HEAD
                                         try {
                                             inputStream.skip(prevSize);
                                             byte[] bytesArray = new byte[CHUNKSIZE];
@@ -236,14 +290,22 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                         } catch(IOException e) {
                                             e.printStackTrace();                                            
                                         }  
+=======
+                                        readStream(inputStream, "modified: " + fileName, prevSize );
+>>>>>>> origin/flume_ftp_dev
                                     }
                                 });
                                     threadOldFile.setName("hiloOldFile_" + aFile.getName());
                                     threadOldFile.start();
                             boolean success = ftpClient.completePendingCommand(); //wlways
+                            } else {
+                            log.info("failed retrieving stream from file modified :" + fileName);
+                            }
+                            ftpClient.changeWorkingDirectory(dirToList);
                             continue;
                         } else
                         if (dif < 0 ){ //known and full modified
+<<<<<<< HEAD
                             final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             final long prevSize = 0;
                             sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize()); //save new size
@@ -299,6 +361,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 //                            continue;
 //                        }
                         //System.out.println(dirToList);
+=======
+                            existFileList.remove(dirToList + "/" + aFile.getName());
+                            saveMap(sizeFileList);
+                            continue;
+                        }
+>>>>>>> origin/flume_ftp_dev
                         ftpClient.changeWorkingDirectory(parentDir);
                         continue;
                     }
@@ -323,9 +391,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
    /*
     @void Serialize hashmap
     */
-    public void saveMap(HashMap<String, Long> map, int num){
+    @SuppressWarnings("CallToPrintStackTrace")
+    public void saveMap(HashMap<String, Long> map){
         try { 
-            FileOutputStream fileOut = new FileOutputStream(num + "hasmap.ser");
+            FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(map);
             out.close();
@@ -335,6 +404,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             e.printStackTrace();
         }
     }
+    
     
     /*
     @return HashMap<String,Long> objects
@@ -347,9 +417,11 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         return hasMap;
     } 
     
+    
     /*
     @void serialize long count
     */
+    @SuppressWarnings("CallToPrintStackTrace")
     public void saveCount(long count){
         try {
             FileOutputStream fileOut = new FileOutputStream("eventCount.ser");
@@ -362,6 +434,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             e.printStackTrace();
         } 
     }
+    
  
     /*
     @return long count
@@ -387,6 +460,31 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         }
     }
    
+    /*
+    read retrieved stream from ftpclient into byte[] and process
+    @return void
+    */
+    
+    public void readStream(InputStream inputStream, String infoEvent, long position){
+        log.info( infoEvent  + " ," + sizeFileList.size());
+        try {      
+                inputStream.skip(position);
+                byte[] bytesArray = new byte[CHUNKSIZE];
+                int bytesRead = -1;
+                while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                    ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE);
+                    baostream.write(bytesArray, 0, bytesRead);
+                    byte[] data = baostream.toByteArray();
+                    processMessage(data);
+                }
+                inputStream.close();
+                //Thread.sleep(200);
+            } catch(IOException e ) {
+                e.printStackTrace();
+            } //catch (InterruptedException e){
+//                e.printStackTrace();
+//            }
+    }
     
     
 } //end of class
