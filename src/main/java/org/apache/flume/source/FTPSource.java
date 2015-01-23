@@ -37,7 +37,7 @@ import org.apache.flume.source.AbstractSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import org.apache.flume.instrumentation.SourceCounter;
 
 import java.io.IOException;
 
@@ -47,6 +47,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
+
 
 
 import org.apache.commons.net.ftp.FTPClient;
@@ -64,12 +65,17 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private HashSet<String> existFileList = new HashSet<>();
     private final int CHUNKSIZE = 1024;   //event size in bytes
     private FTPSourceUtils ftpSourceUtils;
-    private long eventCount = 0;
+    private long eventCount;
+    private FtpSourceCounter ftpSourceCounter;
+    
+ 
     
     @Override
     public void configure(Context context) {            
-       ftpSourceUtils = new FTPSourceUtils(context);
-       ftpSourceUtils.connectToserver();
+        ftpSourceUtils = new FTPSourceUtils(context);
+        ftpSourceUtils.connectToserver();
+        ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
+        
        try {
             sizeFileList = loadMap("hasmap.ser");
             eventCount = loadCount("eventCount.ser");
@@ -83,10 +89,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     */
     @Override
     public PollableSource.Status process() throws EventDeliveryException {
-       
+         
             try {
                   log.info("data processed: " + eventCount/1024  + " MBytes" + " actual dir " + 
-                          ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +
+                   ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +
                   sizeFileList.size());
                   discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);           
                 } catch(IOException e){
@@ -110,9 +116,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     }
 
  
-    public void start(Context context) {
+    @Override
+    public void start() {
         log.info("Starting sql source {} ...", getName());
-        super.start();	    
+        log.info("FTP Source {} stopped. Metrics: {}", getName(), ftpSourceCounter);
+        super.start();
+       ftpSourceCounter.start();
     }
     
 
@@ -128,6 +137,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
+            ftpSourceCounter.stop();
+            log.info("FTP Source {} stopped. Metrics: {}", getName(), ftpSourceCounter);
             super.stop();
     }
     
@@ -136,7 +147,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     @void process last append to files
     */
     public void processMessage(byte[] lastInfo){
-        eventCount++;
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers =  new HashMap<>();  
@@ -179,6 +189,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     final String fileName = aFile.getName();
                     
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
+                       ftpSourceCounter.incrementFilesCount();
                         sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                         saveMap(sizeFileList);
                         final InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
@@ -191,11 +202,13 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                 });
                                     threadNewFile.setName("hiloNewFile_" + aFile.getName());
                                     threadNewFile.start();
-                        boolean success = ftpClient.completePendingCommand();                        
+                        boolean success = ftpClient.completePendingCommand(); 
+                        ftpSourceCounter.incrementFilesProcCount();
                         } else {
                             log.info("failed retrieving stream from file :" + fileName);
                             existFileList.remove(dirToList + "/" + aFile.getName());
                             cleanList(sizeFileList);
+                            ftpSourceCounter.incrementFilesProcCountError();
                         }
                         ftpClient.changeWorkingDirectory(dirToList);
                         continue;
@@ -340,12 +353,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     processMessage(data);
                 }
                 inputStream.close();
-                //Thread.sleep(200);
             } catch(IOException e ) {
                 e.printStackTrace();
-            } //catch (InterruptedException e){
-//                e.printStackTrace();
-//            }
+            } 
     }
     
     

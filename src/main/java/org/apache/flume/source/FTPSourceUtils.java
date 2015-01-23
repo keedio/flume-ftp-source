@@ -15,6 +15,7 @@ import org.apache.commons.net.ftp.FTPConnectionClosedException;
 
 import java.io.IOException;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.flume.instrumentation.SourceCounter;
 
 
 
@@ -29,6 +30,8 @@ public class FTPSourceUtils {
     private String server,user,password,port;
     private int runDiscoverDelay;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
+    private SourceCounter sourceCounter;
+    private FtpSourceCounter ftpSourceCounter;
     
     
     public FTPSourceUtils(Context context){
@@ -38,6 +41,7 @@ public class FTPSourceUtils {
         password = context.getString("password");
         runDiscoverDelay = context.getInteger("run.discover.delay");
         port = context.getString("port");
+        sourceCounter = new SourceCounter("native");
     }
     
     /*
@@ -101,6 +105,20 @@ public class FTPSourceUtils {
     public int getRunDiscoverDelay(){
         return runDiscoverDelay;
     }
+    
+    /*
+    @SourceCounter, native class flume from source metrics
+    */
+    public SourceCounter getSourceCounter(){
+        return sourceCounter;
+    }
        
+    
+    /*
+    @FtpSourceCounter, custom class for specific flume FTP source
+    */
+    public FtpSourceCounter getFtpSourceCounter(){
+        return ftpSourceCounter;
+    }
 }
 
