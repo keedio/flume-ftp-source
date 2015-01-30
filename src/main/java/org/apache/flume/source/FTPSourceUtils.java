@@ -27,7 +27,8 @@ import org.apache.flume.instrumentation.SourceCounter;
 
 public class FTPSourceUtils {
     private FTPClient ftpClient;
-    private String server,user,password,port;
+    private String server,user,password;
+    private Integer port;
     private int runDiscoverDelay;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
     private SourceCounter sourceCounter;
@@ -40,7 +41,7 @@ public class FTPSourceUtils {
         user = context.getString("user");
         password = context.getString("password");
         runDiscoverDelay = context.getInteger("run.discover.delay");
-        port = context.getString("port");
+        port = context.getInteger("port");
         sourceCounter = new SourceCounter("native");
     }
     
@@ -51,7 +52,7 @@ public class FTPSourceUtils {
     public boolean connectToserver(){
         boolean success = false;
        try {
-            ftpClient.connect(server,21);
+            ftpClient.connect(server,port);
             int replyCode = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(replyCode)) {
                 System.out.println("Connect failed");

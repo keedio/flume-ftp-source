@@ -68,8 +68,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private long eventCount;
     private FtpSourceCounter ftpSourceCounter;
     
- 
-    
     @Override
     public void configure(Context context) {            
         ftpSourceUtils = new FTPSourceUtils(context);
@@ -107,7 +105,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
         try 
         {  
-            Thread.sleep(10000);				
+            Thread.sleep(ftpSourceUtils.getRunDiscoverDelay());
             return PollableSource.Status.READY;     //source was successfully able to generate events
         } catch(InterruptedException inte){
             inte.printStackTrace();
@@ -357,6 +355,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 e.printStackTrace();
             } 
     }
-    
+
+    public void setFtpSourceCounter(FtpSourceCounter ftpSourceCounter) {
+        this.ftpSourceCounter = ftpSourceCounter;
+    }
     
 } //end of class
