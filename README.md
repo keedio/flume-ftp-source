@@ -33,3 +33,15 @@ Discover delay, each configured milisecond directory will be explored
 - agent.channels.c1.capacity = 1000
 - agent.channels.c1.transactionCapacity = 100
 
+License
+-------
+Apache License, Version 2.0
+http://www.apache.org/licenses/LICENSE-2.0
+
+
+Wiki
+----
+https://github.com/keedio/flume-ftp-source/wiki/flume-ftp-source,-especificaciones-generales-y-pruebas-iniciales
+
+--
+Luis Lázaro <lalazaro@keedio.com>
