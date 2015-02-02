@@ -32,3 +32,4 @@ Discover delay, each configured milisecond directory will be explored
 - agent.channels.c1.type = memory
 - agent.channels.c1.capacity = 1000
 - agent.channels.c1.transactionCapacity = 100
+
