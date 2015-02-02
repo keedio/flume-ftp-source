@@ -13,8 +13,8 @@ mvn clean package
 
 Configuration of Flume-ftp-source.conf
 --------------------------------------
-Active list
-agent.sources = ftp1
+Active list \n
+agent.sources = ftp1\n
 agent.sinks = k1
 agent.channels = c1 
 
