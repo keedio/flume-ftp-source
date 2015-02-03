@@ -1,7 +1,7 @@
 package org.apache.flume.source
 
-import org.junit.Test
-import org.junit.Assert._
+import org.testng.Assert._
+import org.testng.annotations.Test
 
 
 /**
@@ -49,9 +49,6 @@ class TestFileUtilsTest extends TestFileUtils{
     assertNotNull(garbage)
     assertEquals(100,garbage.size)
     assertEquals(80,garbage(0).size)
-
-    garbage.foreach(logger.info(_))
-
 
     // there are 100 lines, 80 characteres per line + 1 carriage return
     assertEquals(100*81, tmpFile.toFile.length)
