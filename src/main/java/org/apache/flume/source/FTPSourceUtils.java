@@ -19,6 +19,7 @@ import org.apache.flume.instrumentation.SourceCounter;
 
 
 
+
 /**
  *
  * @author luis lazaro 
@@ -55,19 +56,14 @@ public class FTPSourceUtils {
             ftpClient.connect(server,port);
             int replyCode = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(replyCode)) {
-                System.out.println("Connect failed");
-                //return;
+                log.error("Connect Failed");
             }
             success = ftpClient.login(user, password);
             if (!success) {
-                System.out.println("Could not login to the server");
-                //return;
+                log.error("Could not login to the server");
             }
-                       
-           
             } catch (IOException ex) {
-                System.out.println("Oops! Something wrong happened");
-                ex.printStackTrace();
+                log.error("Exception thrown in connectToserver", ex);
             }
        return success;
     }
