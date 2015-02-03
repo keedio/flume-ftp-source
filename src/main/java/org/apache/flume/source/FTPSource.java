@@ -53,7 +53,6 @@ import java.util.Iterator;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
-@SuppressWarnings("CallToPrintStackTrace")
 /*
  * @author Luis Lazaro // lalazaro@keedio.com
     KEEDIO
@@ -78,7 +77,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             sizeFileList = loadMap("hasmap.ser");
             eventCount = loadCount("eventCount.ser");
        } catch(IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            log.error("Exception thrown in configure ", e);
        }
     }
     
@@ -94,7 +93,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                   sizeFileList.size());
                   discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);           
                 } catch(IOException e){
-                    e.printStackTrace();
+                    log.error("Exception thrown in process ", e);
                 }
        
                 cleanList(sizeFileList);
@@ -108,7 +107,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             Thread.sleep(ftpSourceUtils.getRunDiscoverDelay());
             return PollableSource.Status.READY;     //source was successfully able to generate events
         } catch(InterruptedException inte){
-            inte.printStackTrace();
+            log.error("Exception thrown in process while puttin to sleep", inte);
             return PollableSource.Status.BACKOFF;   //inform the runner thread to back off for a bit		
         }
     }
@@ -133,7 +132,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     ftpSourceUtils.getFtpClient().disconnect();
                 }
             } catch (IOException ex) {
-                ex.printStackTrace();
+                log.error("Exception thrown stoping proccess", ex);
             }
             ftpSourceCounter.stop();
             log.info("FTP Source {} stopped. Metrics: {}", getName(), ftpSourceCounter);
@@ -172,12 +171,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             for (FTPFile aFile : subFiles) {
                 String currentFileName = aFile.getName();
                 if (currentFileName.equals(".") || currentFileName.equals("..")) {
-                    System.out.println("skip parent directory and directory itself");
+                    log.info("Skip parent directory and directory itself");
                     continue;
                 }
                 
                 if (aFile.isDirectory()) {
-                    System.out.println("[" + aFile.getName() + "]");
+                    log.info("[" + aFile.getName() + "]");
                     ftpClient.changeWorkingDirectory(parentDir);
                     discoverElements(ftpClient, dirToList, aFile.getName(), level + 1);
                     continue;
@@ -264,17 +263,17 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
    /*
     @void Serialize hashmap
     */
-    @SuppressWarnings("CallToPrintStackTrace")
+   
     public void saveMap(HashMap<String, Long> map){
         try { 
             FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(map);
-            out.close();
+            try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+                out.writeObject(map);
+            }
         } catch(FileNotFoundException e){
-            e.printStackTrace();
+            log.error("Error saving map File", e);
         } catch (IOException e){
-            e.printStackTrace();
+            log.error("Error saving map IO:", e);
         }
     }
     
@@ -284,9 +283,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     */
     public HashMap<String,Long> loadMap(String name) throws ClassNotFoundException, IOException{
         FileInputStream map = new FileInputStream(name);
-        ObjectInputStream in = new ObjectInputStream(map);
-        HashMap hasMap = (HashMap)in.readObject();
-        in.close();
+        HashMap hasMap;
+        try (ObjectInputStream in = new ObjectInputStream(map)) {
+            hasMap = (HashMap)in.readObject();
+        }
         return hasMap;
     } 
     
@@ -298,9 +298,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     public void saveCount(long count){
         try {
             FileOutputStream fileOut = new FileOutputStream("eventCount.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(count);
-            out.close();
+            try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+                out.writeObject(count);
+            }
         } catch(FileNotFoundException e){
             e.printStackTrace();
         } catch (IOException e){
@@ -314,9 +314,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     */
     public long loadCount(String name) throws ClassNotFoundException, IOException{
         FileInputStream number = new FileInputStream(name);
-        ObjectInputStream in = new ObjectInputStream(number);
-        long count = (long)in.readObject();
-        in.close();
+        long count;
+        try (ObjectInputStream in = new ObjectInputStream(number)) {
+            count = (long)in.readObject();
+        }
         return count;
     } 
     
@@ -352,10 +353,11 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 }
                 inputStream.close();
             } catch(IOException e ) {
-                e.printStackTrace();
+                log.error("on readStream", e);
             } 
     }
-
+    
+    
     public void setFtpSourceCounter(FtpSourceCounter ftpSourceCounter) {
         this.ftpSourceCounter = ftpSourceCounter;
     }
