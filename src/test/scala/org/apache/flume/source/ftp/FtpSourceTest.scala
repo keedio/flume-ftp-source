@@ -154,6 +154,10 @@ class FtpSourceTest extends EmbeddedFTPServer with TestFileUtils with LazyLoggin
     cleanup(tmpFile0)
   }
 
+  /**
+   * Creates N temporary non-empty files in the
+   * FTP root dir and process it using the FTP source.
+   */
   @Test
   def testProcessMultipleFiles1(): Unit ={
     val totFiles = 1000

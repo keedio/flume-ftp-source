@@ -60,11 +60,17 @@ trait TestFileUtils extends LazyLogging{
     randomStrings
   }
 
+  /**
+   * Deletes the given path object from file system.
+   * If <i>file</i> is a directory it's removed recursively
+   * @param file the path to remove
+   */
   def forceDelete(file:Path): Unit = {
     if (file.toFile.exists()) {
       if (file.toFile.isFile) {
         Files.delete(file)
       } else if (file.toFile.isDirectory){
+
         Files.walkFileTree(file,new SimpleFileVisitor[Path]{
           override def visitFile(f: Path, attrs: BasicFileAttributes): FileVisitResult = {
             Files.delete(f)
