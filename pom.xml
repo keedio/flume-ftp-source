@@ -13,6 +13,7 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <scala.version>2.10.4</scala.version>
+        <flume.version>1.5.2</flume.version>
     </properties>
 
     <build>
@@ -57,7 +58,7 @@
         <dependency>
             <groupId>org.apache.flume</groupId>
             <artifactId>flume-ng-core</artifactId>
-            <version>1.4.0</version>
+            <version>${flume.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
@@ -71,9 +72,9 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>6.1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
