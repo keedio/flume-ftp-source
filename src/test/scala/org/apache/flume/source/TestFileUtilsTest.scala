@@ -1,6 +1,6 @@
 package org.apache.flume.source
 
-import java.nio.file.{Path, Files}
+import java.nio.file.{FileSystems, Path, Files}
 import java.nio.file.attribute.PosixFilePermission
 
 import org.apache.flume.source.ftp.server.EmbeddedFTPServer
@@ -93,4 +93,34 @@ class TestFileUtilsTest extends TestFileUtils{
 
     }
   }
+
+  @Test
+  def testForceDeleteSymLink(): Unit ={
+
+    val tmpDir = createTmpDir
+    val tmpFile0 = createTmpFile(tmpDir)
+    appendASCIIGarbageToFile(tmpFile0)
+
+    assertTrue(tmpDir.toFile.exists())
+    assertTrue(tmpDir.toFile.isDirectory)
+
+    assertTrue(tmpFile0.toFile.exists)
+    assertTrue(tmpFile0.toFile.isFile)
+
+    val linkPath = tmpDir.toFile.getAbsolutePath
+    val linkName = "myTestLink"
+    var link = FileSystems.getDefault.getPath(linkPath, linkName)
+    link = Files.createSymbolicLink(link, tmpFile0)
+    assertTrue(link.toFile.exists)
+    assertTrue(link.toFile.isFile)
+
+    forceDelete(link)
+
+    assertFalse(link.toFile.exists)
+
+    forceDelete(tmpDir)
+
+    assertFalse(tmpDir.toFile.exists)
+  }
+
 }
