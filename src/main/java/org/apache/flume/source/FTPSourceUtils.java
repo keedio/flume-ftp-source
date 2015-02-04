@@ -32,8 +32,6 @@ public class FTPSourceUtils {
     private Integer port;
     private int runDiscoverDelay;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
-    private SourceCounter sourceCounter;
-    private FtpSourceCounter ftpSourceCounter;
     
     
     public FTPSourceUtils(Context context){
@@ -43,7 +41,6 @@ public class FTPSourceUtils {
         password = context.getString("password");
         runDiscoverDelay = context.getInteger("run.discover.delay");
         port = context.getInteger("port");
-        sourceCounter = new SourceCounter("native");
     }
     
     /*
@@ -103,19 +100,5 @@ public class FTPSourceUtils {
         return runDiscoverDelay;
     }
     
-    /*
-    @SourceCounter, native class flume from source metrics
-    */
-    public SourceCounter getSourceCounter(){
-        return sourceCounter;
-    }
-       
-    
-    /*
-    @FtpSourceCounter, custom class for specific flume FTP source
-    */
-    public FtpSourceCounter getFtpSourceCounter(){
-        return ftpSourceCounter;
-    }
 }
 
