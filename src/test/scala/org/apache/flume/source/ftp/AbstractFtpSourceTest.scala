@@ -14,21 +14,28 @@ import org.testng.annotations.{AfterMethod, BeforeMethod}
 trait AbstractFtpSourceTest {
   this: TestFileUtils =>
 
-  val port = 2121
   @Mock
   var mockContext: Context = _
   var ftpSource: FTPSource = _
   var ftpSourceCounter: FtpSourceCounter = _
 
+  def getPort: Int = 2121
+
+  def getUser: String = "flumetest"
+  def getPassword: String = "flumetest"
+  def getHost: String = "localhost"
+  def getWorkingDirectory: String = null
+
   @BeforeMethod
   def beforeMethod(): Unit = {
     MockitoAnnotations.initMocks(this)
 
-    when(mockContext.getString("name.server")).thenReturn("localhost")
-    when(mockContext.getString("user")).thenReturn("flumetest")
-    when(mockContext.getString("password")).thenReturn("flumetest")
+    when(mockContext.getString("name.server")).thenReturn(getHost)
+    when(mockContext.getString("user")).thenReturn(getUser)
+    when(mockContext.getString("password")).thenReturn(getPassword)
     when(mockContext.getInteger("run.discover.delay")).thenReturn(1000)
-    when(mockContext.getInteger("port")).thenReturn(port)
+    when(mockContext.getInteger("port")).thenReturn(getPort)
+    when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory)
 
     ftpSource = new FTPSource
     ftpSource.configure(mockContext)

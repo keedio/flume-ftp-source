@@ -1,6 +1,6 @@
 package org.apache.flume.source.ftp
 
-import java.nio.file.{Path, Files}
+import java.nio.file.{FileSystems, Path, Files}
 import java.nio.file.attribute.PosixFilePermission
 import javax.annotation.concurrent.NotThreadSafe
 
@@ -22,7 +22,7 @@ import scala.collection.JavaConversions._
  * Created by luca on 30/1/15.
  */
 @NotThreadSafe
-class FtpSourceTest extends EmbeddedFTPServer with TestFileUtils with LazyLogging with AbstractFtpSourceTest {
+class EmbeddedFtpSourceTest extends EmbeddedFTPServer with TestFileUtils with LazyLogging with AbstractFtpSourceTest {
 
   logger.info("homeDir: "+EmbeddedFTPServer.homeDirectory.toFile.getAbsolutePath)
 
@@ -160,7 +160,7 @@ class FtpSourceTest extends EmbeddedFTPServer with TestFileUtils with LazyLoggin
    */
   @Test
   def testProcessMultipleFiles1(): Unit ={
-    val totFiles = 1000
+    val totFiles = 100
 
     val files = for (i <- 1 to totFiles) yield {
       val tmpFile0 = createTmpFile(EmbeddedFTPServer.homeDirectory)
@@ -182,5 +182,6 @@ class FtpSourceTest extends EmbeddedFTPServer with TestFileUtils with LazyLoggin
 
     cleanup(files:_*)
   }
+
 
 }
