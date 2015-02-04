@@ -31,6 +31,7 @@ public class FTPSourceUtils {
     private String server,user,password;
     private Integer port;
     private int runDiscoverDelay;
+    private String workingDirectory;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
     
     
@@ -40,7 +41,9 @@ public class FTPSourceUtils {
         user = context.getString("user");
         password = context.getString("password");
         runDiscoverDelay = context.getInteger("run.discover.delay");
+        workingDirectory = context.getString("working.directory");
         port = context.getInteger("port");
+
     }
     
     /*
@@ -56,6 +59,10 @@ public class FTPSourceUtils {
                 log.error("Connect Failed");
             }
             success = ftpClient.login(user, password);
+            if (workingDirectory != null){
+                ftpClient.changeWorkingDirectory(workingDirectory);
+            }
+
             if (!success) {
                 log.error("Could not login to the server");
             }
