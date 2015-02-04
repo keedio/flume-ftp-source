@@ -2,6 +2,7 @@ package org.apache.flume.source.ftp
 
 import java.nio.file.{FileSystems, Path, Files}
 import java.nio.file.attribute.PosixFilePermission
+import java.util.concurrent.locks.Lock
 import javax.annotation.concurrent.NotThreadSafe
 
 import com.typesafe.scalalogging.slf4j.LazyLogging
@@ -140,7 +141,7 @@ class EmbeddedFtpSourceTest extends EmbeddedFTPServer with TestFileUtils with La
     val proc1 = ftpSource.process
     assertEquals(PollableSource.Status.READY, proc0)
     assertEquals(ftpSourceCounter.getFilesCount,1)
-    assertEquals(ftpSourceCounter.getFilesProcCount,1)
+    assertEquals(ftpSourceCounter.getFilesProcCount,2)
     assertEquals(ftpSourceCounter.getFilesProcCountError,0)
 
     val map = ftpSource.loadMap("hasmap.ser")

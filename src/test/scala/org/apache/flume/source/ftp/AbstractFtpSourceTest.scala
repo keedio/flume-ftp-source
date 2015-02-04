@@ -1,5 +1,5 @@
 package org.apache.flume.source.ftp
-import java.nio.file.Path
+import java.nio.file.{FileSystems, Files, Path}
 
 import org.apache.flume.{Event, Context}
 import org.apache.flume.channel.ChannelProcessor
@@ -30,10 +30,14 @@ trait AbstractFtpSourceTest {
   def beforeMethod(): Unit = {
     MockitoAnnotations.initMocks(this)
 
+    //forceDelete(FileSystems.getDefault.getPath("eventCount.ser"))
+    //forceDelete(FileSystems.getDefault.getPath("hasmap.ser"))
+
+
     when(mockContext.getString("name.server")).thenReturn(getHost)
     when(mockContext.getString("user")).thenReturn(getUser)
     when(mockContext.getString("password")).thenReturn(getPassword)
-    when(mockContext.getInteger("run.discover.delay")).thenReturn(1000)
+    when(mockContext.getInteger("run.discover.delay")).thenReturn(100)
     when(mockContext.getInteger("port")).thenReturn(getPort)
     when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory)
 
@@ -41,6 +45,8 @@ trait AbstractFtpSourceTest {
     ftpSource.configure(mockContext)
     ftpSourceCounter = new FtpSourceCounter("SOURCE.")
     ftpSource.setFtpSourceCounter(ftpSourceCounter)
+
+
 
     class DummyChannelProcessor extends ChannelProcessor(null) {
       override def processEvent(event: Event): Unit = {

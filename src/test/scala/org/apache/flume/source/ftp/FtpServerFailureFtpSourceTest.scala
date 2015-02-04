@@ -25,26 +25,21 @@ class FtpServerFailureFtpSourceTest extends EmbeddedFTPServer with TestFileUtils
   def testFtpFailure(): Unit ={
     class MyEventListener extends FTPSourceEventListener {
       override def fileStreamRetrieved(): Unit = {
-        Thread.sleep(1000)
-        EmbeddedFTPServer.ftpServer.suspend()
+        EmbeddedFTPServer.ftpServer.stop()
 
       }
     }
     ftpSource.setListener(new MyEventListener)
 
     val tmpFile0 = createTmpFile(EmbeddedFTPServer.homeDirectory)
-    appendASCIIGarbageToFile(tmpFile0,100000,100)
+    appendASCIIGarbageToFile(tmpFile0,1000,100)
 
 
     val proc0 = ftpSource.process
     assertEquals(PollableSource.Status.READY, proc0)
     assertEquals(ftpSourceCounter.getFilesCount,1)
     assertEquals(ftpSourceCounter.getFilesProcCount,0)
-    assertEquals(ftpSourceCounter.getFilesProcCountError,0)
-
-    val filename = "//"+tmpFile0.toFile.getName
-    val map = ftpSource.loadMap("hasmap.ser")
-    assertEquals(map.get(filename), 81L*100L)
+    assertEquals(ftpSourceCounter.getFilesProcCountError,1)
 
     cleanup(tmpFile0)
 
