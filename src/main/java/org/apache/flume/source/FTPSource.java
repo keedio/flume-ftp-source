@@ -186,62 +186,56 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     String fileName = aFile.getName();
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         ftpSourceCounter.incrementFilesCount();
+                        InputStream inputStream = null;
                         try {
-                            InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                            inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             listener.fileStreamRetrieved();
-                            boolean readed= readStream(inputStream, "discovered: " + fileName, 0 );
-                            if (!(readed)){
-                                continue;
-                            }
-                           
-                        }  catch (FTPConnectionClosedException e) {
-                            log.error("Ftp server closed connection ", e);
-                            continue;
-                        } finally {
-                            boolean success = ftpClient.completePendingCommand(); //mandatory
+                            readStream(inputStream, "discovered: " + fileName, 0);
+
+                            boolean success = inputStream != null && ftpClient.completePendingCommand(); //mandatory
                             if (success){
                                 existFileList.add(dirToList + "/" + aFile.getName());
                                 sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                 saveMap(sizeFileList);
                                 ftpSourceCounter.incrementFilesProcCount();
                             }  else {
-                                log.info("failed retrieving stream from file, will try in next poll :" + fileName);
-                                ftpSourceCounter.incrementFilesProcCountError();
+                                handleProcessError(fileName);
                             }
+                        }  catch (FTPConnectionClosedException e) {
+                            handleProcessError(fileName);
+                            log.error("Ftp server closed connection ", e);
+                            continue;
                         }
-                        
+
                         ftpClient.changeWorkingDirectory(dirToList);
                         continue;
-                        
-                        
+
+
                     } else  { //known file                        
                         long dif = aFile.getSize() - sizeFileList.get(dirToList + "/" + aFile.getName());
                         if (dif > 0 ){ //known and modified
                             long prevSize = sizeFileList.get(dirToList + "/" + aFile.getName());
+                            InputStream inputStream = null;
                             try {
-                            InputStream inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                            inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             listener.fileStreamRetrieved();
-                            boolean readed= readStream(inputStream, "modified: " + fileName, prevSize );
-                            if (!(readed)){
-                                continue;
-                            }
-                           
-                            }  catch (FTPConnectionClosedException e) {
-                                log.error("Ftp server closed connection ", e);
-                                continue;
-                            } finally {
-                                boolean success = ftpClient.completePendingCommand(); //mandatory
+                            readStream(inputStream, "modified: " + fileName, prevSize );
+
+                                boolean success = inputStream !=null && ftpClient.completePendingCommand(); //mandatory
                                 if (success){
                                     existFileList.add(dirToList + "/" + aFile.getName());
                                     sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                     saveMap(sizeFileList);
                                     ftpSourceCounter.incrementFilesProcCount();
                                 }  else {
-                                    log.info("failed retrieving stream from modified file, will try in next poll :" + fileName);
-                                    ftpSourceCounter.incrementFilesProcCountError();
+                                    handleProcessError(fileName);
                                 }
+                            }  catch (FTPConnectionClosedException e) {
+                                log.error("Ftp server closed connection ", e);
+                                handleProcessError(fileName);
+                                continue;
                             }
-                            
+
                             ftpClient.changeWorkingDirectory(dirToList);
                             continue;
                         } else
@@ -269,6 +263,11 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             } //fin de bucle
         } //el listado no es vacío
     }//fin de método
+
+    private void handleProcessError(String fileName) {
+        log.info("failed retrieving stream from modified file, will try in next poll :" + fileName);
+        ftpSourceCounter.incrementFilesProcCountError();
+    }
     
     
    /*
@@ -351,6 +350,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     */
     
     public boolean readStream(InputStream inputStream, String infoEvent, long position){
+        if (inputStream == null){
+            return false;
+        }
+
         boolean successRead = true;
         log.info( infoEvent  + " ," + sizeFileList.size());
         try {
