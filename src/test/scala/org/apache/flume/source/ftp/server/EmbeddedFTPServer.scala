@@ -3,13 +3,13 @@ package org.apache.flume.source.ftp.server
 import java.nio.file.Path
 
 import org.apache.flume.source.TestFileUtils
-import org.apache.ftpserver.FtpServerFactory
+import org.apache.ftpserver.{FtpServer, FtpServerFactory}
 import org.apache.ftpserver.filesystem.nativefs.impl.NativeFileSystemView
 import org.apache.ftpserver.ftplet.Authority
 import org.apache.ftpserver.listener.ListenerFactory
 import org.apache.ftpserver.usermanager.PropertiesUserManagerFactory
 import org.apache.ftpserver.usermanager.impl.{WritePermission, BaseUser}
-import org.testng.annotations.BeforeClass
+import org.testng.annotations.{AfterSuite, BeforeSuite, AfterClass, BeforeClass}
 
 /**
  * Created by luca on 30/1/15.
@@ -17,10 +17,11 @@ import org.testng.annotations.BeforeClass
 class EmbeddedFTPServer
 
 object EmbeddedFTPServer extends TestFileUtils{
-  val serverFactory = new FtpServerFactory
-  val listenerFactory = new ListenerFactory
 
   val homeDirectory: Path = createTmpDir
+
+  val serverFactory = new FtpServerFactory
+  val listenerFactory = new ListenerFactory
 
   val userManagerFactory=new PropertiesUserManagerFactory()
 
@@ -34,11 +35,19 @@ object EmbeddedFTPServer extends TestFileUtils{
   user.setHomeDirectory(homeDirectory.toFile.getAbsolutePath)
   userManager.save(user)
   serverFactory.setUserManager(userManager);
-  val ftpServer = serverFactory.createServer
+  val ftpServer:FtpServer = serverFactory.createServer
 
-  @BeforeClass
+
+  @BeforeSuite
   def initServer: Unit = {
     ftpServer.start()
+  }
+
+  @AfterSuite
+  def destroyServer: Unit ={
+    if (ftpServer != null && !ftpServer.isStopped){
+      ftpServer.stop()
+    }
   }
 
 }
