@@ -25,6 +25,7 @@ Connection properties for ftp server
 - agent.sources.ftp1.name.server = 127.0.0.1
 - agent.sources.ftp1.user = username
 - agent.sources.ftp1.password = password
+- agent.sources.ftp1.port = 21
 
 Discover delay, each configured milisecond directory will be explored
 - agent.sources.ftp1.run.discover.delay=10000
