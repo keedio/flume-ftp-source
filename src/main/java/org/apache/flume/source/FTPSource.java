@@ -97,7 +97,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     log.error("Exception thrown in process ", e);
                 }
        
-                cleanList(sizeFileList);
+               cleanList(sizeFileList); //clean list according existing actual files
                 existFileList.clear();
                 
                 saveMap(sizeFileList);
@@ -183,6 +183,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     continue;
                 } else if (aFile.isFile()) { //aFile is a regular file
                     ftpClient.changeWorkingDirectory(dirToList);
+                    existFileList.add(dirToList + "/" + aFile.getName());  //control of deleted files y server
                     String fileName = aFile.getName();
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         ftpSourceCounter.incrementFilesCount();
@@ -194,7 +195,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
                             boolean success = inputStream != null && ftpClient.completePendingCommand(); //mandatory
                             if (success){
-                                existFileList.add(dirToList + "/" + aFile.getName());
                                 sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                 saveMap(sizeFileList);
                                 ftpSourceCounter.incrementFilesProcCount();
@@ -223,7 +223,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
                                 boolean success = inputStream !=null && ftpClient.completePendingCommand(); //mandatory
                                 if (success){
-                                    existFileList.add(dirToList + "/" + aFile.getName());
                                     sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                     saveMap(sizeFileList);
                                     ftpSourceCounter.incrementFilesProcCount();
