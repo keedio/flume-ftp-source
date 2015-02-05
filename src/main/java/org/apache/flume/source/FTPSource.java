@@ -152,6 +152,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         event.setBody(message);
         event.setHeaders(headers);
         getChannelProcessor().processEvent(event);
+        eventCount++;
     }
     
     
