@@ -184,7 +184,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     continue;
                 } else if (aFile.isFile()) { //aFile is a regular file
                     ftpClient.changeWorkingDirectory(dirToList);
-                    existFileList.add(dirToList + "/" + aFile.getName());  //control of deleted files y server
+                    existFileList.add(dirToList + "/" + aFile.getName());  //control of deleted files in server
                     String fileName = aFile.getName();
                     if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
                         ftpSourceCounter.incrementFilesCount();
@@ -192,13 +192,13 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         try {
                             inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             listener.fileStreamRetrieved();
-                            readStream(inputStream, "discovered: " + fileName, 0);
-
+                            readStream(inputStream,  0);
                             boolean success = inputStream != null && ftpClient.completePendingCommand(); //mandatory
                             if (success){
                                 sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                 saveMap(sizeFileList);
                                 ftpSourceCounter.incrementFilesProcCount();
+                                log.info( "discovered: " + fileName  + " ," + sizeFileList.size());
                             }  else {
                                 handleProcessError(fileName);
                             }
@@ -220,13 +220,14 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                             try {
                             inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             listener.fileStreamRetrieved();
-                            readStream(inputStream, "modified: " + fileName, prevSize );
+                            readStream(inputStream, prevSize );
 
                                 boolean success = inputStream !=null && ftpClient.completePendingCommand(); //mandatory
                                 if (success){
                                     sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                     saveMap(sizeFileList);
                                     ftpSourceCounter.incrementFilesProcCount();
+                                    log.info(  "modified: " + fileName + " ," + sizeFileList.size());
                                 }  else {
                                     handleProcessError(fileName);
                                 }
@@ -349,13 +350,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     @return void
     */
     
-    public boolean readStream(InputStream inputStream, String infoEvent, long position){
+    public boolean readStream(InputStream inputStream,  long position){
         if (inputStream == null){
             return false;
         }
 
         boolean successRead = true;
-        log.info( infoEvent  + " ," + sizeFileList.size());
         try {
                 inputStream.skip(position);
                 byte[] bytesArray = new byte[CHUNKSIZE];
