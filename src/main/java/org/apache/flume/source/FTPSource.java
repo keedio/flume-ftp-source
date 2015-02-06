@@ -44,9 +44,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ByteArrayOutputStream;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+
 
 /*
  * @author Luis Lazaro // lalazaro@keedio.com
@@ -61,6 +65,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private FTPSourceUtils ftpSourceUtils;
     private long eventCount;
     private FtpSourceCounter ftpSourceCounter;
+    private Path pathTohasmap = Paths.get("hasmap.ser");
+    private Path pathToeventCount = Paths.get("eventCount.ser");
 
     public void setListener(FTPSourceEventListener listener) {
         this.listener = listener;
@@ -73,13 +79,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         ftpSourceUtils = new FTPSourceUtils(context);
         ftpSourceUtils.connectToserver();
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
-        
-       try {
-            sizeFileList = loadMap("hasmap.ser");
-            eventCount = loadCount("eventCount.ser");
-       } catch(IOException | ClassNotFoundException e) {
-            log.error("Exception thrown in configure ", e);
-       }
+        checkPreviousMap(pathTohasmap, pathToeventCount);
     }
     
     /*
@@ -377,6 +377,27 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     
     public void setFtpSourceCounter(FtpSourceCounter ftpSourceCounter) {
         this.ftpSourceCounter = ftpSourceCounter;
+    }
+    
+    
+    /*
+    @return void, check if there are previous files to load
+    */
+    public void checkPreviousMap(Path file1, Path file2){
+        try {
+            if (Files.exists(pathTohasmap)){  
+                sizeFileList = loadMap(pathTohasmap.toString());
+                log.info("Found previous map of files flumed");
+                if (Files.exists(pathToeventCount)) {
+                    eventCount = loadCount(pathToeventCount.toString());
+                     log.info("Found previous event count");
+                } else {
+                    log.info("No found previous even count");
+                }
+            } 
+       } catch(IOException | ClassNotFoundException e) {
+            log.info("Exception thrown in configure ", e);
+       }
     }
     
 } //end of class
