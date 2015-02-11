@@ -15,6 +15,8 @@ import org.apache.commons.net.ftp.FTPConnectionClosedException;
 
 import java.io.IOException;
 import org.apache.commons.net.ftp.FTPReply;
+import org.apache.flume.instrumentation.SourceCounter;
+
 
 
 
@@ -26,8 +28,10 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class FTPSourceUtils {
     private FTPClient ftpClient;
-    private String server,user,password,port;
+    private String server,user,password;
+    private Integer port;
     private int runDiscoverDelay;
+    private String workingDirectory;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
     
     
@@ -37,7 +41,9 @@ public class FTPSourceUtils {
         user = context.getString("user");
         password = context.getString("password");
         runDiscoverDelay = context.getInteger("run.discover.delay");
-        port = context.getString("port");
+        workingDirectory = context.getString("working.directory");
+        port = context.getInteger("port");
+
     }
     
     /*
@@ -47,22 +53,21 @@ public class FTPSourceUtils {
     public boolean connectToserver(){
         boolean success = false;
        try {
-            ftpClient.connect(server,21);
+            ftpClient.connect(server,port);
             int replyCode = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(replyCode)) {
-                System.out.println("Connect failed");
-                //return;
+                log.error("Connect Failed");
             }
             success = ftpClient.login(user, password);
-            if (!success) {
-                System.out.println("Could not login to the server");
-                //return;
+            if (workingDirectory != null){
+                ftpClient.changeWorkingDirectory(workingDirectory);
             }
-                       
-           
+
+            if (!success) {
+                log.error("Could not login to the server");
+            }
             } catch (IOException ex) {
-                System.out.println("Oops! Something wrong happened");
-                ex.printStackTrace();
+                log.error("Exception thrown in connectToserver", ex);
             }
        return success;
     }
@@ -101,6 +106,6 @@ public class FTPSourceUtils {
     public int getRunDiscoverDelay(){
         return runDiscoverDelay;
     }
-       
+    
 }
 
