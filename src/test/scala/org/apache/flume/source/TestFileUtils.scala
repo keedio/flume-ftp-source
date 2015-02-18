@@ -1,7 +1,7 @@
 package org.apache.flume.source
 
 import java.io.IOException
-import java.nio.charset.Charset
+import java.nio.charset.{StandardCharsets, Charset}
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
 
@@ -9,9 +9,6 @@ import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.commons.lang.RandomStringUtils
 import scala.collection.JavaConversions._
 import java.nio.file.StandardOpenOption._
-
-import scala.collection.immutable.IndexedSeq
-
 /**
  * Trait providing helper methods used is integration tests.
  *
@@ -56,15 +53,11 @@ trait TestFileUtils extends LazyLogging{
    */
   def appendASCIIGarbageToFile(file:Path, lines: Int = 100, lineLength: Int = 80): Seq[String] = {
 
-    val randomStrings: IndexedSeq[CharSequence] =
-      for(i <- 1 to lines) yield {
-        RandomStringUtils.randomAscii(lineLength).asInstanceOf[CharSequence]
-      }
+    val randomStrings = for(i <- 1 to lines) yield { RandomStringUtils.randomAscii(lineLength) }
 
+    Files.write(file,randomStrings,StandardCharsets.UTF_8, APPEND)
 
-    Files.write(file,randomStrings, APPEND)
-
-    randomStrings.asInstanceOf[Seq[String]]
+    randomStrings
   }
 
   /**
