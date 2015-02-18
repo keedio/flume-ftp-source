@@ -9,6 +9,9 @@ import com.typesafe.scalalogging.slf4j.LazyLogging
 import org.apache.commons.lang.RandomStringUtils
 import scala.collection.JavaConversions._
 import java.nio.file.StandardOpenOption._
+
+import scala.collection.immutable.IndexedSeq
+
 /**
  * Trait providing helper methods used is integration tests.
  *
@@ -53,11 +56,15 @@ trait TestFileUtils extends LazyLogging{
    */
   def appendASCIIGarbageToFile(file:Path, lines: Int = 100, lineLength: Int = 80): Seq[String] = {
 
-    val randomStrings = for(i <- 1 to lines) yield { RandomStringUtils.randomAscii(lineLength) }
+    val randomStrings: IndexedSeq[CharSequence] =
+      for(i <- 1 to lines) yield {
+        RandomStringUtils.randomAscii(lineLength).asInstanceOf[CharSequence]
+      }
 
-    Files.write(file,randomStrings,APPEND)
 
-    randomStrings
+    Files.write(file,randomStrings, APPEND)
+
+    randomStrings.asInstanceOf[Seq[String]]
   }
 
   /**
