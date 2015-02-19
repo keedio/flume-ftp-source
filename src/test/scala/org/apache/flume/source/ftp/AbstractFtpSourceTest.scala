@@ -68,7 +68,6 @@ trait AbstractFtpSourceTest {
   }
 
   def cleanup(files: Path*): Unit = {
-    logger.info(s"cleaning $files")
     files.foreach(forceDelete(_))
   }
 }

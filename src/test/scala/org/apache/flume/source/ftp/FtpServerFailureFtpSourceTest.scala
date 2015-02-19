@@ -25,6 +25,7 @@ class FtpServerFailureFtpSourceTest extends EmbeddedFTPServer with TestFileUtils
   def testFtpFailure(): Unit ={
     class MyEventListener extends FTPSourceEventListener {
       override def fileStreamRetrieved(): Unit = {
+        logger.info("Stopping server")
         EmbeddedFTPServer.ftpServer.stop()
         Thread.sleep(1000)
       }
@@ -33,7 +34,7 @@ class FtpServerFailureFtpSourceTest extends EmbeddedFTPServer with TestFileUtils
 
     val tmpFile0 = createTmpFile(EmbeddedFTPServer.homeDirectory)
     appendASCIIGarbageToFile(tmpFile0,1000,100)
-
+    assertEquals(ftpSourceCounter.getFilesCount,0)
 
     val proc0 = ftpSource.process
     assertEquals(PollableSource.Status.READY, proc0)
@@ -42,6 +43,5 @@ class FtpServerFailureFtpSourceTest extends EmbeddedFTPServer with TestFileUtils
     assertEquals(ftpSourceCounter.getFilesProcCountError,1)
 
     cleanup(tmpFile0)
-
   }
 }

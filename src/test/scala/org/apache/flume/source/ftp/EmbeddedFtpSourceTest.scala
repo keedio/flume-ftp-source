@@ -34,8 +34,6 @@ class EmbeddedFtpSourceTest extends EmbeddedFTPServer with TestFileUtils with La
     assertEquals(ftpSourceCounter.getFilesCount, 0)
     assertEquals(ftpSourceCounter.getFilesProcCount,0)
     assertEquals(ftpSourceCounter.getFilesProcCountError,0)
-
-
   }
 
   @Test
@@ -117,8 +115,6 @@ class EmbeddedFtpSourceTest extends EmbeddedFTPServer with TestFileUtils with La
 
     val map = ftpSource.loadMap("hasmap.ser")
 
-    logger.info(tmpFile0.toFile.getName)
-
     val filename = "//"+tmpFile0.toFile.getName
 
     assertEquals(map.get(filename), 81L*100L)
@@ -145,8 +141,6 @@ class EmbeddedFtpSourceTest extends EmbeddedFTPServer with TestFileUtils with La
     assertEquals(ftpSourceCounter.getFilesProcCountError,0)
 
     val map = ftpSource.loadMap("hasmap.ser")
-
-    logger.info(tmpFile0.toFile.getName)
 
     val filename = "//"+tmpFile0.toFile.getName
 
