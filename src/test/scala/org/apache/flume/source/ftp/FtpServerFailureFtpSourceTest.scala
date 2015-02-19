@@ -27,7 +27,6 @@ class FtpServerFailureFtpSourceTest extends EmbeddedFTPServer with TestFileUtils
       override def fileStreamRetrieved(): Unit = {
         logger.info("Stopping server")
         EmbeddedFTPServer.ftpServer.suspend()
-        Thread.sleep(2000)
       }
     }
     ftpSource.setListener(new MyEventListener)

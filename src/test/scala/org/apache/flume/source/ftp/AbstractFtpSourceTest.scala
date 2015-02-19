@@ -33,7 +33,7 @@ trait AbstractFtpSourceTest {
     //forceDelete(FileSystems.getDefault.getPath("eventCount.ser"))
     //forceDelete(FileSystems.getDefault.getPath("hasmap.ser"))
 
-
+    when(mockContext.getInteger("buffer.size")).thenReturn(0)
     when(mockContext.getString("name.server")).thenReturn(getHost)
     when(mockContext.getString("user")).thenReturn(getUser)
     when(mockContext.getString("password")).thenReturn(getPassword)
