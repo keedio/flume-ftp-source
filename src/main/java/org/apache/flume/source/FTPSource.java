@@ -67,6 +67,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private FtpSourceCounter ftpSourceCounter;
     private Path pathTohasmap = Paths.get("hasmap.ser");
     private Path pathToeventCount = Paths.get("eventCount.ser");
+    private Context context = new Context();
+    private int counter = 0;
 
     public void setListener(FTPSourceEventListener listener) {
         this.listener = listener;
@@ -90,15 +92,28 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
          
             try {
                   log.info("data processed: " + eventCount/1024  + " MBytes" + " actual dir " + 
-                   ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +
-                  sizeFileList.size());
-                  discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);           
+                   ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +   sizeFileList.size());
+                  discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
+                  cleanList(sizeFileList); //clean list according existing actual files
+                  existFileList.clear();
                 } catch(IOException e){
-                    log.error("Exception thrown in process ", e);
+                    log.error("Exception thrown in process, try to reconnect " + counter , e );
+                    ftpSourceUtils.connectToserver();
+                    checkPreviousMap(pathTohasmap, pathToeventCount);
+                    counter++;
+                    if (counter < 3){
+                        process();
+                    } else {
+                        log.error("Server connection closed without indication, reached limit reconnections " + counter);
+                        try {
+                            Thread.sleep(ftpSourceUtils.getRunDiscoverDelay() + 10000);
+                            counter = 0;
+                        } catch(InterruptedException ce){}
+                    }
                 }
        
-               cleanList(sizeFileList); //clean list according existing actual files
-                existFileList.clear();
+//               cleanList(sizeFileList); //clean list according existing actual files
+//                existFileList.clear();
                 
                 saveMap(sizeFileList);
                 saveCount(eventCount);
@@ -392,13 +407,13 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     eventCount = loadCount(pathToeventCount.toString());
                      log.info("Found previous event count");
                 } else {
-                    log.info("No found previous even count");
+                    log.info("Not found previous even count");
                 }
             } 
        } catch(IOException | ClassNotFoundException e) {
-            log.info("Exception thrown in configure ", e);
+            log.info("Exception thrown checking previous map ", e);
        }
     }
-    
+  
 } //end of class
 
