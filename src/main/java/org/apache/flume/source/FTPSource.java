@@ -98,9 +98,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                   existFileList.clear();
                 } catch(IOException e){
                     log.error("Exception thrown in process, try to reconnect " + counter , e );
-                    ftpSourceUtils.connectToserver();
+                    if (!ftpSourceUtils.connectToserver()) {
+                        counter++;
+                    } else {
                     checkPreviousMap(pathTohasmap, pathToeventCount);
-                    counter++;
+                    }
+                    
                     if (counter < 3){
                         process();
                     } else {
