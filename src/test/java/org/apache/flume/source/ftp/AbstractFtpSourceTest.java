@@ -12,12 +12,15 @@ import static org.mockito.Mockito.*;
 import org.apache.flume.source.FTPSource;
 import org.apache.flume.source.FtpSourceCounter;
 import org.apache.flume.source.TestFileUtils;
+import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
+import org.apache.log4j.Logger;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
-public abstract class AbstractFtpSourceTest {
+public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
+    private Logger logger = Logger.getLogger(getClass());
 
     @Mock
     Context mockContext = new Context();
@@ -44,6 +47,8 @@ public abstract class AbstractFtpSourceTest {
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
 
+        logger.info("Creating FTP source");
+
         ftpSource = new FTPSource();
         ftpSource.configure(mockContext);
         ftpSourceCounter = new FtpSourceCounter("SOURCE.");
@@ -63,6 +68,7 @@ public abstract class AbstractFtpSourceTest {
     @AfterMethod
     public void afterMethod() {
         try {
+            logger.info("Stopping FTP source");
             ftpSource.stop();
         } catch (Throwable e) {
             e.printStackTrace();
