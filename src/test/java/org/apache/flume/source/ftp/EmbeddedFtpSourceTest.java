@@ -239,7 +239,11 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
 
         String[] directories = EmbeddedFTPServer.homeDirectory.toFile().list();
 
-        logger.info("Found files: " + directories);
+        logger.info("Found files: ");
+
+        for (String directory : directories) {
+            logger.info(directory);
+        }
 
         Path tmpFile0 = null;
         try {
