@@ -12,6 +12,7 @@ import org.apache.flume.PollableSource;
 import org.apache.flume.source.TestFileUtils;
 import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
 
+import org.apache.flume.source.utils.FTPSourceEventListener;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ import org.testng.annotations.Test;
  * Basic integration tests for the Keedios' Flume FTP Source,
  *
  */
-
 @NotThreadSafe
 public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
 
@@ -47,7 +47,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
 
-    @Test
+    @Test(dependsOnMethods = "testProcessNoFile")
     public void testProcessNewFile() {
         Path tmpFile = null;
         try {
@@ -64,7 +64,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
 
-    @Test
+    @Test(dependsOnMethods = "testProcessNewFile")
     public void testProcessNewFileInNewFolder() {
         Path tmpDir = null;
         Path tmpFile = null;
@@ -89,7 +89,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
      * Creates a new empty file in the ftp root,
      * creates a new directory in the ftp root and an empty file inside of it.
      */
-    @Test
+    @Test(dependsOnMethods = "testProcessNewFileInNewFolder")
     public void testProcessMultipleFiles0() {
         Path tmpDir = null;
         Path tmpFile0 = null;
@@ -114,7 +114,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
     /**
      * Tries to access a file without permissions
      */
-    @Test
+    @Test(dependsOnMethods = "testProcessMultipleFiles0")
     public void testProcessNoPermission() {
         Path tmpFile0 = null;
         try {
@@ -135,7 +135,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
 
     }
 
-    @Test
+    @Test(dependsOnMethods = "testProcessNoPermission")
     public void testProcessNotEmptyFile() {
         Path tmpFile0 = null;
         try {
@@ -159,7 +159,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
 
-    @Test
+    @Test(dependsOnMethods = "testProcessNotEmptyFile")
     public void testProcessModifiedFile() {
         Path tmpFile0 = null;
         try {
@@ -196,7 +196,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
      * Creates N temporary non-empty files in the
      * FTP root dir and process it using the FTP source.
      */
-    @Test
+    @Test(dependsOnMethods = "testProcessModifiedFile")
     public void testProcessMultipleFiles1() {
         int totFiles = 100;
         List<Path> files = new LinkedList<>();
@@ -226,4 +226,34 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
 
+    @Test(dependsOnMethods = "testProcessMultipleFiles1")
+    public void testFtpFailure() {
+
+
+        class MyEventListener extends FTPSourceEventListener {
+            @Override
+            public void fileStreamRetrieved()  {
+                logger.info("Stopping server");
+                EmbeddedFTPServer.ftpServer.suspend();
+            }
+        }
+        ftpSource.setListener(new MyEventListener());
+
+        Path tmpFile0 = null;
+        try {
+            tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
+            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 0);
+
+            PollableSource.Status proc0 = ftpSource.process();
+            Assert.assertEquals(PollableSource.Status.READY, proc0);
+            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 1);
+        } catch (IOException|EventDeliveryException e) {
+            Assert.fail();
+        } finally {
+            cleanup(tmpFile0);
+        }
+    }
 }

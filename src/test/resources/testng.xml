@@ -6,7 +6,6 @@
             <class name="org.apache.flume.source.ftp.EmbeddedFtpSourceTest" />
             <!--class name="org.apache.flume.source.ftp.ExternalFtpSourceTests" /-->
             <class name="org.apache.flume.source.TestFileUtilsTest" />
-            <class name="org.apache.flume.source.ftp.FtpServerFailureFtpSourceTest"/>
         </classes>
     </test>
 </suite>
