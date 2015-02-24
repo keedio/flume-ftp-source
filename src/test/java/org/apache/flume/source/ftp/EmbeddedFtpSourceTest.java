@@ -228,8 +228,6 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
 
     @Test(dependsOnMethods = "testProcessMultipleFiles1")
     public void testFtpFailure() {
-
-
         class MyEventListener extends FTPSourceEventListener {
             @Override
             public void fileStreamRetrieved()  {
@@ -238,6 +236,10 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             }
         }
         ftpSource.setListener(new MyEventListener());
+
+        String[] directories = EmbeddedFTPServer.homeDirectory.toFile().list();
+
+        logger.info("Found files: " + directories);
 
         Path tmpFile0 = null;
         try {
