@@ -27,20 +27,6 @@ public class FtpServerFailureFtpSourceTest extends AbstractFtpSourceTest {
      * of a the FTP file stream but before starting reading from the stream itself.
      */
 
-    // FIXME: breaks Jenkins
-
-    @BeforeSuite
-    public void initServer() throws FtpException {
-        EmbeddedFTPServer.ftpServer.start();
-    }
-
-    @AfterSuite
-    public void destroyServer() {
-        if ( EmbeddedFTPServer.ftpServer != null && !EmbeddedFTPServer.ftpServer.isStopped() ){
-            EmbeddedFTPServer.ftpServer.stop();
-        }
-    }
-
     @Test
     public void testFtpFailure() {
 

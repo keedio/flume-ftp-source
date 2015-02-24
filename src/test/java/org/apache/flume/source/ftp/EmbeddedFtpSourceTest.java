@@ -34,19 +34,6 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         logger.info("homeDir: " + EmbeddedFTPServer.homeDirectory.toFile().getAbsolutePath());
     }
 
-    @BeforeSuite
-    public void initServer() throws FtpException {
-        EmbeddedFTPServer.ftpServer.start();
-    }
-
-    @AfterSuite
-    public void destroyServer() {
-        if ( EmbeddedFTPServer.ftpServer != null && !EmbeddedFTPServer.ftpServer.isStopped() ){
-            EmbeddedFTPServer.ftpServer.stop();
-        }
-    }
-
-
     @Test
     public void testProcessNoFile() {
         try {
