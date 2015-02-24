@@ -2,6 +2,7 @@ package org.apache.flume.source.ftp;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.flume.Event;
@@ -25,7 +26,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     @Mock
     Context mockContext = new Context();
 
-    FTPSource ftpSource = new FTPSource();
+    FTPSource ftpSource;
     FtpSourceCounter ftpSourceCounter;
 
     int getPort = 2121;
@@ -70,6 +71,9 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         try {
             logger.info("Stopping FTP source");
             ftpSource.stop();
+
+            Paths.get("hasmap.ser").toFile().delete();
+            Paths.get("eventCount.ser").toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }
