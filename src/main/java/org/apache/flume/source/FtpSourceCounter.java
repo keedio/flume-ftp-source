@@ -10,14 +10,17 @@ import org.apache.flume.instrumentation.MonitoredCounterGroup;
  * @author Luis Lázaro <lalazaro@keedio.com>
  */
 public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSourceCounterMBean {
-    private static long files_count, filesProcCount, filesProcCountError;
-    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError"};                 
+    private static long files_count, filesProcCount, filesProcCountError, eventCount, sendThroughput,start_time,last_sent;
+    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", "eventCount","start_time","last_sent"};                 
         
     public FtpSourceCounter(String name){
        super(MonitoredCounterGroup.Type.SOURCE, name, ATTRIBUTES);
        files_count = 0;
        filesProcCount = 0;
        filesProcCountError = 0;
+       eventCount = 0;
+       last_sent = 0;
+       setStartTime();
     }
             
     /*
@@ -68,4 +71,32 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
         filesProcCountError++;
     }
     
+    @Override
+    public void incrementEventCount(){
+        last_sent = System.currentTimeMillis();
+        eventCount++;
+    }
+    
+    @Override
+    public long getEventCount(){
+        return eventCount;
+    }
+    
+    @Override
+    public long getSendThroughput() {
+        return sendThroughput;
+    }
+    
+    @Override
+    public long setStartTime() {
+        start_time = System.currentTimeMillis();
+        return start_time;
+    }
+    
+    @Override
+    public void setSendThroughput(){
+        if (last_sent > start_time) {
+            sendThroughput = eventCount / ((last_sent - start_time) / 1000);
+        }
+    }
 }

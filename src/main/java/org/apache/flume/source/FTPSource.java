@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
+import org.apache.flume.ChannelException;
 
 
 import java.io.InputStream;
@@ -77,7 +78,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private FTPSourceEventListener listener = new FTPSourceEventListener();
 
     @Override
-    public void configure(Context context) {            
+    public void configure(Context context)  {            
         ftpSourceUtils = new FTPSourceUtils(context);
         ftpSourceUtils.connectToserver();
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
@@ -169,8 +170,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
         event.setBody(message);
         event.setHeaders(headers);
-        getChannelProcessor().processEvent(event);
-        eventCount++;
+        try {
+          getChannelProcessor().processEvent(event);
+        } catch(ChannelException e){}
+        ftpSourceCounter.incrementEventCount();
     }
     
     
@@ -417,6 +420,15 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             log.info("Exception thrown checking previous map ", e);
        }
     }
+    
+    /**
+ * JMX initialization:
+ * Create and register Anagrams MBean in Platform MBeanServer.
+ * Initialize thinking time and current anagram.
+ */
+private void initManagement() throws Exception {
+
+}
   
 } //end of class
 
