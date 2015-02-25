@@ -176,7 +176,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             PollableSource.Status proc1 = ftpSource.process();
             Assert.assertEquals(PollableSource.Status.READY, proc0);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 2);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
             Map<String,Long> map = ftpSource.loadMap("hasmap.ser");
