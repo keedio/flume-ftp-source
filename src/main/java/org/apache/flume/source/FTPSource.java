@@ -247,7 +247,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                 if (success){
                                     sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                     saveMap(sizeFileList);
-                                    ftpSourceCounter.incrementFilesProcCount();
+                                    //ftpSourceCounter.incrementFilesProcCount();
                                     log.info(  "modified: " + fileName + " ," + sizeFileList.size());
                                 }  else {
                                     handleProcessError(fileName);
