@@ -17,7 +17,5 @@ public interface FtpSourceCounterMBean {
     public void incrementFilesProcCountError();
     public long getEventCount();
     public void incrementEventCount();
-    public  long getSendThroughput();
-    public void setSendThroughput();
-    public long setStartTime();
+    public long getSendThroughput();
 }

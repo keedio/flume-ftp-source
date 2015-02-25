@@ -10,8 +10,8 @@ import org.apache.flume.instrumentation.MonitoredCounterGroup;
  * @author Luis Lázaro <lalazaro@keedio.com>
  */
 public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSourceCounterMBean {
-    private static long files_count, filesProcCount, filesProcCountError, eventCount, sendThroughput,start_time,last_sent;
-    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", "eventCount","start_time","last_sent"};                 
+    private  long files_count, filesProcCount, filesProcCountError, eventCount, sendThroughput,start_time,last_sent;
+    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", "eventCount","start_time","last_sent", "sendThroughput"};                 
         
     public FtpSourceCounter(String name){
        super(MonitoredCounterGroup.Type.SOURCE, name, ATTRIBUTES);
@@ -20,7 +20,8 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
        filesProcCountError = 0;
        eventCount = 0;
        last_sent = 0;
-       setStartTime();
+       start_time = System.currentTimeMillis();
+       sendThroughput = 0;
     }
             
     /*
@@ -75,6 +76,10 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
     public void incrementEventCount(){
         last_sent = System.currentTimeMillis();
         eventCount++;
+       if (last_sent - start_time >= 1000) {
+           long secondsElapsed = (last_sent - start_time) / 1000;
+           sendThroughput = eventCount / secondsElapsed;
+        }
     }
     
     @Override
@@ -85,18 +90,5 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
     @Override
     public long getSendThroughput() {
         return sendThroughput;
-    }
-    
-    @Override
-    public long setStartTime() {
-        start_time = System.currentTimeMillis();
-        return start_time;
-    }
-    
-    @Override
-    public void setSendThroughput(){
-        if (last_sent > start_time) {
-            sendThroughput = eventCount / ((last_sent - start_time) / 1000);
-        }
     }
 }
