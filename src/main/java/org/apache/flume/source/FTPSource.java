@@ -64,11 +64,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private HashSet<String> existFileList = new HashSet<>();
     private final int CHUNKSIZE = 1024;   //event size in bytes
     private FTPSourceUtils ftpSourceUtils;
-    private long eventCount;
     private FtpSourceCounter ftpSourceCounter;
     private Path pathTohasmap = Paths.get("hasmap.ser");
-    private Path pathToeventCount = Paths.get("eventCount.ser");
-    private Context context = new Context();
     private int counter = 0;
 
     public void setListener(FTPSourceEventListener listener) {
@@ -82,7 +79,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         ftpSourceUtils = new FTPSourceUtils(context);
         ftpSourceUtils.connectToserver();
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
-        checkPreviousMap(pathTohasmap, pathToeventCount);
+        checkPreviousMap(pathTohasmap);
     }
     
     /*
@@ -92,7 +89,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     public PollableSource.Status process() throws EventDeliveryException {
          
             try {
-                  log.info("data processed: " + eventCount/1024  + " MBytes" + " actual dir " + 
+                  log.info("data processed: " + ftpSourceCounter.getEventCount()/CHUNKSIZE  + " MBytes" + " actual dir " + 
                    ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +   sizeFileList.size());
                   discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
                   cleanList(sizeFileList); //clean list according existing actual files
@@ -102,7 +99,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     if (!ftpSourceUtils.connectToserver()) {
                         counter++;
                     } else {
-                    checkPreviousMap(pathTohasmap, pathToeventCount);
+                    checkPreviousMap(pathTohasmap);
                     }
                     
                     if (counter < 3){
@@ -120,7 +117,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 //                existFileList.clear();
                 
                 saveMap(sizeFileList);
-                saveCount(eventCount);
 
         try
         {  
@@ -145,7 +141,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     @Override
     public void stop() {
         saveMap(sizeFileList);
-        saveCount(eventCount);
             try {
                 if (ftpSourceUtils.getFtpClient().isConnected()) {
                     ftpSourceUtils.getFtpClient().logout();
@@ -322,37 +317,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         return hasMap;
     } 
     
-    
-    /*
-    @void serialize long count
-    */
-    @SuppressWarnings("CallToPrintStackTrace")
-    public void saveCount(long count){
-        try {
-            FileOutputStream fileOut = new FileOutputStream("eventCount.ser");
-            try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-                out.writeObject(count);
-            }
-        } catch(FileNotFoundException e){
-            e.printStackTrace();
-        } catch (IOException e){
-            e.printStackTrace();
-        } 
-    }
-    
- 
-    /*
-    @return long count
-    */
-    public long loadCount(String name) throws ClassNotFoundException, IOException{
-        FileInputStream number = new FileInputStream(name);
-        long count;
-        try (ObjectInputStream in = new ObjectInputStream(number)) {
-            count = (long)in.readObject();
-        }
-        return count;
-    } 
-    
    
    /*
     @void, delete file from hashmaps if deleted from ftp
@@ -404,31 +368,21 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     /*
     @return void, check if there are previous files to load
     */
-    public void checkPreviousMap(Path file1, Path file2){
+    public void checkPreviousMap(Path file1){
         try {
             if (Files.exists(pathTohasmap)){  
                 sizeFileList = loadMap(pathTohasmap.toString());
                 log.info("Found previous map of files flumed");
-                if (Files.exists(pathToeventCount)) {
-                    eventCount = loadCount(pathToeventCount.toString());
-                     log.info("Found previous event count");
-                } else {
-                    log.info("Not found previous even count");
-                }
-            } 
+            } else {
+                log.info("Not found preivous map of files flumed");
+            }
+                
        } catch(IOException | ClassNotFoundException e) {
             log.info("Exception thrown checking previous map ", e);
        }
     }
     
-    /**
- * JMX initialization:
- * Create and register Anagrams MBean in Platform MBeanServer.
- * Initialize thinking time and current anagram.
- */
-private void initManagement() throws Exception {
-
-}
+    
   
 } //end of class
 
