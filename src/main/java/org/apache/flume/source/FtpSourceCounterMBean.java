@@ -18,4 +18,6 @@ public interface FtpSourceCounterMBean {
     public long getEventCount();
     public void incrementEventCount();
     public long getSendThroughput();
+    public void incrementCountModProc();
+    public long getCountModProc();
 }

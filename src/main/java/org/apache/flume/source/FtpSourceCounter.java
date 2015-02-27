@@ -10,8 +10,18 @@ import org.apache.flume.instrumentation.MonitoredCounterGroup;
  * @author Luis Lázaro <lalazaro@keedio.com>
  */
 public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSourceCounterMBean {
-    private  long files_count, filesProcCount, filesProcCountError, eventCount, sendThroughput,start_time,last_sent;
-    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", "eventCount","start_time","last_sent", "sendThroughput"};                 
+    
+    private static  long files_count                        /* contador de ficheros descubiertos */
+                                , filesProcCount                   /* contador de ficheros descubiertos y procesados con éxito */
+                                , filesProcCountError            /* contador de ficheros descubiertos y procesados con error */
+                                , eventCount                        /* contador de eventos */
+                                , sendThroughput                /* tasa de eventos por segundo */
+                                , start_time                          /* milisegundos desde EPOC hasta creación de contador */
+                                , last_sent                            /* milisegundos desde EPOC hasta generación de último evento */
+                                , countModProc;                    /* contador de modificaciones que se han procesado con éxito */ 
+    
+    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", "eventCount","start_time","last_sent", 
+                                                                        "sendThroughput", "countModProc", "countModProcError"};                 
         
     public FtpSourceCounter(String name){
        super(MonitoredCounterGroup.Type.SOURCE, name, ATTRIBUTES);
@@ -22,6 +32,7 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
        last_sent = 0;
        start_time = System.currentTimeMillis();
        sendThroughput = 0;
+       countModProc = 0;
     }
             
     /*
@@ -91,4 +102,17 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
     public long getSendThroughput() {
         return sendThroughput;
     }
+    
+    @Override
+    public void incrementCountModProc(){
+        countModProc++;
+    }
+    
+    @Override
+    public long getCountModProc(){
+        return countModProc;
+    }
+    
+    
+    
 }
