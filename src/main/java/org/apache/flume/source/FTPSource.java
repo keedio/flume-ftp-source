@@ -347,11 +347,14 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 byte[] bytesArray = new byte[CHUNKSIZE];
                 int bytesRead = -1;
                 while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                    ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE);
-                    baostream.write(bytesArray, 0, bytesRead);
-                    byte[] data = baostream.toByteArray();
-                    processMessage(data);
+                    try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
+                        baostream.write(bytesArray, 0, bytesRead);
+                        byte[] data = baostream.toByteArray();
+                        processMessage(data);
+                        data = null;
+                    }
                 }
+               
                 inputStream.close();
             } catch(IOException e ) {
                 log.error("on readStream", e);
