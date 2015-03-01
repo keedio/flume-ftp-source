@@ -63,6 +63,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private HashMap<String, Long> sizeFileList = new HashMap<>();
     private HashSet<String> existFileList = new HashSet<>();
     private final int CHUNKSIZE = 1024;   //event size in bytes
+    private final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
     private FTPSourceUtils ftpSourceUtils;
     private FtpSourceCounter ftpSourceCounter;
     private Path pathTohasmap = Paths.get("hasmap.ser");
@@ -102,7 +103,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     checkPreviousMap(pathTohasmap);
                     }
                     
-                    if (counter < 3){
+                    if (counter < ATTEMPTS_MAX){
                         process();
                     } else {
                         log.error("Server connection closed without indication, reached limit reconnections " + counter);
