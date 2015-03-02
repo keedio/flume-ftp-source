@@ -119,13 +119,13 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
     
     @Override
     public long getMbProcessed(){
-        mbProcessed = getEventCount() /(1024 * 1024);
+        mbProcessed = getEventCount() /(1024);
         return mbProcessed;
     }
     
     @Override
     public long getKbProcessed(){
-        kbProcessed = getEventCount() /(1024);
+        kbProcessed = getEventCount();
         return kbProcessed;
     }
     
