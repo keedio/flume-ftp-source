@@ -233,7 +233,6 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             public void fileStreamRetrieved()  {
                 logger.info("Stopping server");
                 EmbeddedFTPServer.ftpServer.stop();
-                ftpSource.stop();
             }
         }
         ftpSource.setListener(new MyEventListener());
