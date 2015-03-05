@@ -225,8 +225,9 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             cleanup(files);
         }
     }
-
-    @Test(dependsOnMethods = "testProcessMultipleFiles1")
+    
+   // @Test(dependsOnMethods = "testProcessMultipleFiles1")
+    @Test
     public void testFtpFailure() {
         class MyEventListener extends FTPSourceEventListener {
             @Override
