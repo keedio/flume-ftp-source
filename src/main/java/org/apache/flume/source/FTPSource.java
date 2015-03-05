@@ -141,6 +141,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
     @Override
     public void stop() {
+        ftpSourceCounter.stop();
         saveMap(sizeFileList);
             try {
                 if (ftpSourceUtils.getFtpClient().isConnected()) {
@@ -150,7 +151,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             } catch (IOException ex) {
                 log.error("Exception thrown stoping proccess", ex);
             }
-            ftpSourceCounter.stop();
+            //ftpSourceCounter.stop();
             log.info("FTP Source {} stopped. Metrics: {}", getName(), ftpSourceCounter);
             super.stop();
     }
