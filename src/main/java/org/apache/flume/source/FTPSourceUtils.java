@@ -70,6 +70,7 @@ public class FTPSourceUtils {
             }
         } catch (IOException ex) {
             log.error("Exception thrown in connectToserver", ex);
+            connectToserver();
         }
 
         return success;
