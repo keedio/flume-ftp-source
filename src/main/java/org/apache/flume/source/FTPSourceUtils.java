@@ -49,9 +49,9 @@ public class FTPSourceUtils {
     @return boolean, Opens a Socket connected to a server
     and login to return True if successfully completed, false if not.
     */
-    public boolean connectToserver() {
+    public boolean connectToserver() throws IOException {
         boolean success = false;
-        try {
+//        try {
             ftpClient.connect(server, port);
             int replyCode = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(replyCode)) {
@@ -68,10 +68,10 @@ public class FTPSourceUtils {
             if (bufferSize != null) {
                 ftpClient.setBufferSize(bufferSize);
             }
-        } catch (IOException ex) {
-            log.error("Exception thrown in connectToserver", ex);
-            connectToserver();
-        }
+//        } catch (IOException ex) {
+//            log.error("Exception thrown in connectToserver", ex);
+//            connectToserver();
+//        }
 
         return success;
     }
