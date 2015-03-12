@@ -6,17 +6,16 @@
 package org.apache.flume.source;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.ftp.FTPFile;
 
 import org.apache.flume.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
 
 import java.io.IOException;
 
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.flume.instrumentation.SourceCounter;
 
 
 /**
@@ -32,9 +31,9 @@ public class FTPSourceUtils {
     private String workingDirectory;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
     private Integer bufferSize;
+    private boolean securityMode;
 
     public FTPSourceUtils(Context context) {
-        ftpClient = new FTPClient();
         bufferSize = context.getInteger("buffer.size");
         server = context.getString("name.server");
         user = context.getString("user");
@@ -42,37 +41,38 @@ public class FTPSourceUtils {
         runDiscoverDelay = context.getInteger("run.discover.delay");
         workingDirectory = context.getString("working.directory");
         port = context.getInteger("port");
-
+        securityMode = context.getBoolean("security.mode");
+        if (securityMode){
+            ftpClient = new FTPSClient("TLS") ;
+        } else {
+            ftpClient = new FTPClient();
+        }
     }
 
     /*
     @return boolean, Opens a Socket connected to a server
     and login to return True if successfully completed, false if not.
     */
-    public boolean connectToserver() throws IOException {
-        boolean success = false;
-//        try {
+    public boolean connectToserver() throws IOException { 
+           boolean success = false;
             ftpClient.connect(server, port);
             int replyCode = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(replyCode)) {
-                log.error("Connect Failed");
+                ftpClient.disconnect();
+                log.error("Connect Failed due to FTP server refused connection.");
+                success = false;
             }
-            success = ftpClient.login(user, password);
+            
+            if (!(ftpClient.login(user, password))) {
+                log.error("Could not login to the server");
+                success = false;
+            }
             if (workingDirectory != null) {
                 ftpClient.changeWorkingDirectory(workingDirectory);
-            }
-
-            if (!success) {
-                log.error("Could not login to the server");
             }
             if (bufferSize != null) {
                 ftpClient.setBufferSize(bufferSize);
             }
-//        } catch (IOException ex) {
-//            log.error("Exception thrown in connectToserver", ex);
-//            connectToserver();
-//        }
-
         return success;
     }
 
@@ -111,5 +111,6 @@ public class FTPSourceUtils {
         return runDiscoverDelay;
     }
 
+    
 }
 
