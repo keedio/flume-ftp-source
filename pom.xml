@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.flume.flume-ng-sources</groupId>
     <artifactId>flume-ftp-source</artifactId>
-    <version>001</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
     <name>flume-ftp-source</name>
 
