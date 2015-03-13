@@ -1,0 +1,11 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite name="flumeFTPsource" verbose="1" parallel="false">
+    <test name="FtpSource" preserve-order="true" parallel="false">
+        <classes>
+            <class name="org.apache.flume.source.ftp.EmbeddedFtpSourceTest" />
+            <!--class name="org.apache.flume.source.ftp.ExternalFtpSourceTests" /-->
+            <class name="org.apache.flume.source.TestFileUtilsTest" />
+        </classes>
+    </test>
+</suite>
