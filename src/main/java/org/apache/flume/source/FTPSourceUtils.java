@@ -47,12 +47,12 @@ public class FTPSourceUtils {
         validateCertificate = context.getBoolean("validate.certificate");
         if (securityMode){
             ftpClient = new FTPSClient("TLS") ;
+            FTPSClient ftpsClient = new FTPSClient(true);
+            ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
+            ftpClient = ftpsClient;
             if (validateCertificate){
-                FTPSClient ftpsClient = new FTPSClient(true);
-                ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
-               // ftpsClient.setTrustManager(TrustManagerUtils.getValidateServerCertificateTrustManager());
+                ftpsClient.setTrustManager(TrustManagerUtils.getValidateServerCertificateTrustManager());
                 ftpClient = ftpsClient;
-                
             }
         } else {
             ftpClient = new FTPClient();
