@@ -147,7 +147,7 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
-            HashMap<String, Long> map = ftpSource.loadMap("hasmap.ser");
+            Map<String, Long> map = ftpSource.loadMap("hasmap.ser");
 
             String filename = "//"+tmpFile0.toFile().getName();
 

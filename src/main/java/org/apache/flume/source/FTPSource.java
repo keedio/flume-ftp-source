@@ -60,10 +60,11 @@ import org.apache.commons.net.ftp.FTPFile;
 public class FTPSource extends AbstractSource implements Configurable, PollableSource {
     
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
-    private HashMap<String, Long> sizeFileList = new HashMap<>();
-    private HashSet<String> existFileList = new HashSet<>();
-    private final int CHUNKSIZE = 1024;   //event size in bytes
-    private final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
+    private Map<String, Long> sizeFileList = new HashMap<>();
+    private Set<String> existFileList = new HashSet<>();
+    private static final int CHUNKSIZE = 1024;   //event size in bytes
+    private static final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
+    private static final long EXTRA_DELAY = 10000;
     private FTPSourceUtils ftpSourceUtils;
     private FtpSourceCounter ftpSourceCounter;
     private Path pathTohasmap = Paths.get("hasmap.ser");
@@ -80,7 +81,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         ftpSourceUtils = new FTPSourceUtils(context);
         try {
         ftpSourceUtils.connectToserver();
-        } catch (IOException e){}
+        } catch (IOException e){
+        }
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
         checkPreviousMap(pathTohasmap);
     }
@@ -105,22 +107,22 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         } else {
                         checkPreviousMap(pathTohasmap);
                         }
-                    } catch (IOException c){ }
+                    } catch (IOException c){ 
+                    }
                     
                     if (counter < ATTEMPTS_MAX){
                         process();
                     } else {
                         log.error("Server connection closed without indication, reached limit reconnections " + counter);
                         try {
-                            Thread.sleep(ftpSourceUtils.getRunDiscoverDelay() + 10000);
+                            Thread.sleep(ftpSourceUtils.getRunDiscoverDelay() + EXTRA_DELAY);
                             counter = 0;
-                        } catch(InterruptedException ce){}
+                        } catch(InterruptedException ce){
+                        }
                     }
                 }
        
-//               cleanList(sizeFileList); //clean list according existing actual files
-//                existFileList.clear();
-                
+//              
                 saveMap(sizeFileList);
 
         try
@@ -172,7 +174,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         event.setHeaders(headers);
         try {
           getChannelProcessor().processEvent(event);
-        } catch(ChannelException e){}
+        } catch(ChannelException e){
+        }
         ftpSourceCounter.incrementEventCount();
     }
     
@@ -296,7 +299,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     @void Serialize hashmap
     */
    
-    public void saveMap(HashMap<String, Long> map){
+    public void saveMap(Map<String, Long> map){
         try { 
             FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
             try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
@@ -313,7 +316,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     /*
     @return HashMap<String,Long> objects
     */
-    public HashMap<String,Long> loadMap(String name) throws ClassNotFoundException, IOException{
+    public Map<String,Long> loadMap(String name) throws ClassNotFoundException, IOException{
         FileInputStream map = new FileInputStream(name);
         HashMap hasMap;
         try (ObjectInputStream in = new ObjectInputStream(map)) {
@@ -326,7 +329,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
    /*
     @void, delete file from hashmaps if deleted from ftp
     */
-    public void cleanList(HashMap<String,Long> map) {
+    public void cleanList(Map<String,Long> map) {
           for (Iterator<String> iter=map.keySet().iterator();iter.hasNext();) {
           final String fileName = iter.next();
           if (!(existFileList.contains(fileName))){ 
