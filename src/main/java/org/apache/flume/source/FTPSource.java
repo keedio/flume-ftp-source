@@ -82,6 +82,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         try {
         ftpSourceUtils.connectToserver();
         } catch (IOException e){
+            e.printStackTrace();
         }
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
         checkPreviousMap(pathTohasmap);
@@ -118,11 +119,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                             Thread.sleep(ftpSourceUtils.getRunDiscoverDelay() + EXTRA_DELAY);
                             counter = 0;
                         } catch(InterruptedException ce){
+                            ce.printStackTrace();
                         }
                     }
                 }
        
-//              
+              
                 saveMap(sizeFileList);
 
         try
@@ -175,6 +177,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         try {
           getChannelProcessor().processEvent(event);
         } catch(ChannelException e){
+            e.printStackTrace();
         }
         ftpSourceCounter.incrementEventCount();
     }
