@@ -381,8 +381,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     */
     public void checkPreviousMap(Path file1){
         try {
-            if (Files.exists(pathTohasmap)){  
-                sizeFileList = loadMap(pathTohasmap.toString());
+            if (Files.exists(file1)){  
+                sizeFileList = loadMap(file1.toString());
                 log.info("Found previous map of files flumed");
             } else {
                 log.info("Not found preivous map of files flumed");
