@@ -303,7 +303,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         try { 
             FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
             try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-                out.writeObject(map);
+                out.writeObject((HashMap)map);
             }
         } catch(FileNotFoundException e){
             log.error("Error saving map File", e);
