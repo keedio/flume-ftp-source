@@ -27,13 +27,13 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class FTPSourceUtils {
     private FTPClient ftpClient;
-    private String server, user, password;
+    private String server, user, password, protocolSec;
     private Integer port;
     private int runDiscoverDelay;
     private String workingDirectory;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
     private Integer bufferSize;
-    private boolean securityMode, validateCertificate;
+    private boolean securityMode, securityCert;
 
     public FTPSourceUtils(Context context) {
         bufferSize = context.getInteger("buffer.size");
@@ -44,17 +44,20 @@ public class FTPSourceUtils {
         workingDirectory = context.getString("working.directory");
         port = context.getInteger("port");
         securityMode = context.getBoolean("security.mode");
-        validateCertificate = context.getBoolean("validate.certificate");
+        securityCert = context.getBoolean("security.certificate");
+        protocolSec = context.getString("security.cipher");
+        
         if (securityMode){
-            ftpClient = new FTPSClient("TLS") ;
-            FTPSClient ftpsClient = new FTPSClient(true);
-            ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
-            ftpClient = ftpsClient;
-            if (validateCertificate){
+            FTPSClient ftpsClient = new FTPSClient(protocolSec);
+            if (securityCert){
                 ftpsClient.setTrustManager(TrustManagerUtils.getValidateServerCertificateTrustManager());
                 ftpClient = ftpsClient;
+            } else {
+                ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
+                ftpClient = ftpsClient;
             }
-        } else {
+            
+        } else {    //plain text
             ftpClient = new FTPClient();
         }
     }
