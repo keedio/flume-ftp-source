@@ -8,6 +8,7 @@ package org.apache.flume.source;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.util.TrustManagerUtils;
 
 import org.apache.flume.Context;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 
 import org.apache.commons.net.ftp.FTPReply;
+
 
 
 /**
@@ -31,7 +33,7 @@ public class FTPSourceUtils {
     private String workingDirectory;
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
     private Integer bufferSize;
-    private boolean securityMode;
+    private boolean securityMode, validateCertificate;
 
     public FTPSourceUtils(Context context) {
         bufferSize = context.getInteger("buffer.size");
@@ -42,8 +44,16 @@ public class FTPSourceUtils {
         workingDirectory = context.getString("working.directory");
         port = context.getInteger("port");
         securityMode = context.getBoolean("security.mode");
+        validateCertificate = context.getBoolean("validate.certificate");
         if (securityMode){
             ftpClient = new FTPSClient("TLS") ;
+            if (validateCertificate){
+                FTPSClient ftpsClient = new FTPSClient(true);
+                ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
+               // ftpsClient.setTrustManager(TrustManagerUtils.getValidateServerCertificateTrustManager());
+                ftpClient = ftpsClient;
+                
+            }
         } else {
             ftpClient = new FTPClient();
         }
