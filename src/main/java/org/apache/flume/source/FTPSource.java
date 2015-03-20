@@ -82,7 +82,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         try {
         ftpSourceUtils.connectToserver();
         } catch (IOException e){
-            log.error("IOException trying connecting from configure source", e);
+            log.error("IOException trying connect from configure source", e);
         }
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
         checkPreviousMap(pathTohasmap);
