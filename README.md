@@ -41,7 +41,7 @@ certificate sent by the server, validated or not.
 Specific Connection properties for SFTP server
 ----------------------------------------------
 Type of source for SFTP sources
-- agent.sources.sftp1.type = org.apache.flume.source.SFTPSource //SFTP
+- agent.sources.sftp1.type = org.apache.flume.source.SFTPSource 
 
 - agent.sources.sftp1.knownHosts = /home/username/.ssh/known_hosts
 - agent.sources.sftp1.port = 22
