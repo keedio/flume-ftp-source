@@ -1,7 +1,8 @@
 Flume-ftp-source
 ================
-A network server on port 21 (FTP) will be source of events for Apache-flume. Files in main directory's server will be discovered and proccessed. The source is implemented a pollable source in terms of Flume, as the polling time is configurable in the main configuration of flume's file.
+A network server on port 21 (FTP) will be source of events for Apache-flume. Files in main directory's server will be discovered and proccessed. The source is implemented as pollable source in terms of Flume, as the polling time is configurable in the main configuration of flume's file.
 In main flume's agent configuration file must be specified if security for FTP is required. There are two kind of protocol security supported by the plugin:
+
 -FTP: File Transfer Protocol, normal plain text (insecure) but available for common use. Port 21.
 -FTPS: File Transfer Protocol that uses AUTH SSL o TLS cryptographic protocols. Port 21.
 -SFTP: File Transfer Protocol that uses SSH V3, via a single channel (layer transport) and sending/receiving in binary. Port 22.(Recommended).
