@@ -32,11 +32,12 @@ Connection properties for ftp/ftps server
 Connection properties specific for ftps server
 - agent.sources.ftp1.security.enabled = true
 - agent.sources.ftp1.security.cipher = TLS
-- agent.sources.ftp1.security.certificate.enabled = true //if false the will accept any 
+- agent.sources.ftp1.security.certificate.enabled = true //if false the plugin will accept any 
 certificate sent by the server, validated or not.
 
 
 Connection properties specific for sftps server:
+
 Type of source for ftp/ftps sources
 - agent.sources.sftp1.type = org.apache.flume.source.SFTPSource //SFTP
 
