@@ -30,22 +30,23 @@ Connection properties for ftp/ftps server
 - agent.sources.ftp1.port = 21
 
 Specific connection properties for FTPS server
+----------------------------------------------
 - agent.sources.ftp1.security.enabled = true
 - agent.sources.ftp1.security.cipher = TLS
 - agent.sources.ftp1.security.certificate.enabled = true //if false the plugin will accept any 
 certificate sent by the server, validated or not.
 
 
-Specific Connection properties for SFTP server:
-
+Specific Connection properties for SFTP server
+----------------------------------------------
 Type of source for SFTP sources
 - agent.sources.sftp1.type = org.apache.flume.source.SFTPSource //SFTP
 
-- agent.sources.sftp1.knownHosts = /home/<username>/.ssh/known_hosts
+- agent.sources.sftp1.knownHosts = /home/username/.ssh/known_hosts
 - agent.sources.sftp1.port = 22
 
 Common configuration for FTP/FTPS/SFTP
----------------------------------------------------------------------
+--------------------------------------
 Discover delay, each configured milisecond directory will be explored
 - agent.sources.<agen.sources>.run.discover.delay=10000
 
