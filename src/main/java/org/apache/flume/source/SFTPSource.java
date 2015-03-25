@@ -47,8 +47,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.SftpException;
 
@@ -193,7 +191,7 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
             for (ChannelSftp.LsEntry aFile : subFiles) {
                 String currentFileName = aFile.getFilename();
                 if (currentFileName.equals(".") || currentFileName.equals("..")) {
-                    log.info("Skip parent directory and directory itself");
+                    //log.info("Skip parent directory and directory itself");
                     continue;
                 }
                 

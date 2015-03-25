@@ -17,7 +17,7 @@ import org.testng.annotations.BeforeSuite;
 import org.apache.ftpserver.ssl.SslConfigurationFactory;
 
 /**
- * Created by luca on 30/1/15.
+ * Created by luis lazaro marzo 2015
  */
 public class EmbeddedSecureFtpServer {
 
@@ -38,7 +38,7 @@ public class EmbeddedSecureFtpServer {
             userManagerFactory = new PropertiesUserManagerFactory();
             userManager = userManagerFactory.createUserManager();
             user = new BaseUser();
-            listenerFactory.setPort(2422);
+            listenerFactory.setPort(2222);
             ssl.setSslProtocol("TLS");
             ssl.setKeystoreFile(new File("src/test/resources/keystore.jks"));
             ssl.setKeystorePassword("password");
@@ -62,7 +62,7 @@ public class EmbeddedSecureFtpServer {
 
     @BeforeSuite
     public void initServer() throws FtpException {
-        ftpServer.start();
+       // ftpServer.start();
     }
 
     @AfterSuite

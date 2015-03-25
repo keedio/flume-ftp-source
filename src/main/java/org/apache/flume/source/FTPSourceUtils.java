@@ -43,8 +43,8 @@ public class FTPSourceUtils {
         runDiscoverDelay = context.getInteger("run.discover.delay");
         workingDirectory = context.getString("working.directory");
         port = context.getInteger("port");
-        securityMode = context.getBoolean("security.mode");
-        securityCert = context.getBoolean("security.certificate");
+        securityMode = context.getBoolean("security.enabled");
+        securityCert = context.getBoolean("security.certificate.enabled");
         protocolSec = context.getString("security.cipher");
         
         if (securityMode){
