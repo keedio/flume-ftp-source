@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public abstract class AbstractSecureFtpSourceTest extends EmbeddedSecureFtpServer{
     private Logger logger = Logger.getLogger(getClass());
@@ -40,7 +41,7 @@ public abstract class AbstractSecureFtpSourceTest extends EmbeddedSecureFtpServe
     boolean getSecurityCert = false;
     String getProtocolSec = "TLS";
 
-    @BeforeMethod
+    @Test(enabled=false) @BeforeMethod
     public void beforeMethod() {
         MockitoAnnotations.initMocks(this);
 
@@ -75,6 +76,7 @@ public abstract class AbstractSecureFtpSourceTest extends EmbeddedSecureFtpServe
     }
 
     @AfterMethod
+    @Test(enabled=false)
     public void afterMethod() {
         try {
             logger.info("Stopping FTP source");
@@ -86,7 +88,7 @@ public abstract class AbstractSecureFtpSourceTest extends EmbeddedSecureFtpServe
             e.printStackTrace();
         }
     }
-
+    @Test(enabled=false)
     public void cleanup(Path file) {
         try {
             TestFileUtils.forceDelete(file);
@@ -94,7 +96,7 @@ public abstract class AbstractSecureFtpSourceTest extends EmbeddedSecureFtpServe
             e.printStackTrace();
         }
     }
-
+    @Test(enabled=false)
     public void cleanup(List<Path> files) {
         for (Path f : files) {
             try {

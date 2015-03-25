@@ -22,6 +22,8 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+
+
 /**
  * Basic integration tests for the Keedios' Flume FTP Source,
  *
@@ -35,7 +37,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
         logger.info("homeDir: " + EmbeddedSecureFtpServer.homeDirectory.toFile().getAbsolutePath());
     }
 
-    @Test
+    @Test(enabled=false)
     public void testProcessNoFile() {
         try {
             PollableSource.Status proc = ftpSource.process();
@@ -48,7 +50,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
         }
     }
 
-    @Test(dependsOnMethods = "testProcessNoFile")
+    @Test(dependsOnMethods = "testProcessNoFile", enabled=false)
     public void testProcessNewFile() {
         Path tmpFile = null;
         try {
@@ -65,7 +67,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
         }
     }
 
-    @Test(dependsOnMethods = "testProcessNewFile")
+    @Test(dependsOnMethods = "testProcessNewFile", enabled=false)
     public void testProcessNewFileInNewFolder() {
         Path tmpDir = null;
         Path tmpFile = null;
@@ -90,7 +92,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
      * Creates a new empty file in the ftp root,
      * creates a new directory in the ftp root and an empty file inside of it.
      */
-    @Test(dependsOnMethods = "testProcessNewFileInNewFolder")
+    @Test(dependsOnMethods = "testProcessNewFileInNewFolder", enabled=false)
     public void testProcessMultipleFiles0() {
         Path tmpDir = null;
         Path tmpFile0 = null;
@@ -115,7 +117,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
     /**
      * Tries to access a file without permissions
      */
-    @Test(dependsOnMethods = "testProcessMultipleFiles0")
+    @Test(dependsOnMethods = "testProcessMultipleFiles0", enabled=false)
     public void testProcessNoPermission() {
         Path tmpFile0 = null;
         try {
@@ -136,7 +138,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
 
     }
 
-    @Test(dependsOnMethods = "testProcessNoPermission")
+    @Test(dependsOnMethods = "testProcessNoPermission", enabled=false)
     public void testProcessNotEmptyFile() {
         Path tmpFile0 = null;
         try {
@@ -160,7 +162,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
         }
     }
 
-    @Test(dependsOnMethods = "testProcessNotEmptyFile")
+    @Test(dependsOnMethods = "testProcessNotEmptyFile", enabled=false)
     public void testProcessModifiedFile() {
         Path tmpFile0 = null;
         try {
@@ -197,7 +199,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
      * Creates N temporary non-empty files in the
      * FTP root dir and process it using the FTP source.
      */
-    @Test(dependsOnMethods = "testProcessModifiedFile")
+    @Test(dependsOnMethods = "testProcessModifiedFile", enabled=false)
     public void testProcessMultipleFiles1() {
         int totFiles = 100;
         List<Path> files = new LinkedList<>();
@@ -227,8 +229,7 @@ public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
         }
     }
     
-   @Test(dependsOnMethods = "testProcessMultipleFiles1")
-    //@Test(enabled=false)
+   @Test(dependsOnMethods = "testProcessMultipleFiles1", enabled=false)
     public void testFtpFailure() {
         class MyEventListener extends FTPSourceEventListener {
             @Override
