@@ -10,7 +10,7 @@ In main flume's agent configuration file must be specified if security for FTP i
 Requirements
 ------------
 - Apache-flume mayor to 1.4.0.
-- commons-net-3.3.jar as external dependency.
+- commons-net-3.3.jar
 - jsch-0.1.52.jar 
 
 
