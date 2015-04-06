@@ -110,7 +110,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         }
                     } catch (IOException c){ 
                         log.error("IOexception", e);
-                        counter = ATTEMPTS_MAX;
                     }
                     
                     if (counter < ATTEMPTS_MAX){
