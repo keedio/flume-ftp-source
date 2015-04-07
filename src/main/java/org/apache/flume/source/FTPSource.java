@@ -79,11 +79,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     @Override
     public void configure(Context context)  {            
         ftpSourceUtils = new FTPSourceUtils(context);
-        try {
         ftpSourceUtils.connectToserver();
-        } catch (IOException e){
-            log.error("IOException trying connect from configure source", e);
-        }
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
         checkPreviousMap(pathTohasmap);
     }
@@ -102,16 +98,13 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                   existFileList.clear();
                 } catch(IOException e){
                     log.error("Exception thrown in process, try to reconnect " + counter , e );
-                    try {
-                        if (!ftpSourceUtils.connectToserver()) {
-                            counter++;
-                        } else {
+
+                    if (!ftpSourceUtils.connectToserver()) {
+                        counter++;
+                    } else {
                         checkPreviousMap(pathTohasmap);
-                        }
-                    } catch (IOException c){ 
-                        log.error("IOexception", e);
                     }
-                    
+
                     if (counter < ATTEMPTS_MAX){
                         process();
                     } else {
