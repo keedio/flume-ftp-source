@@ -257,7 +257,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             PollableSource.Status proc0 = ftpSource.process();
             Assert.assertEquals(PollableSource.Status.READY, proc0);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-            //Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 1);
         } catch (IOException|EventDeliveryException e) {
             Assert.fail();
