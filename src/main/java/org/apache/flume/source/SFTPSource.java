@@ -142,7 +142,6 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
             return PollableSource.Status.BACKOFF;   //inform the runner thread to back off for a bit		
         }
     }
-
  
     @Override
     public void start() {
