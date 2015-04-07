@@ -247,7 +247,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
                 }
             }
         }
-        ftpSource.getFTPClient().setFileType(FTP.BINARY_FILE_TYPE);
+        //ftpSource.getFTPClient().setFileType(FTP.BINARY_FILE_TYPE);
         ftpSource.setListener(new MyEventListener());
 
         String[] directories = EmbeddedFTPServer.homeDirectory.toFile().list();
@@ -261,7 +261,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         Path tmpFile0 = null;
         try {
             tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
-            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100000, 1000);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 0);
 
             PollableSource.Status proc0 = ftpSource.process();
