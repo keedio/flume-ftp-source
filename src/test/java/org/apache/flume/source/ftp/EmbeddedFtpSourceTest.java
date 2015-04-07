@@ -7,6 +7,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.flume.EventDeliveryException;
 import org.apache.flume.PollableSource;
 import org.apache.flume.source.TestFileUtils;
@@ -230,22 +231,23 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
     }
     
    @Test(dependsOnMethods = "testProcessMultipleFiles1")
-    public void testFtpFailure() {
+    public void testFtpFailure() throws IOException {
         class MyEventListener extends FTPSourceEventListener {
             @Override
             public void fileStreamRetrieved()  {
                 logger.info("Stopping server");
-                EmbeddedFTPServer.ftpServer.suspend();
+                EmbeddedFTPServer.ftpServer.stop();
 
-                while (!EmbeddedFTPServer.ftpServer.isSuspended()){
+                while (!EmbeddedFTPServer.ftpServer.isStopped()){
                     try {
-                        Thread.currentThread().wait(1000);
+                        Thread.currentThread().wait(100);
                     } catch (InterruptedException e) {
                         logger.error("",e);
                     }
                 }
             }
         }
+        //ftpSource.getFTPClient().setFileType(FTP.BINARY_FILE_TYPE);
         ftpSource.setListener(new MyEventListener());
 
         String[] directories = EmbeddedFTPServer.homeDirectory.toFile().list();
@@ -259,7 +261,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         Path tmpFile0 = null;
         try {
             tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
-            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100000, 1000);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 0);
 
             PollableSource.Status proc0 = ftpSource.process();
