@@ -65,7 +65,9 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
     private static final long EXTRA_DELAY = 10000;
     private SFTPSourceUtils sftpSourceUtils;
     private FtpSourceCounter ftpSourceCounter;
-    private Path pathTohasmap = Paths.get("hasmap.ser");
+    private Path pathTohasmap = Paths.get("");
+    private Path hasmap = Paths.get("");
+    private Path absolutePath = Paths.get("");
     private int counter = 0;
 
     public void setListener(FTPSourceEventListener listener) {
@@ -77,8 +79,17 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
     @Override
     public void configure(Context context)  {            
         sftpSourceUtils = new SFTPSourceUtils(context);
+        ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());             
+        pathTohasmap = Paths.get(sftpSourceUtils.getFolder());
+        if (checkFolder()){
+            hasmap = Paths.get(sftpSourceUtils.getFileName());
+            absolutePath = Paths.get(pathTohasmap.toString(), hasmap.toString());
+        } else {
+            log.error("Folder " + pathTohasmap.toString() + " not exists");
+            System.exit(1);
+        }
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
-        checkPreviousMap(pathTohasmap);
+        checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
     }
     
     /*
@@ -102,7 +113,7 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
                         if (!sftpSourceUtils.getSFtpClient().isConnected()) {
                             counter++;
                         } else {
-                        checkPreviousMap(pathTohasmap);
+                        checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
                         }
                     
                     
@@ -292,7 +303,7 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
    
     public void saveMap(Map<String, Long> map){
         try { 
-            FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
+            FileOutputStream fileOut = new FileOutputStream(absolutePath.toString());
             try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
                 out.writeObject((HashMap)map);
             }
@@ -384,7 +395,16 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
        }
     }
     
-    
+    /*
+    return boolean, folder exists
+    */
+    public boolean checkFolder(){
+        boolean folderExits = false;
+         if (Files.exists(pathTohasmap)){
+             folderExits = true;
+         }
+         return folderExits;
+    }
   
 } //end of class
 

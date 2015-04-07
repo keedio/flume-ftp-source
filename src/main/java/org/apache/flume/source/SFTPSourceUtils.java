@@ -25,7 +25,7 @@ public class SFTPSourceUtils {
     private Session sessionSftp;
     private Channel channel;
     private ChannelSftp sftpClient;
-    private String server, user, password,knownHosts;
+    private String server, user, password,knownHosts, folder, fileName;
     private Integer port;
     private int runDiscoverDelay;
     private String workingDirectory;
@@ -41,6 +41,8 @@ public class SFTPSourceUtils {
         workingDirectory = context.getString("working.directory");
         port = context.getInteger("port");
         knownHosts = context.getString("knownHosts");
+        folder = context.getString("folder");
+        fileName = context.getString("file.name");
         jsch = new JSch();
         try {
             jsch.setKnownHosts(knownHosts);
@@ -86,6 +88,18 @@ public class SFTPSourceUtils {
         return runDiscoverDelay;
     }
 
+    /*
+    @return folder
+    */
+    public String getFolder(){
+        return folder;
+    }
     
+    /*
+    return fileName
+    */
+    public String getFileName(){
+        return fileName;
+    }
 }
 
