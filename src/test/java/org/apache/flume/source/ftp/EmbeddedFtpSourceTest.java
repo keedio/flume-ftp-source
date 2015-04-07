@@ -235,11 +235,11 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             @Override
             public void fileStreamRetrieved()  {
                 logger.info("Stopping server");
-                EmbeddedFTPServer.ftpServer.stop();
+                EmbeddedFTPServer.ftpServer.suspend();
 
-                while (!EmbeddedFTPServer.ftpServer.isStopped()){
+                while (!EmbeddedFTPServer.ftpServer.isSuspended()){
                     try {
-                        Thread.currentThread().wait(100);
+                        Thread.currentThread().wait(1000);
                     } catch (InterruptedException e) {
                         logger.error("",e);
                     }
