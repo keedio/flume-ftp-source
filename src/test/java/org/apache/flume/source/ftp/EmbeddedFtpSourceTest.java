@@ -138,62 +138,62 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
     }
 
     
-//    @Test(dependsOnMethods = "testProcessNoPermission")
-//    public void testProcessNotEmptyFile() {
-//        Path tmpFile0 = null;
-//        try {
-//            tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
-//            TestFileUtils.appendASCIIGarbageToFile(tmpFile0);
-//            PollableSource.Status proc = ftpSource.process();
-//            Assert.assertEquals(PollableSource.Status.READY, proc);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
-//
-//            Map<String, Long> map = ftpSource.loadMap(this.getFileName);
-//
-//            String filename = "//"+tmpFile0.toFile().getName();
-//
-//            Assert.assertEquals( Long.valueOf(map.get(filename)), Long.valueOf(81L * 100L));
-//        } catch (IOException|ClassNotFoundException|EventDeliveryException e) {
-//            Assert.fail();
-//        } finally {
-//            cleanup(tmpFile0);
-//        }
-//    }
+    @Test(dependsOnMethods = "testProcessNoPermission")
+    public void testProcessNotEmptyFile() {
+        Path tmpFile0 = null;
+        try {
+            tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0);
+            PollableSource.Status proc = ftpSource.process();
+            Assert.assertEquals(PollableSource.Status.READY, proc);
+            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
-//    @Test(dependsOnMethods = "testProcessNotEmptyFile")
-//    public void testProcessModifiedFile() {
-//        Path tmpFile0 = null;
-//        try {
-//            tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
-//            TestFileUtils.appendASCIIGarbageToFile(tmpFile0);
-//            PollableSource.Status proc0 = ftpSource.process();
-//            Assert.assertEquals(PollableSource.Status.READY, proc0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
-//
-//            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
-//
-//            PollableSource.Status proc1 = ftpSource.process();
-//            Assert.assertEquals(PollableSource.Status.READY, proc0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
-//
-//            Map<String,Long> map = ftpSource.loadMap(getFileName);
-//
-//            String filename = "//"+tmpFile0.toFile().getName();
-//
-//            Assert.assertEquals(Long.valueOf(map.get(filename)), Long.valueOf(81L * 100L + 1000L * 101L));
-//
-//        } catch (IOException|EventDeliveryException|ClassNotFoundException e) {
-//            Assert.fail();
-//        } finally {
-//            cleanup(tmpFile0);
-//        }
-//    }
+            Map<String, Long> map = ftpSource.loadMap(this.getAbsoutePath);
+
+            String filename = "//"+tmpFile0.toFile().getName();
+
+            Assert.assertEquals( Long.valueOf(map.get(filename)), Long.valueOf(81L * 100L));
+        } catch (IOException|ClassNotFoundException|EventDeliveryException e) {
+            Assert.fail();
+        } finally {
+            cleanup(tmpFile0);
+        }
+    }
+
+    @Test(dependsOnMethods = "testProcessNotEmptyFile")
+    public void testProcessModifiedFile() {
+        Path tmpFile0 = null;
+        try {
+            tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0);
+            PollableSource.Status proc0 = ftpSource.process();
+            Assert.assertEquals(PollableSource.Status.READY, proc0);
+            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
+
+            PollableSource.Status proc1 = ftpSource.process();
+            Assert.assertEquals(PollableSource.Status.READY, proc0);
+            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
+            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+
+            Map<String,Long> map = ftpSource.loadMap(this.getAbsoutePath);
+
+            String filename = "//"+tmpFile0.toFile().getName();
+
+            Assert.assertEquals(Long.valueOf(map.get(filename)), Long.valueOf(81L * 100L + 1000L * 101L));
+
+        } catch (IOException|EventDeliveryException|ClassNotFoundException e) {
+            Assert.fail();
+        } finally {
+            cleanup(tmpFile0);
+        }
+    }
 
     /**
      * Creates N temporary non-empty files in the
@@ -230,7 +230,6 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
     }
     
    @Test(dependsOnMethods = "testProcessMultipleFiles1")
-    //@Test(enabled=false)
     public void testFtpFailure() {
         class MyEventListener extends FTPSourceEventListener {
             @Override
