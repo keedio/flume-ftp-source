@@ -68,8 +68,9 @@ public class FTPSourceUtils {
     @return boolean, Opens a Socket connected to a server
     and login to return True if successfully completed, false if not.
     */
-    public boolean connectToserver() throws IOException { 
-           boolean success = false;
+    public boolean connectToserver() {
+        boolean success = true;
+        try {
             ftpClient.connect(server, port);
             int replyCode = ftpClient.getReplyCode();
             if (!FTPReply.isPositiveCompletion(replyCode)) {
@@ -77,7 +78,7 @@ public class FTPSourceUtils {
                 log.error("Connect Failed due to FTP server refused connection.");
                 success = false;
             }
-            
+
             if (!(ftpClient.login(user, password))) {
                 log.error("Could not login to the server");
                 success = false;
@@ -88,6 +89,10 @@ public class FTPSourceUtils {
             if (bufferSize != null) {
                 ftpClient.setBufferSize(bufferSize);
             }
+        } catch (IOException e) {
+            success = false;
+            log.error("IOException trying connect from configure source", e);
+        }
         return success;
     }
 

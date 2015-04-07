@@ -89,12 +89,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             log.error("Folder " + pathTohasmap.toString() + " not exists");
             System.exit(1);
         }
-        
-        try {
         ftpSourceUtils.connectToserver();
-        } catch (IOException e){
-            log.error("IOException trying connect from configure source", e);
-        }
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
         checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
     }
@@ -113,15 +108,12 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                   existFileList.clear();
                 } catch(IOException e){
                     log.error("Exception thrown in process, try to reconnect " + counter , e );
-                    try {
+                    
                         if (!ftpSourceUtils.connectToserver()) {
                             counter++;
                         } else {
                         checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
                         }
-                    } catch (IOException c){ 
-                        log.error("IOexception", e);
-                    }
                     
                     if (counter < ATTEMPTS_MAX){
                         process();
