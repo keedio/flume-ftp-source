@@ -67,7 +67,9 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private static final long EXTRA_DELAY = 10000;
     private FTPSourceUtils ftpSourceUtils;
     private FtpSourceCounter ftpSourceCounter;
-    private Path pathTohasmap = Paths.get("hasmap.ser");
+    private Path pathTohasmap = Paths.get("");
+    private Path hasmap = Paths.get("");
+    private Path absolutePath = Paths.get("");
     private int counter = 0;
 
     public void setListener(FTPSourceEventListener listener) {
@@ -79,13 +81,22 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     @Override
     public void configure(Context context)  {            
         ftpSourceUtils = new FTPSourceUtils(context);
+        pathTohasmap = Paths.get(ftpSourceUtils.getFolder());
+        if (checkFolder()){
+            hasmap = Paths.get(ftpSourceUtils.getFileName());
+            absolutePath = Paths.get(pathTohasmap.toString(), hasmap.toString());
+        } else {
+            log.error("Folder " + pathTohasmap.toString() + " not exists");
+            System.exit(1);
+        }
+        
         try {
         ftpSourceUtils.connectToserver();
         } catch (IOException e){
             log.error("IOException trying connect from configure source", e);
         }
         ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
-        checkPreviousMap(pathTohasmap);
+        checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
     }
     
     /*
@@ -96,7 +107,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
          
             try {
                   log.info("data processed: " + ftpSourceCounter.getEventCount()/CHUNKSIZE  + " MBytes" + " actual dir " + 
-                   ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +   sizeFileList.size());
+                  ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +   sizeFileList.size());
                   discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
                   cleanList(sizeFileList); //clean list according existing actual files
                   existFileList.clear();
@@ -106,7 +117,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         if (!ftpSourceUtils.connectToserver()) {
                             counter++;
                         } else {
-                        checkPreviousMap(pathTohasmap);
+                        checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
                         }
                     } catch (IOException c){ 
                         log.error("IOexception", e);
@@ -305,7 +316,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
    
     public void saveMap(Map<String, Long> map){
         try { 
-            FileOutputStream fileOut = new FileOutputStream("hasmap.ser");
+            FileOutputStream fileOut = new FileOutputStream(absolutePath.toString());
             try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
                 out.writeObject((HashMap)map);
             }
@@ -390,6 +401,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 log.info("Found previous map of files flumed");
             } else {
                 log.info("Not found preivous map of files flumed");
+                
             }
                 
        } catch(IOException | ClassNotFoundException e) {
@@ -397,6 +409,16 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
        }
     }
     
+    /*
+    return boolean, folder exists
+    */
+    public boolean checkFolder(){
+        boolean folderExits = false;
+         if (Files.exists(pathTohasmap)){
+             folderExits = true;
+         }
+         return folderExits;
+    }
     
   
 } //end of class

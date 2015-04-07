@@ -27,7 +27,7 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class FTPSourceUtils {
     private FTPClient ftpClient;
-    private String server, user, password, protocolSec;
+    private String server, user, password, protocolSec, folder, fileName;
     private Integer port;
     private int runDiscoverDelay;
     private String workingDirectory;
@@ -46,6 +46,8 @@ public class FTPSourceUtils {
         securityMode = context.getBoolean("security.enabled");
         securityCert = context.getBoolean("security.certificate.enabled");
         protocolSec = context.getString("security.cipher");
+        folder = context.getString("folder");
+        fileName = context.getString("file.name");
         
         if (securityMode){
             FTPSClient ftpsClient = new FTPSClient(protocolSec);
@@ -124,6 +126,18 @@ public class FTPSourceUtils {
         return runDiscoverDelay;
     }
 
+    /*
+    @return folder
+    */
+    public String getFolder(){
+        return folder;
+    }
     
+    /*
+    return fileName
+    */
+    public String getFileName(){
+        return fileName;
+    }
 }
 
