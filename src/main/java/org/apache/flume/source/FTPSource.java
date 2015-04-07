@@ -411,6 +411,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
          }
          return folderExits;
     }
+
+    public FTPClient getFTPClient(){
+        return ftpSourceUtils.getFtpClient();
+    }
     
   
 } //end of class
