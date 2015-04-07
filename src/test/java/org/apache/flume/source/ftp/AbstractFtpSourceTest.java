@@ -35,6 +35,8 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getPassword = "flumetest";
     String getHost = "localhost";
     String getWorkingDirectory = null;
+    String getFileName = "hasmap.ser";
+    String getFolder = "/var/tmp";
 
     @BeforeMethod
     public void beforeMethod() {
@@ -47,6 +49,8 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
+        when(mockContext.getString("file.name")).thenReturn(getFileName);
+        when(mockContext.getString("folder")).thenReturn(getFolder);
 
         logger.info("Creating FTP source");
 
@@ -72,8 +76,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
             logger.info("Stopping FTP source");
             ftpSource.stop();
 
-            Paths.get("hasmap.ser").toFile().delete();
-            Paths.get("eventCount.ser").toFile().delete();
+            Paths.get(getFileName).toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }

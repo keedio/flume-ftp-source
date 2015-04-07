@@ -7,11 +7,13 @@ In main flume's agent configuration file must be specified if security for FTP i
 - FTPS: File Transfer Protocol that uses AUTH SSL o TLS cryptographic protocols. Port 21.
 - SFTP: File Transfer Protocol that uses SSH V3, via a single channel (layer transport) and sending/receiving in binary. Port 22.(Recommended).
 
+Files proccesed will be "saved" in an external file.
+
 Requirements
 ------------
 - Apache-flume mayor to 1.4.0.
-- commons-net-3.3.jar
-- jsch-0.1.52.jar 
+- commons-net-3.3.jar (ftpClient and ftpsClient)
+- jsch-0.1.52.jar (channelSftp)
 
 
 Configuration of Flume-ftp-source.conf for FTP(plain) and FTPS (secure)
@@ -22,16 +24,15 @@ Active list for ftp/ftps
 - agent.channels = c1 
 
 Type of source for ftp/ftps sources
-- agent.sources.ftp1.type = org.apache.flume.source.FTPSource //common for FTP and FTPS
+- agent.sources.ftp1.type = org.apache.flume.source.FTPSource 
 
 Connection properties for ftp/ftps server
 - agent.sources.ftp1.name.server = 127.0.0.1
 - agent.sources.ftp1.user = username
 - agent.sources.ftp1.password = password
 - agent.sources.ftp1.port = 21
-
-Specific connection properties for FTPS server
-----------------------------------------------
+- agent.sources.ftp1.folder = /var/flume
+- agent.sources.ftp1.file.name = status-ftp1-file.ser
 - agent.sources.ftp1.security.enabled = true
 - agent.sources.ftp1.security.cipher = TLS
 - agent.sources.ftp1.security.certificate.enabled = true //if false the plugin will accept any 
