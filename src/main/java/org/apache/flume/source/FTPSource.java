@@ -297,7 +297,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     }//fin de método
 
     private void handleProcessError(String fileName) {
-        log.info("failed retrieving stream form file, will try in next poll :" + fileName);
+        log.info("failed retrieving stream from file, will try in next poll :" + fileName);
         ftpSourceCounter.incrementFilesProcCountError();
     }
     
