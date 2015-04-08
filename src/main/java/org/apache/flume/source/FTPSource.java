@@ -1,24 +1,22 @@
-/*******************************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *  
+/**
+ * *****************************************************************************
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements. See the NOTICE file distributed with this
+ * work for additional information regarding copyright ownership. The ASF
+ * licenses this file to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- *  
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- *******************************************************************************/
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ ******************************************************************************
+ */
 package org.apache.flume.source;
-
-
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -39,7 +37,6 @@ import java.io.IOException;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.flume.ChannelException;
 
-
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -55,10 +52,10 @@ import org.apache.commons.net.ftp.FTPFile;
 
 /*
  * @author Luis Lazaro // lalazaro@keedio.com
-    KEEDIO
+ KEEDIO
  */
 public class FTPSource extends AbstractSource implements Configurable, PollableSource {
-    
+
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     private Map<String, Long> sizeFileList = new HashMap<>();
     private Set<String> existFileList = new HashSet<>();
@@ -79,10 +76,10 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private FTPSourceEventListener listener = new FTPSourceEventListener();
 
     @Override
-    public void configure(Context context)  {            
+    public void configure(Context context) {
         ftpSourceUtils = new FTPSourceUtils(context);
         pathTohasmap = Paths.get(ftpSourceUtils.getFolder());
-        if (checkFolder()){
+        if (checkFolder()) {
             hasmap = Paths.get(ftpSourceUtils.getFileName());
             absolutePath = Paths.get(pathTohasmap.toString(), hasmap.toString());
         } else {
@@ -90,124 +87,118 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             System.exit(1);
         }
         ftpSourceUtils.connectToserver();
-        ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());       
+        ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());
         checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
     }
-    
+
     /*
-    @enum Status , process source configured from context
-    */
+     @enum Status , process source configured from context
+     */
     @Override
     public PollableSource.Status process() throws EventDeliveryException {
-         
-            try {
-                  log.info("data processed: " + ftpSourceCounter.getEventCount()/CHUNKSIZE  + " MBytes" + " actual dir " + 
-                  ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " +   sizeFileList.size());
-                  discoverElements(ftpSourceUtils.getFtpClient(),ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
-                  cleanList(sizeFileList); //clean list according existing actual files
-                  existFileList.clear();
-                } catch(IOException e){
-                    log.error("Exception thrown in process, try to reconnect " + counter , e );
-                    
-                        if (!ftpSourceUtils.connectToserver()) {
-                            counter++;
-                        } else {
-                        checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
-                        }
-                    
-                    if (counter < ATTEMPTS_MAX){
-                        process();
-                    } else {
-                        log.error("Server connection closed without indication, reached limit reconnections " + counter);
-                        try {
-                            Thread.sleep(ftpSourceUtils.getRunDiscoverDelay() + EXTRA_DELAY);
-                            counter = 0;
-                        } catch(InterruptedException ce){
-                            log.error("InterruptedException", ce);
-                        }
-                    }
-                }
-       
-              
-                saveMap(sizeFileList);
 
-        try
-        {  
+        try {
+            log.info("data processed: " + ftpSourceCounter.getEventCount() / CHUNKSIZE + " MBytes" + " actual dir "
+                    + ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " + sizeFileList.size());
+            discoverElements(ftpSourceUtils.getFtpClient(), ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
+            cleanList(sizeFileList); //clean list according existing actual files
+            existFileList.clear();
+        } catch (IOException e) {
+            log.error("Exception thrown in process, try to reconnect " + counter, e);
+
+            if (!ftpSourceUtils.connectToserver()) {
+                counter++;
+            } else {
+                checkPreviousMap(Paths.get(pathTohasmap.toString(), hasmap.toString()));
+            }
+
+            if (counter < ATTEMPTS_MAX) {
+                process();
+            } else {
+                log.error("Server connection closed without indication, reached limit reconnections " + counter);
+                try {
+                    Thread.sleep(ftpSourceUtils.getRunDiscoverDelay() + EXTRA_DELAY);
+                    counter = 0;
+                } catch (InterruptedException ce) {
+                    log.error("InterruptedException", ce);
+                }
+            }
+        }
+
+        saveMap(sizeFileList);
+
+        try {
             Thread.sleep(ftpSourceUtils.getRunDiscoverDelay());
             return PollableSource.Status.READY;     //source was successfully able to generate events
-        } catch(InterruptedException inte){
+        } catch (InterruptedException inte) {
             log.error("Exception thrown in process while putting to sleep", inte);
             return PollableSource.Status.BACKOFF;   //inform the runner thread to back off for a bit		
         }
     }
 
- 
     @Override
     public void start() {
         log.info("Starting sql source {} ...", getName());
         log.info("FTP Source {} starting. Metrics: {}", getName(), ftpSourceCounter);
         super.start();
-       ftpSourceCounter.start();
+        ftpSourceCounter.start();
     }
-    
 
     @Override
     public void stop() {
         saveMap(sizeFileList);
-            try {
-                if (ftpSourceUtils.getFtpClient().isConnected()) {
-                    ftpSourceUtils.getFtpClient().logout();
-                    ftpSourceUtils.getFtpClient().disconnect();
-                }
-            } catch (IOException ex) {
-                log.error("Exception thrown stoping proccess", ex);
+        try {
+            if (ftpSourceUtils.getFtpClient().isConnected()) {
+                ftpSourceUtils.getFtpClient().logout();
+                ftpSourceUtils.getFtpClient().disconnect();
             }
-            ftpSourceCounter.stop();
-            log.info("FTP Source " +  this.getName() + " stopped. Metrics: {}", getName(), ftpSourceCounter);
-            super.stop();
+        } catch (IOException ex) {
+            log.error("Exception thrown stoping proccess", ex);
+        }
+        ftpSourceCounter.stop();
+        log.info("FTP Source " + this.getName() + " stopped. Metrics: {}", getName(), ftpSourceCounter);
+        super.stop();
     }
-    
-    
+
     /*
-    @void process last append to files
-    */
-    public void processMessage(byte[] lastInfo){
+     @void process last append to files
+     */
+    public void processMessage(byte[] lastInfo) {
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
-        Map<String, String> headers =  new HashMap<>();  
+        Map<String, String> headers = new HashMap<>();
         headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
         event.setBody(message);
         event.setHeaders(headers);
         try {
-          getChannelProcessor().processEvent(event);
-        } catch(ChannelException e){
-            log.error("ChannelException",e);
+            getChannelProcessor().processEvent(event);
+        } catch (ChannelException e) {
+            log.error("ChannelException", e);
         }
         ftpSourceCounter.incrementEventCount();
     }
-    
-    
+
     /*
-    discoverElements: find files to process them
-    @return void 
-    */
+     discoverElements: find files to process them
+     @return void 
+     */
     @SuppressWarnings("UnnecessaryContinue")
-    public void discoverElements( FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
-        
+    public void discoverElements(FTPClient ftpClient, String parentDir, String currentDir, int level) throws IOException {
+
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
             dirToList += "/" + currentDir;
         }
         FTPFile[] subFiles = ftpClient.listFiles(dirToList);
         if (subFiles != null && subFiles.length > 0) {
-            
+
             for (FTPFile aFile : subFiles) {
                 String currentFileName = aFile.getName();
                 if (currentFileName.equals(".") || currentFileName.equals("..")) {
                     log.info("Skip parent directory and directory itself");
                     continue;
                 }
-                
+
                 if (aFile.isDirectory()) {
                     log.info("[" + aFile.getName() + "]");
                     ftpClient.changeWorkingDirectory(parentDir);
@@ -217,23 +208,23 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                     ftpClient.changeWorkingDirectory(dirToList);
                     existFileList.add(dirToList + "/" + aFile.getName());  //control of deleted files in server
                     String fileName = aFile.getName();
-                    if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))){ //new file
+                    if (!(sizeFileList.containsKey(dirToList + "/" + aFile.getName()))) { //new file
                         ftpSourceCounter.incrementFilesCount();
                         InputStream inputStream = null;
                         try {
                             inputStream = ftpClient.retrieveFileStream(aFile.getName());
                             listener.fileStreamRetrieved();
-                            readStream(inputStream,  0);
+                            readStream(inputStream, 0);
                             boolean success = inputStream != null && ftpClient.completePendingCommand(); //mandatory
-                            if (success){
+                            if (success) {
                                 sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                 saveMap(sizeFileList);
                                 ftpSourceCounter.incrementFilesProcCount();
-                                log.info( "discovered: " + fileName  + " ," + sizeFileList.size());
-                            }  else {
+                                log.info("discovered: " + fileName + " ," + sizeFileList.size());
+                            } else {
                                 handleProcessError(fileName);
                             }
-                        }  catch (FTPConnectionClosedException e) {
+                        } catch (FTPConnectionClosedException e) {
                             handleProcessError(fileName);
                             log.error("Ftp server closed connection ", e);
                             continue;
@@ -242,27 +233,26 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         ftpClient.changeWorkingDirectory(dirToList);
                         continue;
 
-
-                    } else  { //known file                        
+                    } else { //known file                        
                         long dif = aFile.getSize() - sizeFileList.get(dirToList + "/" + aFile.getName());
-                        if (dif > 0 ){ //known and modified
+                        if (dif > 0) { //known and modified
                             long prevSize = sizeFileList.get(dirToList + "/" + aFile.getName());
                             InputStream inputStream = null;
                             try {
-                            inputStream = ftpClient.retrieveFileStream(aFile.getName());
-                            listener.fileStreamRetrieved();
-                            readStream(inputStream, prevSize );
+                                inputStream = ftpClient.retrieveFileStream(aFile.getName());
+                                listener.fileStreamRetrieved();
+                                readStream(inputStream, prevSize);
 
-                                boolean success = inputStream !=null && ftpClient.completePendingCommand(); //mandatory
-                                if (success){
+                                boolean success = inputStream != null && ftpClient.completePendingCommand(); //mandatory
+                                if (success) {
                                     sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                     saveMap(sizeFileList);
                                     ftpSourceCounter.incrementCountModProc();
-                                    log.info(  "modified: " + fileName + " ," + sizeFileList.size());
-                                }  else {
+                                    log.info("modified: " + fileName + " ," + sizeFileList.size());
+                                } else {
                                     handleProcessError(fileName);
                                 }
-                            }  catch (FTPConnectionClosedException e) {
+                            } catch (FTPConnectionClosedException e) {
                                 log.error("Ftp server closed connection ", e);
                                 handleProcessError(fileName);
                                 continue;
@@ -270,8 +260,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
                             ftpClient.changeWorkingDirectory(dirToList);
                             continue;
-                        } else
-                        if (dif < 0 ){ //known and full modified
+                        } else if (dif < 0) { //known and full modified
                             existFileList.remove(dirToList + "/" + aFile.getName()); //will be rediscovered as new file
                             saveMap(sizeFileList);
                             continue;
@@ -280,18 +269,18 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                         continue;
                     }
                 } else if (aFile.isSymbolicLink()) {
-                    log.info(aFile.getName() + " is a link of " + aFile.getLink() + " access denied" );
+                    log.info(aFile.getName() + " is a link of " + aFile.getLink() + " access denied");
                     ftpClient.changeWorkingDirectory(parentDir);
                     continue;
                 } else if (aFile.isUnknown()) {
-                    log.info(aFile.getName() + " unknown type of file" );
+                    log.info(aFile.getName() + " unknown type of file");
                     ftpClient.changeWorkingDirectory(parentDir);
                     continue;
                 } else {
                     ftpClient.changeWorkingDirectory(parentDir);
                     continue;
                 }
-                
+
             } //fin de bucle
         } //el listado no es vacío
     }//fin de método
@@ -300,122 +289,114 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         log.info("failed retrieving stream from file, will try in next poll :" + fileName);
         ftpSourceCounter.incrementFilesProcCountError();
     }
-    
-    
-   /*
-    @void Serialize hashmap
-    */
-   
-    public void saveMap(Map<String, Long> map){
-        try { 
+
+    /*
+     @void Serialize hashmap
+     */
+    public void saveMap(Map<String, Long> map) {
+        try {
             FileOutputStream fileOut = new FileOutputStream(absolutePath.toString());
             try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-                out.writeObject((HashMap)map);
+                out.writeObject((HashMap) map);
             }
-        } catch(FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             log.error("Error saving map File", e);
-        } catch (IOException e){
+        } catch (IOException e) {
             log.error("Error saving map IO:", e);
         }
     }
-    
-    
+
     /*
-    @return HashMap<String,Long> objects
-    */
-    public Map<String,Long> loadMap(String name) throws ClassNotFoundException, IOException{
+     @return HashMap<String,Long> objects
+     */
+    public Map<String, Long> loadMap(String name) throws ClassNotFoundException, IOException {
         FileInputStream map = new FileInputStream(name);
         HashMap hasMap;
         try (ObjectInputStream in = new ObjectInputStream(map)) {
-            hasMap = (HashMap)in.readObject();
+            hasMap = (HashMap) in.readObject();
         }
         return hasMap;
-    } 
-    
-   
-   /*
-    @void, delete file from hashmaps if deleted from ftp
-    */
-    public void cleanList(Map<String,Long> map) {
-          for (Iterator<String> iter=map.keySet().iterator();iter.hasNext();) {
-          final String fileName = iter.next();
-          if (!(existFileList.contains(fileName))){ 
-              iter.remove();
-          }
+    }
+
+    /*
+     @void, delete file from hashmaps if deleted from ftp
+     */
+    public void cleanList(Map<String, Long> map) {
+        for (Iterator<String> iter = map.keySet().iterator(); iter.hasNext();) {
+            final String fileName = iter.next();
+            if (!(existFileList.contains(fileName))) {
+                iter.remove();
+            }
         }
     }
-   
+
     /*
-    read retrieved stream from ftpclient into byte[] and process
-    @return void
-    */
-    
-    public boolean readStream(InputStream inputStream,  long position){
-        if (inputStream == null){
+     read retrieved stream from ftpclient into byte[] and process
+     @return void
+     */
+    public boolean readStream(InputStream inputStream, long position) {
+        if (inputStream == null) {
             return false;
         }
 
         boolean successRead = true;
         try {
-                inputStream.skip(position);
-                byte[] bytesArray = new byte[CHUNKSIZE];
-                int bytesRead = -1;
-                while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                    try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
-                        baostream.write(bytesArray, 0, bytesRead);
-                        byte[] data = baostream.toByteArray();
-                        processMessage(data);
-                        data = null;
-                    }
+            inputStream.skip(position);
+            byte[] bytesArray = new byte[CHUNKSIZE];
+            int bytesRead = -1;
+            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
+                    baostream.write(bytesArray, 0, bytesRead);
+                    byte[] data = baostream.toByteArray();
+                    processMessage(data);
+                    data = null;
                 }
-               
-                inputStream.close();
-            } catch(IOException e ) {
-                log.error("on readStream", e);
-                successRead = false;
             }
-            return successRead;
+
+            inputStream.close();
+        } catch (IOException e) {
+            log.error("on readStream", e);
+            successRead = false;
+        }
+        return successRead;
     }
-    
-    
+
     public void setFtpSourceCounter(FtpSourceCounter ftpSourceCounter) {
         this.ftpSourceCounter = ftpSourceCounter;
     }
-    
-    
+
     /*
-    @return void, check if there are previous files to load
-    */
-    public void checkPreviousMap(Path file1){
+     @return void, check if there are previous files to load
+     */
+    public void checkPreviousMap(Path file1) {
         try {
-            if (Files.exists(file1)){  
+            if (Files.exists(file1)) {
                 sizeFileList = loadMap(file1.toString());
                 log.info("Found previous map of files flumed");
             } else {
                 log.info("Not found preivous map of files flumed");
-                
+
             }
-                
-       } catch(IOException | ClassNotFoundException e) {
+
+        } catch (IOException | ClassNotFoundException e) {
             log.info("Exception thrown checking previous map ", e);
-       }
-    }
-    
-    /*
-    return boolean, folder exists
-    */
-    public boolean checkFolder(){
-        boolean folderExits = false;
-         if (Files.exists(pathTohasmap)){
-             folderExits = true;
-         }
-         return folderExits;
+        }
     }
 
-    public FTPClient getFTPClient(){
+    /*
+     return boolean, folder exists
+     */
+    public boolean checkFolder() {
+        boolean folderExits = false;
+        if (Files.exists(pathTohasmap)) {
+            folderExits = true;
+        }
+        return folderExits;
+    }
+
+    public FTPClient getFTPClient() {
         return ftpSourceUtils.getFtpClient();
     }
-    
-  
+
 } //end of class
 
