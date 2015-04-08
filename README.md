@@ -9,15 +9,15 @@ In main flume's agent configuration file must be specified if security for FTP i
 
 Files proccesed will be "saved" in an external file.
 
-Requirements
-------------
+### Requirements ######
+
 - Apache-flume mayor to 1.4.0.
 - commons-net-3.3.jar (ftpClient and ftpsClient)
 - jsch-0.1.52.jar (channelSftp)
 
 
-Configuration of Flume-ftp-source.conf for FTP(plain) and FTPS (secure)
-----------------------------------------------------------------------
+### Configuration of Flume-ftp-source.conf for FTP(plain) and FTPS (secure) ######
+
 ###### Active list for ftp/ftps
 - agent.sources = ftp1
 - agent.sinks = k1
@@ -39,16 +39,16 @@ Configuration of Flume-ftp-source.conf for FTP(plain) and FTPS (secure)
 certificate sent by the server, validated or not.
 
 
-Specific Connection properties for SFTP server
-----------------------------------------------
+### Specific Connection properties for SFTP server ######
+
 ###### Type of source for SFTP sources
 - agent.sources.sftp1.type = org.apache.flume.source.SFTPSource 
 
 - agent.sources.sftp1.knownHosts = /home/username/.ssh/known_hosts
 - agent.sources.sftp1.port = 22
 
-Common configuration for FTP/FTPS/SFTP
---------------------------------------
+### Common configuration for FTP/FTPS/SFTP ######
+
 ###### Discover delay, each configured milisecond directory will be explored
 - agent.sources.<agen.sources>.run.discover.delay=10000
 
@@ -57,14 +57,14 @@ Common configuration for FTP/FTPS/SFTP
 - agent.channels.c1.capacity = 1000
 - agent.channels.c1.transactionCapacity = 100
 
-License
--------
+### License ######
+
 Apache License, Version 2.0
 http://www.apache.org/licenses/LICENSE-2.0
 
 
-Wiki
-----
+### Wiki ######
+
 https://github.com/keedio/flume-ftp-source/wiki/flume-ftp-source,-especificaciones-generales-y-pruebas-iniciales
 
 --
