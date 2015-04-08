@@ -18,15 +18,15 @@ Requirements
 
 Configuration of Flume-ftp-source.conf for FTP(plain) and FTPS (secure)
 ----------------------------------------------------------------------
-Active list for ftp/ftps
+###### Active list for ftp/ftps
 - agent.sources = ftp1
 - agent.sinks = k1
 - agent.channels = c1 
 
-Type of source for ftp/ftps sources
+###### Type of source for ftp/ftps sources
 - agent.sources.ftp1.type = org.apache.flume.source.FTPSource 
 
-Connection properties for ftp/ftps server
+###### Connection properties for ftp/ftps server
 - agent.sources.ftp1.name.server = 127.0.0.1
 - agent.sources.ftp1.user = username
 - agent.sources.ftp1.password = password
@@ -41,7 +41,7 @@ certificate sent by the server, validated or not.
 
 Specific Connection properties for SFTP server
 ----------------------------------------------
-Type of source for SFTP sources
+###### Type of source for SFTP sources
 - agent.sources.sftp1.type = org.apache.flume.source.SFTPSource 
 
 - agent.sources.sftp1.knownHosts = /home/username/.ssh/known_hosts
@@ -49,10 +49,10 @@ Type of source for SFTP sources
 
 Common configuration for FTP/FTPS/SFTP
 --------------------------------------
-Discover delay, each configured milisecond directory will be explored
+###### Discover delay, each configured milisecond directory will be explored
 - agent.sources.<agen.sources>.run.discover.delay=10000
 
-Channel:
+######Channel:
 - agent.channels.c1.type = memory
 - agent.channels.c1.capacity = 1000
 - agent.channels.c1.transactionCapacity = 100
