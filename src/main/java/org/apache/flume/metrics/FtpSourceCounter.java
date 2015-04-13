@@ -2,7 +2,7 @@
 * FptSourceCounter exposes custom metrics for specific source FTP
 ************/
 
-package org.apache.flume.source;
+package org.apache.flume.metrics;
 
 import org.apache.flume.instrumentation.MonitoredCounterGroup;
 /**

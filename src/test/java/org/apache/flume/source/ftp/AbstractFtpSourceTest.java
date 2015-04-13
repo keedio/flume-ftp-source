@@ -11,7 +11,7 @@ import org.apache.flume.channel.ChannelProcessor;
 import static org.mockito.Mockito.*;
 
 import org.apache.flume.source.FTPSource;
-import org.apache.flume.source.FtpSourceCounter;
+import org.apache.flume.metrics.FtpSourceCounter;
 import org.apache.flume.source.TestFileUtils;
 import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
 import org.apache.log4j.Logger;

@@ -20,6 +20,7 @@ package org.apache.flume.source;
 
 
 
+import org.apache.flume.metrics.FtpSourceCounter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
