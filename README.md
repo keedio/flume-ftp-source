@@ -18,29 +18,42 @@ Files proccesed will be "saved" in an external file.
 
 ### Parameters for flume ######
 
-###### Type of source for FTP/FTPS sources
+###### Example configuration for FTP source
 >       agent.sources.ftp1.type = org.apache.flume.source.FTPSource 
-
-###### Type of source for SFTP sources
->       agent.sources.sftp1.type = org.apache.flume.source.SFTPSource 
-
-###### Common connection properties for FTP/FTPS/SFTP servers
 >       agent.sources.ftp1.name.server = 127.0.0.1
 >       agent.sources.ftp1.user = username
 >       agent.sources.ftp1.password = password
 >       agent.sources.ftp1.port = 21
 >       agent.sources.ftp1.folder = /var/flume
 >       agent.sources.ftp1.file.name = status-ftp1-file.ser
->       agent.sources.ftp1.security.enabled = true (only ftps)
->       agent.sources.ftp1.security.cipher = TLS   (only ftps)
->       agent.sources.ftp1.security.certificate.enabled = true (only ftps) (if false the plugin will accept any 
+>       agent.sources.ftp1.security.enabled = false
+>       agent.sources.ftp1.security.cipher = false
+>       agent.sources.ftp1.security.certificate.enabled = false 
+
+
+###### Example configuration for FTPS source
+>       agent.sources.ftp1.type = org.apache.flume.source.FTPSource (same source as FTP) 
+>       agent.sources.ftp1.name.server = 127.0.0.1
+>       agent.sources.ftp1.user = username
+>       agent.sources.ftp1.password = password
+>       agent.sources.ftp1.port = 21
+>       agent.sources.ftp1.folder = /var/flume
+>       agent.sources.ftp1.file.name = status-ftp1-file.ser
+>       agent.sources.ftp1.security.enabled = true 
+>       agent.sources.ftp1.security.cipher = (false | true)
+>       agent.sources.ftp1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
 >       certificate sent by the server, validated or not).
 
+###### Example configuration for SFTP source
+>       agent.sources.sftp1.type = org.apache.flume.source.SFTPSource (exclusive source for SFTP) 
+>       agent.sources.sftp1.name.server = 127.0.0.1
+>       agent.sources.sftp1.user = username
+>       agent.sources.sftp1.password = password
+>       agent.sources.sftp1.port = 22
+>       agent.sources.sftp1.folder = /var/flume
+>       agent.sources.sftp1.file.name = status-sftp1-file.ser
+>       agent.sources.sftp1.knownHosts = /home/username/.ssh/known_hosts
 
-### Specific Connection properties for SFTP server ######
-
-###### Type of source for SFTP sources
->     agent.sources.sftp1.knownHosts = /home/username/.ssh/known_hosts
 
 ###### Discover delay, each configured milisecond directory will be explored
 >     agent.sources.fpt1.run.discover.delay=10000
