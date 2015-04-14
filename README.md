@@ -27,7 +27,7 @@ Files proccesed will be "saved" in an external file.
 >       agent.sources.ftp1.folder = /var/flume
 >       agent.sources.ftp1.file.name = status-ftp1-file.ser
 >       agent.sources.ftp1.security.enabled = false
->       agent.sources.ftp1.security.cipher = false
+>       agent.sources.ftp1.security.cipher = TLS
 >       agent.sources.ftp1.security.certificate.enabled = false 
 
 
@@ -40,7 +40,7 @@ Files proccesed will be "saved" in an external file.
 >       agent.sources.ftp1.folder = /var/flume
 >       agent.sources.ftp1.file.name = status-ftp1-file.ser
 >       agent.sources.ftp1.security.enabled = true 
->       agent.sources.ftp1.security.cipher = (false | true)
+>       agent.sources.ftp1.security.cipher = TLS
 >       agent.sources.ftp1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
 >       certificate sent by the server, validated or not).
 
