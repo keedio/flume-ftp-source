@@ -34,6 +34,7 @@ public class FTPSourceUtils {
     private static final Logger log = LoggerFactory.getLogger(FTPSourceUtils.class);
     private Integer bufferSize;
     private boolean securityMode, securityCert;
+    private boolean flushLines;
 
     public FTPSourceUtils(Context context) {
         bufferSize = context.getInteger("buffer.size");
@@ -48,6 +49,8 @@ public class FTPSourceUtils {
         protocolSec = context.getString("security.cipher");
         folder = context.getString("folder");
         fileName = context.getString("file.name");
+        flushLines = context.getBoolean("flushlines");
+        
         
         if (securityMode){
             FTPSClient ftpsClient = new FTPSClient(protocolSec);
@@ -83,6 +86,7 @@ public class FTPSourceUtils {
                 log.error("Could not login to the server");
                 success = false;
             }
+            ftpClient.enterLocalPassiveMode();
             if (workingDirectory != null) {
                 ftpClient.changeWorkingDirectory(workingDirectory);
             }
@@ -143,6 +147,20 @@ public class FTPSourceUtils {
     */
     public String getFileName(){
         return fileName;
+    }
+
+    /**
+     * @return the flushLines
+     */
+    public boolean isFlushLines() {
+        return flushLines;
+    }
+
+    /**
+     * @param flushLines the flushLines to set
+     */
+    public void setFlushLines(boolean flushLines) {
+        this.flushLines = flushLines;
     }
 }
 
