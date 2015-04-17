@@ -64,8 +64,9 @@ Files proccesed will be "saved" in an external file.
       
 
 ### Version history #####
-1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls
+1.1.5 flush lines from SFTPSource
 1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing):
+1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls
 
 ### License ######
 
