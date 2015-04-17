@@ -14,7 +14,7 @@
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  * License for the specific language governing permissions and limitations under
  * the License.
- ******************************************************************************
+ * *****************************************************************************
  */
 package org.apache.flume.source;
 
@@ -22,6 +22,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.*;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 import org.apache.flume.Context;
 import org.apache.flume.Event;
@@ -98,8 +100,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     public PollableSource.Status process() throws EventDeliveryException {
 
         try {
-            log.info("data processed: " + ftpSourceCounter.getEventCount() / CHUNKSIZE + " MBytes" + " actual dir "
-                    + ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files : " + sizeFileList.size());
+            log.info( "Actual dir: "
+                    + ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files proccesed: " + sizeFileList.size());
             discoverElements(ftpSourceUtils.getFtpClient(), ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
             cleanList(sizeFileList); //clean list according existing actual files
             existFileList.clear();
@@ -340,24 +342,43 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         }
 
         boolean successRead = true;
-        try {
-            inputStream.skip(position);
-            byte[] bytesArray = new byte[CHUNKSIZE];
-            int bytesRead = -1;
-            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
-                    baostream.write(bytesArray, 0, bytesRead);
-                    byte[] data = baostream.toByteArray();
-                    processMessage(data);
-                    data = null;
-                }
-            }
 
-            inputStream.close();
-        } catch (IOException e) {
-            log.error("on readStream", e);
-            successRead = false;
+        if (ftpSourceUtils.isFlushLines()) {
+            try {
+                inputStream.skip(position);
+                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+                String line = null;
+
+                while ((line = in.readLine()) != null) {
+                    processMessage(line.getBytes());
+                }
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                successRead = false;
+            }
+        } else {
+
+            try {
+                inputStream.skip(position);
+                byte[] bytesArray = new byte[CHUNKSIZE];
+                int bytesRead = -1;
+                while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                    try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
+                        baostream.write(bytesArray, 0, bytesRead);
+                        byte[] data = baostream.toByteArray();
+                        processMessage(data);
+                        data = null;
+                    }
+                }
+
+                inputStream.close();
+            } catch (IOException e) {
+                log.error("on readStream", e);
+                successRead = false;
+            }
         }
+        //end condition for only byte
+
         return successRead;
     }
 

@@ -58,6 +58,15 @@ Files proccesed will be "saved" in an external file.
 ###### Discover delay, each configured milisecond directory will be explored
 >     agent.sources.fpt1.run.discover.delay=10000
 
+###### Force flume-ftp to proccess lines instead of chunk of bytes
+###### (thanks to schmiegelow : https://github.com/schmiegelow/flume-ftp-source)
+>     agent.sources.ftp1.flushlines = true
+      
+
+### Version history #####
+1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls
+1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing):
+
 ### License ######
 
 Apache License, Version 2.0
@@ -67,6 +76,8 @@ http://www.apache.org/licenses/LICENSE-2.0
 ### Wiki ######
 
 https://github.com/keedio/flume-ftp-source/wiki/flume-ftp-source,-especificaciones-generales-y-pruebas-iniciales
+
+
 
 --
 Luis Lázaro <lalazaro@keedio.com>
