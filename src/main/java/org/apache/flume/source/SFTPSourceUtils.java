@@ -30,6 +30,7 @@ public class SFTPSourceUtils {
     private String workingDirectory;
     private static final Logger log = LoggerFactory.getLogger(SFTPSourceUtils.class);
     private Integer bufferSize;
+    private boolean flushLines;
 
     public SFTPSourceUtils(Context context) {
         bufferSize = context.getInteger("buffer.size");
@@ -43,6 +44,7 @@ public class SFTPSourceUtils {
         folder = context.getString("folder");
         fileName = context.getString("file.name");
         jsch = new JSch();
+        flushLines = context.getBoolean("flushlines");
         try {
             jsch.setKnownHosts(knownHosts);
             sessionSftp = jsch.getSession(user,server);
@@ -99,6 +101,21 @@ public class SFTPSourceUtils {
     */
     public String getFileName(){
         return fileName;
+    }
+    
+    
+    /**
+     * @return the flushLines
+     */
+    public boolean isFlushLines() {
+        return flushLines;
+    }
+
+    /**
+     * @param flushLines the flushLines to set
+     */
+    public void setFlushLines(boolean flushLines) {
+        this.flushLines = flushLines;
     }
 }
 
