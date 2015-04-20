@@ -43,6 +43,7 @@ public abstract class KeedioSource {
     private Path hasmap = Paths.get("");
     private Path absolutePath = Paths.get("");   
     
+    
     protected String server;
     protected String user;
     protected String password;
@@ -52,10 +53,11 @@ public abstract class KeedioSource {
     protected Integer bufferSize;
     protected int runDiscoverDelay;
     protected String workingDirectory; //working directory specified in config.
+    private boolean flushLines;
+    
     protected boolean connected;
     protected String dirToList;
-    //protected String directory;
-    protected Object file;    
+    protected Object file;   //type of file the sources will use in each file-system-connection
      
     public abstract boolean connect();
     public abstract void disconnect();
@@ -364,6 +366,20 @@ public abstract class KeedioSource {
       hasmap = Paths.get(getFileName());
       absolutePath = Paths.get(pathTohasmap.toString(), hasmap.toString());
       return absolutePath;
+    }
+
+    /**
+     * @return the flushLines
+     */
+    public boolean isFlushLines() {
+        return flushLines;
+    }
+
+    /**
+     * @param flushLines the flushLines to set
+     */
+    public void setFlushLines(boolean flushLines) {
+        this.flushLines = flushLines;
     }
     
 } //endclass

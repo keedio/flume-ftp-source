@@ -41,14 +41,14 @@ import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.flume.source.AbstractSource;
 import org.apache.flume.source.utils.FTPSourceEventListener;
 
-
 import org.apache.flume.metrics.FtpSourceCounter;
 import java.util.List;
 
-
-
 import com.foundationdb.tuple.ByteArrayUtil;
 import org.apache.flume.client.KeedioSource;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 /*
  * @author Luis Lazaro // lalazaro@keedio.com
@@ -139,7 +139,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     /**
      * @return void
      */
-    public void stop() {
+    public synchronized void stop() {
         keedioSource.saveMap();
         if (keedioSource.isConnected()) {
             keedioSource.disconnect();
@@ -151,8 +151,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     /**
      * discoverElements: find files to process them
      *
-     * @return void
-     * @param KeedioSource, String, int
+     * @param keedioSource
+     * @param parentDir, will be the directory retrieved by the server when
+     * connected
+     * @param currentDir, actual dir int the recursive method
+     * @param level, deep to search
+     * @throws IOException
      */
     // @SuppressWarnings("UnnecessaryContinue")
     public void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws IOException {
@@ -271,29 +275,46 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         }
 
         boolean successRead = true;
-        try {
-            inputStream.skip(position);
-            byte[] bytesArray = new byte[CHUNKSIZE];
-            int bytesRead = -1;
-            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
-                    baostream.write(bytesArray, 0, bytesRead);
-                    byte[] data = baostream.toByteArray();
-                    String carriage = System.getProperty("line.separator");
-                    byte[] carriageB = carriage.getBytes();
-                    String emptyString = "";
-                    byte[] emptyB = emptyString.getBytes();
-                    byte[] data_mutate = ByteArrayUtil.replace(data, CHUNKSIZE - 1,0, carriageB, emptyB);
-                    processMessage(data_mutate);
-                    data = null;
-                    data_mutate = null;
-                }
-            }
 
-            inputStream.close();
-        } catch (IOException e) {
-            log.error("on readStream", e);
-            successRead = false;
+        if (keedioSource.isFlushLines()) {
+            try {
+                inputStream.skip(position);
+                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+                String line = null;
+
+                while ((line = in.readLine()) != null) {
+                    processMessage(line.getBytes());
+                }
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                successRead = false;
+            }
+        } else {
+
+            try {
+                inputStream.skip(position);
+                byte[] bytesArray = new byte[CHUNKSIZE];
+                int bytesRead = -1;
+                while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                    try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
+                        baostream.write(bytesArray, 0, bytesRead);
+                        byte[] data = baostream.toByteArray();
+                        String carriage = System.getProperty("line.separator");
+                        byte[] carriageB = carriage.getBytes();
+                        String emptyString = "";
+                        byte[] emptyB = emptyString.getBytes();
+                        byte[] data_mutate = ByteArrayUtil.replace(data, CHUNKSIZE - 1, 0, carriageB, emptyB);
+                        processMessage(data_mutate);
+                        data = null;
+                        data_mutate = null;
+                    }
+                }
+
+                inputStream.close();
+            } catch (IOException e) {
+                log.error("on readStream", e);
+                successRead = false;
+            }
         }
         return successRead;
     }
@@ -364,6 +385,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         keedioSource.setPort(context.getInteger("port"));
         keedioSource.setFolder(context.getString("folder"));
         keedioSource.setFileName(context.getString("file.name"));
+        keedioSource.setFlushLines(context.getBoolean("flushlines"));
     }
 
     /**
@@ -388,11 +410,11 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     public void setFtpSourceCounter(FtpSourceCounter ftpSourceCounter) {
         this.ftpSourceCounter = ftpSourceCounter;
     }
-    
+
     /**
-    * @return KeedioSource
-    */
-    public KeedioSource getKeedioSource(){
+     * @return KeedioSource
+     */
+    public KeedioSource getKeedioSource() {
         return keedioSource;
     }
 } //endclass

@@ -39,6 +39,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getFolder = "/var/tmp";
     String getAbsoutePath = "/var/tmp/hasmap.ser";
     String getSource = "ftp";
+    
 
     @BeforeMethod
     public void beforeMethod() {

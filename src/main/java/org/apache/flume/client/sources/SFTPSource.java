@@ -32,7 +32,7 @@ public class SFTPSource extends KeedioSource {
     private Session sessionSftp;
     private Channel channel;
     private ChannelSftp sftpClient;
-    private ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
+    //private ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
 
     /**
      * @return boolean Opens a Socket connected to a server and login to return
@@ -138,7 +138,6 @@ public class SFTPSource extends KeedioSource {
      * @return void
      */
     public void disconnect() {
-
         channel.disconnect();
         sessionSftp.disconnect();
         setConnected(false);
@@ -185,6 +184,7 @@ public class SFTPSource extends KeedioSource {
      */
     public InputStream getInputStream(Object file) throws IOException {
         InputStream inputStream = null;
+        ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
         try {
             inputStream = sftpClient.get(afile.getFilename());
         } catch (SftpException e) {
@@ -199,6 +199,7 @@ public class SFTPSource extends KeedioSource {
      * @param object as file
      */
     public String getObjectName(Object file) {
+        ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
         return afile.getFilename();
     }
 
@@ -208,6 +209,7 @@ public class SFTPSource extends KeedioSource {
      * @param Object to check
      */
     public boolean isDirectory(Object file) {
+        ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
         return afile.getAttrs().isDir();
     }
 
@@ -243,6 +245,7 @@ public class SFTPSource extends KeedioSource {
      */
     public long getObjectSize(Object file) {
         long filesize = 0L;
+        ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
         try {
             filesize = sftpClient.lstat(afile.getFilename()).getSize();
         } catch (SftpException e) {
@@ -257,6 +260,7 @@ public class SFTPSource extends KeedioSource {
      * @param object as file
      */
     public boolean isLink(Object file) {
+        ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
         return afile.getAttrs().isLink();
     }
 
@@ -267,6 +271,7 @@ public class SFTPSource extends KeedioSource {
      */
     public String getLink(Object file) {
         String link = "";
+        ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
         try {
             link = sftpClient.readlink(afile.getFilename());
         } catch (SftpException e) {

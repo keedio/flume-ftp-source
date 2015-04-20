@@ -73,12 +73,10 @@ public class FTPSource extends KeedioSource {
      */
     public void disconnect() {
         try {
-            if (ftpClient.isConnected()) {
-                ftpClient.disconnect();
-                getFtpClient().logout();
-                getFtpClient().disconnect();
-                //setConnected(false);
-            }
+            getFtpClient().logout();
+            getFtpClient().disconnect();
+            setConnected(false);
+
         } catch (IOException e) {
             log.error("Source " + this.getClass().getName() + " failed disconnect", e);
         }
@@ -104,6 +102,7 @@ public class FTPSource extends KeedioSource {
      */
     public List<Object> listFiles(String dir) {
         List<Object> list = new ArrayList<>();
+        FTPFile afile = (FTPFile) file;
         try {
             FTPFile[] subFiles = getFtpClient().listFiles(dir);
             for (FTPFile file : subFiles) {

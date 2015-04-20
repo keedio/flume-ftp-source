@@ -27,9 +27,15 @@ public class FTPSSource extends KeedioSource {
 
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     //private FTPFile afile = (FTPFile) file;
-    private FTPSClient ftpsClient = new FTPSClient();
+    
     private boolean securityMode, securityCert;
     private String protocolSec;
+    private FTPSClient ftpsClient;
+
+    public FTPSSource() {
+        ftpsClient = new FTPSClient(protocolSec);
+        checkIfCertificate();
+    }
 
     /**
      * @return boolean Opens a Socket connected to a server and login to return
@@ -66,9 +72,10 @@ public class FTPSSource extends KeedioSource {
         }
         return isConnected();
     }
-    
+
     /**
      * Disconnect and logout from current connection to server
+     *
      * @return void
      */
     public void disconnect() {
@@ -81,62 +88,61 @@ public class FTPSSource extends KeedioSource {
         }
     }
 
-     @Override
+    @Override
     /**
      * @return void
      * @param String destination
      */
     public void changeToDirectory(String directory) {
         try {
-        ftpsClient.changeWorkingDirectory(directory);
-        } catch (IOException e){
-            log.error("Could not change to directory " + directory );
+            ftpsClient.changeWorkingDirectory(directory);
+        } catch (IOException e) {
+            log.error("Could not change to directory " + directory);
         }
     }
-    
+
     @Override
     /**
-    * @return list with objects in directory 
-    * @param current directory
-    */
-    public List<Object> listFiles(String directory){       
+     * @return list with objects in directory
+     * @param current directory
+     */
+    public List<Object> listFiles(String directory) {
         List<Object> list = new ArrayList<>();
         try {
-        FTPFile[] subFiles = ftpsClient.listFiles(directory);
-        for (FTPFile file : subFiles){
-            list.add((Object)file);
-        }
-        } catch (IOException e){
-            log.error("Could not list list files from  " + directory );
+            FTPFile[] subFiles = ftpsClient.listFiles(directory);
+            for (FTPFile file : subFiles) {
+                list.add((Object) file);
+            }
+        } catch (IOException e) {
+            log.error("Could not list list files from  " + directory);
         }
         return list;
     }
-    
-    
-     @Override
+
+    @Override
     /**
      * @param Object
      * @return InputStream
      */
-    public InputStream getInputStream(Object file ) throws IOException{
+    public InputStream getInputStream(Object file) throws IOException {
         InputStream inputStream = null;
-       FTPFile afile = (FTPFile) file;
+        FTPFile afile = (FTPFile) file;
         try {
-        inputStream = ftpsClient.retrieveFileStream(afile.getName());
-        } catch(IOException e){
+            inputStream = ftpsClient.retrieveFileStream(afile.getName());
+        } catch (IOException e) {
             log.error("Error trying to retrieve inputstream");
         }
-        return inputStream;        
+        return inputStream;
     }
-    
+
     @Override
     /**
-    * @return name of the file
-    * @param object as file
-    */
+     * @return name of the file
+     * @param object as file
+     */
     public String getObjectName(Object file) {
         FTPFile afile = (FTPFile) file;
-        return afile.getName();        
+        return afile.getName();
     }
 
     @Override
@@ -144,71 +150,69 @@ public class FTPSSource extends KeedioSource {
      * @return boolean
      * @param Object to check
      */
-    public boolean isDirectory(Object file){
+    public boolean isDirectory(Object file) {
         FTPFile afile = (FTPFile) file;
         return afile.isDirectory();
     }
-    
-    
+
     @Override
     /**
      * @return boolean
      * @param Object to check
      */
-    public boolean isFile(Object file){
+    public boolean isFile(Object file) {
         FTPFile afile = (FTPFile) file;
         return afile.isFile();
     }
-    
-    
+
     @Override
     /**
      * @return boolean
      */
-    public boolean particularCommand(){
+    public boolean particularCommand() {
         boolean success = true;
         try {
-        success = ftpsClient.completePendingCommand();
-        } catch (IOException e){
+            success = ftpsClient.completePendingCommand();
+        } catch (IOException e) {
             log.error("Error on command completePendingCommand of FTPClient");
         }
         return success;
     }
-    
+
     @Override
     /**
      * @return long size
      * @param object file
      */
-    public long getObjectSize(Object file){
+    public long getObjectSize(Object file) {
         FTPFile afile = (FTPFile) file;
         return afile.getSize();
     }
-    
+
     @Override
     /**
      * @return boolean is a link
      * @param object as file
      */
-    public boolean isLink(Object file){   
+    public boolean isLink(Object file) {
         FTPFile afile = (FTPFile) file;
         return afile.isSymbolicLink();
     }
-    
+
     @Override
     /**
      * @return String name of the link
      * @param object as file
      */
-    public String getLink(Object file){
+    public String getLink(Object file) {
         FTPFile afile = (FTPFile) file;
         return afile.getLink();
     }
-    
+
     /**
      * @return the ftpsClient
      */
-    public FTPSClient getFtpsClient() {        
+    public FTPSClient getFtpsClient() {
         return ftpsClient;
     }
 
@@ -271,27 +275,27 @@ public class FTPSSource extends KeedioSource {
             ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
         }
     }
-    
-     @Override
+
+    @Override
     /**
-     * 
+     *
      * @return String directory retrieved for server on connect
      */
-    public String getDirectoryserver(){
+    public String getDirectoryserver() {
         String printWorkingDirectory = "";
         try {
-        printWorkingDirectory = ftpsClient.printWorkingDirectory();
-        } catch(IOException e){
+            printWorkingDirectory = ftpsClient.printWorkingDirectory();
+        } catch (IOException e) {
             log.error("Error getting printworkingdirectory for server -ftpSsource");
         }
         return printWorkingDirectory;
     }
-    
+
     /**
-     * 
+     *
      * @return object as cliente of ftpSsource
      */
-    public Object getClientSource(){
+    public Object getClientSource() {
         return ftpsClient;
     }
 }
