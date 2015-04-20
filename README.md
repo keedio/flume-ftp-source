@@ -7,6 +7,10 @@ In main flume's agent configuration file must be specified if security for FTP i
 - FTPS: File Transfer Protocol that uses AUTH SSL o TLS cryptographic protocols. Port 21.
 - SFTP: File Transfer Protocol that uses SSH V3, via a single channel (layer transport) and sending/receiving in binary. Port 22.(Recommended).
 
+Files can be proccesed int two ways:
+- by lines, as one event is a full line.
+- by chunk of bytes, exactly 1024 KB is the size of one event.
+
 Proccesed files's names will be "saved" into an external file (file.name). The file will be created in .folder.
 
 ### Requirements ######
