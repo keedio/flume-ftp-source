@@ -10,7 +10,7 @@ import org.apache.flume.Context;
 import org.apache.flume.channel.ChannelProcessor;
 import static org.mockito.Mockito.*;
 
-import org.apache.flume.source.FTPSource;
+import org.apache.flume.source.Source;
 import org.apache.flume.metrics.FtpSourceCounter;
 import org.apache.flume.source.TestFileUtils;
 import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
@@ -26,7 +26,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     @Mock
     Context mockContext = new Context();
 
-    FTPSource ftpSource;
+    Source ftpSource;
     FtpSourceCounter ftpSourceCounter;
 
     int getPort = 2121;
@@ -38,11 +38,13 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getFileName = "hasmap.ser";
     String getFolder = "/var/tmp";
     String getAbsoutePath = "/var/tmp/hasmap.ser";
+    String getSource = "ftp";
 
     @BeforeMethod
     public void beforeMethod() {
         MockitoAnnotations.initMocks(this);
 
+        when(mockContext.getString("client.source")).thenReturn(getSource);
         when(mockContext.getInteger("buffer.size")).thenReturn(0);
         when(mockContext.getString("name.server")).thenReturn(getHost);
         when(mockContext.getString("user")).thenReturn(getUser);
@@ -56,7 +58,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
 
         logger.info("Creating FTP source");
 
-        ftpSource = new FTPSource();
+        ftpSource = new Source();
         ftpSource.configure(mockContext);
         ftpSourceCounter = new FtpSourceCounter("SOURCE.");
         ftpSource.setFtpSourceCounter(ftpSourceCounter);

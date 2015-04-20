@@ -151,8 +151,8 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
-            Map<String, Long> map = ftpSource.loadMap(this.getAbsoutePath);
-
+           // Map<String, Long> map = ftpSource.loadMap(this.getAbsoutePath);
+            Map<String, Long> map = ftpSource.getKeedioSource().loadMap(this.getAbsoutePath);
             String filename = "//"+tmpFile0.toFile().getName();
 
             Assert.assertEquals( Long.valueOf(map.get(filename)), Long.valueOf(81L * 100L));
@@ -183,7 +183,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
-            Map<String,Long> map = ftpSource.loadMap(this.getAbsoutePath);
+            Map<String, Long> map = ftpSource.getKeedioSource().loadMap(this.getAbsoutePath);
 
             String filename = "//"+tmpFile0.toFile().getName();
 
@@ -247,7 +247,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
                 }
             }
         }
-        //ftpSource.getFTPClient().setFileType(FTP.BINARY_FILE_TYPE);
+       // ftpSource.getKeedioSource().getClientSource().setFileType(FTP.BINARY_FILE_TYPE);
         ftpSource.setListener(new MyEventListener());
 
         String[] directories = EmbeddedFTPServer.homeDirectory.toFile().list();
@@ -261,7 +261,8 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         Path tmpFile0 = null;
         try {
             tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
-            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100000, 1000);
+            //TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100000, 1000);
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100, 10);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 0);
 
             PollableSource.Status proc0 = ftpSource.process();
