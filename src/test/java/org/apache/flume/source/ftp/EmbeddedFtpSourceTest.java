@@ -7,6 +7,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.*;
 import javax.annotation.concurrent.NotThreadSafe;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.flume.EventDeliveryException;
 import org.apache.flume.PollableSource;
 import org.apache.flume.source.TestFileUtils;
@@ -20,6 +21,8 @@ import org.testng.Assert;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+
+
 
 /**
  * Basic integration tests for the Keedios' Flume FTP Source,
@@ -135,6 +138,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
 
     }
 
+    
     @Test(dependsOnMethods = "testProcessNoPermission")
     public void testProcessNotEmptyFile() {
         Path tmpFile0 = null;
@@ -147,7 +151,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
-            HashMap<String, Long> map = ftpSource.loadMap("hasmap.ser");
+            Map<String, Long> map = ftpSource.loadMap(this.getAbsoutePath);
 
             String filename = "//"+tmpFile0.toFile().getName();
 
@@ -179,7 +183,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
-            Map<String,Long> map = ftpSource.loadMap("hasmap.ser");
+            Map<String,Long> map = ftpSource.loadMap(this.getAbsoutePath);
 
             String filename = "//"+tmpFile0.toFile().getName();
 
@@ -227,15 +231,23 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
     }
     
    @Test(dependsOnMethods = "testProcessMultipleFiles1")
-    //@Test(enabled=false)
-    public void testFtpFailure() {
+    public void testFtpFailure() throws IOException {
         class MyEventListener extends FTPSourceEventListener {
             @Override
             public void fileStreamRetrieved()  {
                 logger.info("Stopping server");
                 EmbeddedFTPServer.ftpServer.stop();
+
+                while (!EmbeddedFTPServer.ftpServer.isStopped()){
+                    try {
+                        Thread.currentThread().wait(100);
+                    } catch (InterruptedException e) {
+                        logger.error("",e);
+                    }
+                }
             }
         }
+        //ftpSource.getFTPClient().setFileType(FTP.BINARY_FILE_TYPE);
         ftpSource.setListener(new MyEventListener());
 
         String[] directories = EmbeddedFTPServer.homeDirectory.toFile().list();
@@ -249,7 +261,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
         Path tmpFile0 = null;
         try {
             tmpFile0 = TestFileUtils.createTmpFile(EmbeddedFTPServer.homeDirectory);
-            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
+            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100000, 1000);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 0);
 
             PollableSource.Status proc0 = ftpSource.process();

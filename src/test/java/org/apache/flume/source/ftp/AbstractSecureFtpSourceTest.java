@@ -13,14 +13,15 @@ import static org.mockito.Mockito.*;
 import org.apache.flume.source.FTPSource;
 import org.apache.flume.source.FtpSourceCounter;
 import org.apache.flume.source.TestFileUtils;
-import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
+import org.apache.flume.source.ftp.server.EmbeddedSecureFtpServer;
 import org.apache.log4j.Logger;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
+public abstract class AbstractSecureFtpSourceTest extends EmbeddedSecureFtpServer{
     private Logger logger = Logger.getLogger(getClass());
 
     @Mock
@@ -29,17 +30,18 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     FTPSource ftpSource;
     FtpSourceCounter ftpSourceCounter;
 
-    int getPort = 2121;
+    int getPort = 2422;
 
     String getUser = "flumetest";
     String getPassword = "flumetest";
     String getHost = "localhost";
     String getWorkingDirectory = null;
-    String getFileName = "hasmap.ser";
-    String getFolder = "/var/tmp";
-    String getAbsoutePath = "/var/tmp/hasmap.ser";
+    //secure
+    boolean getSecurityMode = false;
+    boolean getSecurityCert = false;
+    String getProtocolSec = "TLS";
 
-    @BeforeMethod
+    @Test(enabled=false) @BeforeMethod
     public void beforeMethod() {
         MockitoAnnotations.initMocks(this);
 
@@ -50,9 +52,10 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
-        when(mockContext.getString("file.name")).thenReturn(getFileName);
-        when(mockContext.getString("folder")).thenReturn(getFolder);
-        
+        //secure
+        when(mockContext.getBoolean("security.mode")).thenReturn(getSecurityMode);
+        when(mockContext.getBoolean("security.certificate")).thenReturn(getSecurityCert);
+        when(mockContext.getString("security.cipher")).thenReturn(getProtocolSec);
 
         logger.info("Creating FTP source");
 
@@ -73,17 +76,19 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     }
 
     @AfterMethod
+    @Test(enabled=false)
     public void afterMethod() {
         try {
             logger.info("Stopping FTP source");
             ftpSource.stop();
 
-            Paths.get(getFileName).toFile().delete();
+            Paths.get("hasmap.ser").toFile().delete();
+            Paths.get("eventCount.ser").toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }
     }
-
+    @Test(enabled=false)
     public void cleanup(Path file) {
         try {
             TestFileUtils.forceDelete(file);
@@ -91,7 +96,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
             e.printStackTrace();
         }
     }
-
+    @Test(enabled=false)
     public void cleanup(List<Path> files) {
         for (Path f : files) {
             try {

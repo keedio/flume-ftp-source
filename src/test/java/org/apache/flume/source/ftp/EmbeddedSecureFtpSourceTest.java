@@ -1,3 +1,4 @@
+
 package org.apache.flume.source.ftp;
 
 import java.io.IOException;
@@ -21,21 +22,23 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+
+
 /**
  * Basic integration tests for the Keedios' Flume FTP Source,
  *
  */
 @NotThreadSafe
-public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
+public class EmbeddedSecureFtpSourceTest extends AbstractSecureFtpSourceTest {
 
-    private static Logger logger = LoggerFactory.getLogger(EmbeddedFtpSourceTest.class);
+    private static Logger logger = LoggerFactory.getLogger(EmbeddedSecureFtpSourceTest.class);
 
     static {
         logger.info("homeDir: " + EmbeddedSecureFtpServer.homeDirectory.toFile().getAbsolutePath());
     }
 
-    @Test
-    public void testProcessNoFileSec() {
+    @Test(enabled=false)
+    public void testProcessNoFile() {
         try {
             PollableSource.Status proc = ftpSource.process();
             Assert.assertEquals(PollableSource.Status.READY, proc);
@@ -47,8 +50,8 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
 
-    @Test(dependsOnMethods = "testProcessNoFileSec")
-    public void testProcessNewFileSec() {
+    @Test(dependsOnMethods = "testProcessNoFile", enabled=false)
+    public void testProcessNewFile() {
         Path tmpFile = null;
         try {
             tmpFile = TestFileUtils.createTmpFile(EmbeddedSecureFtpServer.homeDirectory);
@@ -64,8 +67,8 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
 
-    @Test(dependsOnMethods = "testProcessNewFileSec")
-    public void testProcessNewFileInNewFoldeSec() {
+    @Test(dependsOnMethods = "testProcessNewFile", enabled=false)
+    public void testProcessNewFileInNewFolder() {
         Path tmpDir = null;
         Path tmpFile = null;
         try {
@@ -89,8 +92,8 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
      * Creates a new empty file in the ftp root,
      * creates a new directory in the ftp root and an empty file inside of it.
      */
-    @Test(dependsOnMethods = "testProcessNewFileInNewFolderSec")
-    public void testProcessMultipleFilesSec() {
+    @Test(dependsOnMethods = "testProcessNewFileInNewFolder", enabled=false)
+    public void testProcessMultipleFiles0() {
         Path tmpDir = null;
         Path tmpFile0 = null;
         Path tmpFile1 = null;
@@ -114,8 +117,8 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
     /**
      * Tries to access a file without permissions
      */
-    @Test(dependsOnMethods = "testProcessMultipleFiles0Sec")
-    public void testProcessNoPermissionSec() {
+    @Test(dependsOnMethods = "testProcessMultipleFiles0", enabled=false)
+    public void testProcessNoPermission() {
         Path tmpFile0 = null;
         try {
             tmpFile0 = TestFileUtils.createTmpFile(EmbeddedSecureFtpServer.homeDirectory);
@@ -135,8 +138,8 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
 
     }
 
-    @Test(dependsOnMethods = "testProcessNoPermission")
-    public void testProcessNotEmptyFileSec() {
+    @Test(dependsOnMethods = "testProcessNoPermission", enabled=false)
+    public void testProcessNotEmptyFile() {
         Path tmpFile0 = null;
         try {
             tmpFile0 = TestFileUtils.createTmpFile(EmbeddedSecureFtpServer.homeDirectory);
@@ -147,7 +150,7 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
 
-            HashMap<String, Long> map = ftpSource.loadMap("hasmap.ser");
+            Map<String, Long> map = ftpSource.loadMap("hasmap.ser");
 
             String filename = "//"+tmpFile0.toFile().getName();
 
@@ -159,8 +162,8 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
 
-    @Test(dependsOnMethods = "testProcessNotEmptyFileSec")
-    public void testProcessModifiedFileSec() {
+    @Test(dependsOnMethods = "testProcessNotEmptyFile", enabled=false)
+    public void testProcessModifiedFile() {
         Path tmpFile0 = null;
         try {
             tmpFile0 = TestFileUtils.createTmpFile(EmbeddedSecureFtpServer.homeDirectory);
@@ -196,8 +199,8 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
      * Creates N temporary non-empty files in the
      * FTP root dir and process it using the FTP source.
      */
-    @Test(dependsOnMethods = "testProcessModifiedFileSec")
-    public void testProcessMultipleFiles1Sec() {
+    @Test(dependsOnMethods = "testProcessModifiedFile", enabled=false)
+    public void testProcessMultipleFiles1() {
         int totFiles = 100;
         List<Path> files = new LinkedList<>();
 
@@ -226,7 +229,7 @@ public class EmbeddedSecFtpSourceTest extends AbstractFtpSourceTest {
         }
     }
     
-   @Test(dependsOnMethods = "testProcessMultipleFiles1Sec")
+   @Test(dependsOnMethods = "testProcessMultipleFiles1", enabled=false)
     public void testFtpFailure() {
         class MyEventListener extends FTPSourceEventListener {
             @Override
