@@ -40,6 +40,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getAbsoutePath = "/var/tmp/hasmap.ser";
     String getSource = "ftp";
     
+    
 
     @BeforeMethod
     public void beforeMethod() {
@@ -55,6 +56,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
         when(mockContext.getString("file.name")).thenReturn(getFileName);
         when(mockContext.getString("folder")).thenReturn(getFolder);
+       
         
 
         logger.info("Creating FTP source");

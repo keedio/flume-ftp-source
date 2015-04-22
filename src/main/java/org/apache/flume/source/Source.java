@@ -18,9 +18,6 @@
  */
 package org.apache.flume.source;
 
-import org.apache.flume.client.sources.SFTPSource;
-import org.apache.flume.client.sources.FTPSSource;
-import org.apache.flume.client.sources.FTPSource;
 import java.util.*;
 
 import org.apache.flume.Context;
@@ -38,37 +35,55 @@ import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 
-import org.apache.flume.source.AbstractSource;
 import org.apache.flume.source.utils.FTPSourceEventListener;
 
 import org.apache.flume.metrics.FtpSourceCounter;
 import java.util.List;
 
 import com.foundationdb.tuple.ByteArrayUtil;
-import org.apache.flume.client.KeedioSource;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-/*
- * @author Luis Lazaro // lalazaro@keedio.com
- KEEDIO
+import org.apache.flume.client.factory.SourceFactory;
+import org.apache.flume.client.KeedioSource;
+
+/**
+ *
+ * @author luislazaro lalazaro@keedio.com - KEEDIO
+ *
  */
 public class Source extends AbstractSource implements Configurable, PollableSource {
 
+    private SourceFactory sourceFactory = new SourceFactory();
     private KeedioSource keedioSource;
 
     private static final Logger log = LoggerFactory.getLogger(Source.class);
-    private static final int CHUNKSIZE = 1024;   //event size in bytes
+    private static final int CHUNKSIZE = 1024;  //event size in bytes
     private static final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
     private static final long EXTRA_DELAY = 10000;
     private static int COUNTER = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private FtpSourceCounter ftpSourceCounter;
 
+    /**
+     * Request keedioSource to the factory
+     *
+     * @param context
+     * @return
+     */
+    public KeedioSource orderKeedioSource(Context context) {
+        keedioSource = sourceFactory.createKeedioSource(context);
+        return keedioSource;
+    }
+
+    /**
+     *
+     * @param context
+     */
     @Override
     public void configure(Context context) {
-        keedioSource = initSource(context);
+        keedioSource = orderKeedioSource(context);
         if (keedioSource.existFolder()) {
             keedioSource.makeLocationFile();
         } else {
@@ -88,7 +103,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     public PollableSource.Status process() throws EventDeliveryException {
         try {
             log.info("Actual dir:  " + keedioSource.getDirectoryserver() + " files: "
-                    + keedioSource.getSizeFileList().size());
+                    + keedioSource.getFileList().size());
             discoverElements(keedioSource, keedioSource.getDirectoryserver(), "", 0);
             keedioSource.cleanList(); //clean list according existing actual files
             keedioSource.getExistFileList().clear();
@@ -120,25 +135,25 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             return PollableSource.Status.READY;     //source was successfully able to generate events
         } catch (InterruptedException inte) {
             log.error("Exception thrown in process while putting to sleep", inte);
-            return PollableSource.Status.BACKOFF;   //inform the runner thread to back off for a bit		
+            return PollableSource.Status.BACKOFF;   //inform the runner thread to back off for a bit
         }
     }
 
-    @Override
     /**
      * @return void
      */
-    public void start() {
+    @Override
+    public synchronized void start() {
         log.info("Starting Keedio source ...", this.getName());
         log.info("FTP Source {} starting. Metrics: {}", getName(), ftpSourceCounter);
         super.start();
         ftpSourceCounter.start();
     }
 
-    @Override
     /**
      * @return void
      */
+    @Override
     public synchronized void stop() {
         keedioSource.saveMap();
         if (keedioSource.isConnected()) {
@@ -158,7 +173,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @param level, deep to search
      * @throws IOException
      */
-    // @SuppressWarnings("UnnecessaryContinue")
+    @SuppressWarnings("UnnecessaryContinue")
     public void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws IOException {
 
         String dirToList = parentDir;
@@ -184,9 +199,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                 } else if (keedioSource.isFile(aFile)) { //aFile is a regular file
                     keedioSource.changeToDirectory(dirToList);
-                    keedioSource.getExistFileList().add(dirToList + "/" + currentFileName);  //control of deleted files in server
-                    //String fileName = aFile.getName();
-                    if (!(keedioSource.getSizeFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
+                    keedioSource.getExistFileList().add(dirToList + "/" + currentFileName);  //control of deleted files in server                    
+                    if (!(keedioSource.getFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
                         ftpSourceCounter.incrementFilesCount();
                         InputStream inputStream = null;
                         try {
@@ -195,10 +209,10 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                             readStream(inputStream, 0);
                             boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
                             if (success) {
-                                keedioSource.getSizeFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
+                                keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
                                 keedioSource.saveMap();
                                 ftpSourceCounter.incrementFilesProcCount();
-                                log.info("discovered: " + currentFileName + " ," + this.keedioSource.getSizeFileList().size());
+                                log.info("discovered: " + currentFileName + " ," + this.keedioSource.getFileList().size());
                             } else {
                                 handleProcessError(currentFileName);
                             }
@@ -209,15 +223,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         }
 
                         keedioSource.changeToDirectory(dirToList);
-                        //ftpClient.changeWorkingDirectory(dirToList);
                         continue;
 
                     } else { //known file
-                        long dif = keedioSource.getObjectSize(aFile)
-                                - keedioSource.getSizeFileList().get(dirToList + "/" + currentFileName);
-                        //long dif = aFile.getSize() - sizeFileList.get(dirToList + "/" + aFile.getName());
+                        long dif = (keedioSource.getObjectSize(aFile) - keedioSource.getFileList().get(dirToList + "/" + currentFileName));
                         if (dif > 0) { //known and modified
-                            long prevSize = keedioSource.getSizeFileList().get(dirToList + "/" + currentFileName);
+                            long prevSize = keedioSource.getFileList().get(dirToList + "/" + currentFileName);
                             InputStream inputStream = null;
                             try {
                                 inputStream = keedioSource.getInputStream(aFile);
@@ -226,10 +237,10 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                                 boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
                                 if (success) {
-                                    keedioSource.getSizeFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
+                                    keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
                                     keedioSource.saveMap();
                                     ftpSourceCounter.incrementCountModProc();
-                                    log.info("modified: " + currentFileName + " ," + this.keedioSource.getSizeFileList().size());
+                                    log.info("modified: " + currentFileName + " ," + this.keedioSource.getFileList().size());
                                 } else {
                                     handleProcessError(currentFileName);
                                 }
@@ -239,7 +250,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                                 continue;
                             }
                             keedioSource.changeToDirectory(dirToList);
-                            //ftpClient.changeWorkingDirectory(dirToList);
                             continue;
                         } else if (dif < 0) { //known and full modified
                             keedioSource.getExistFileList().remove(dirToList + "/" + currentFileName); //will be rediscovered as new file
@@ -264,10 +274,15 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     }//fin de método
 
     /**
-     * read retrieved stream from ftpclient into byte[] and process
+     * Read retrieved stream from ftpclient into byte[] and process. If
+     * flushlines is true the retrieved inputstream will be readed by lines. And
+     * the type of file is set to ASCII from KeedioSource.
      *
      * @return boolean
-     * @param inputStream, position
+     * @param inputStream
+     * @param position
+     * @see
+     * <a href="https://foundationdb.com/key-value-store/documentation/javadoc/index.html?com/foundationdb/tuple/ByteArrayUtil.html">ByteArrayUtil</a>
      */
     public boolean readStream(InputStream inputStream, long position) {
         if (inputStream == null) {
@@ -323,7 +338,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @void process last appended data to files
      * @param lastInfo byte[]
      */
-    public synchronized void processMessage(byte[] lastInfo) {
+    public void processMessage(byte[] lastInfo) {
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
@@ -336,56 +351,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             log.error("ChannelException", e);
         }
 
-    }
-
-    /**
-     * @param context of the source
-     * @return KeedioSource
-     */
-    public KeedioSource initSource(Context context) {
-        switch (context.getString("client.source")) {
-            case "ftp":
-                keedioSource = new FTPSource();
-                initCommonParam(context);
-                break;
-            case "sftp":
-                keedioSource = new SFTPSource();
-                SFTPSource sftpSource = new SFTPSource();
-                sftpSource.setKnownHosts(context.getString("knownHosts"));
-                keedioSource = sftpSource;
-                initCommonParam(context);
-                break;
-            case "ftps":
-                keedioSource = new FTPSSource();
-                FTPSSource ftpsSource = new FTPSSource();
-                ftpsSource.setProtocolSec(context.getString("security.cipher"));
-                ftpsSource.setSecurityMode(context.getBoolean("security.enabled"));
-                ftpsSource.setSecurityCert(context.getBoolean("security.certificate.enabled"));
-                keedioSource = ftpsSource;
-                initCommonParam(context);
-                break;
-            default:
-                log.error("Source not found in context");
-                System.exit(1);
-        }
-        return keedioSource;
-    }
-
-    /**
-     * @void initialize common parameters for all sources
-     * @param context of source
-     */
-    public void initCommonParam(Context context) {
-        keedioSource.setBufferSize(context.getInteger("buffer.size"));
-        keedioSource.setServer(context.getString("name.server"));
-        keedioSource.setUser(context.getString("user"));
-        keedioSource.setPassword(context.getString("password"));
-        keedioSource.setRunDiscoverDelay(context.getInteger("run.discover.delay"));
-        keedioSource.setWorkingDirectory(context.getString("working.directory"));
-        keedioSource.setPort(context.getInteger("port"));
-        keedioSource.setFolder(context.getString("folder"));
-        keedioSource.setFileName(context.getString("file.name"));
-        keedioSource.setFlushLines(context.getBoolean("flushlines"));
     }
 
     /**

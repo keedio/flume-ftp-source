@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.flume.client.KeedioSource;
 import org.apache.commons.net.ftp.FTPSClient;
@@ -32,6 +33,7 @@ public class FTPSSource extends KeedioSource {
     private String protocolSec;
     private FTPSClient ftpsClient;
 
+    
     public FTPSSource() {
         ftpsClient = new FTPSClient(protocolSec);
         checkIfCertificate();
@@ -76,8 +78,8 @@ public class FTPSSource extends KeedioSource {
     /**
      * Disconnect and logout from current connection to server
      *
-     * @return void
      */
+    @Override
     public void disconnect() {
         try {
             ftpsClient.logout();
@@ -128,6 +130,11 @@ public class FTPSSource extends KeedioSource {
         InputStream inputStream = null;
         FTPFile afile = (FTPFile) file;
         try {
+            if (isFlushLines()) {
+                this.setFileType(FTP.ASCII_FILE_TYPE);
+            } else {
+                this.setFileType(FTP.BINARY_FILE_TYPE);
+            }
             inputStream = ftpsClient.retrieveFileStream(afile.getName());
         } catch (IOException e) {
             log.error("Error trying to retrieve inputstream");
@@ -165,8 +172,9 @@ public class FTPSSource extends KeedioSource {
         return afile.isFile();
     }
 
-    @Override
     /**
+     * This method calls completePendigCommand, mandatory for FTPSClient
+     * @see <a href="http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html#completePendingCommand()">completePendigCommmand</a>
      * @return boolean
      */
     public boolean particularCommand() {
@@ -297,5 +305,10 @@ public class FTPSSource extends KeedioSource {
      */
     public Object getClientSource() {
         return ftpsClient;
+    }
+    
+    @Override   
+    public void setFileType(int fileType) throws IOException {
+        ftpsClient.setFileType(fileType);
     }
 }

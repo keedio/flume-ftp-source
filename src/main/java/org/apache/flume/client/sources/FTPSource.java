@@ -18,6 +18,7 @@ import java.util.List;
 import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.IOException;
+import org.apache.commons.net.ftp.FTP;
 
 /**
  *
@@ -69,8 +70,8 @@ public class FTPSource extends KeedioSource {
     /**
      * Disconnect and logout from current connection to server
      *
-     * @return void
      */
+    @Override
     public void disconnect() {
         try {
             getFtpClient().logout();
@@ -102,7 +103,6 @@ public class FTPSource extends KeedioSource {
      */
     public List<Object> listFiles(String dir) {
         List<Object> list = new ArrayList<>();
-        FTPFile afile = (FTPFile) file;
         try {
             FTPFile[] subFiles = getFtpClient().listFiles(dir);
             for (FTPFile file : subFiles) {
@@ -123,6 +123,11 @@ public class FTPSource extends KeedioSource {
         InputStream inputStream = null;
         FTPFile afile = (FTPFile) file;
         try {
+            if (isFlushLines()) {
+                this.setFileType(FTP.ASCII_FILE_TYPE);
+            } else {
+                this.setFileType(FTP.BINARY_FILE_TYPE);
+            }
             inputStream = getFtpClient().retrieveFileStream(afile.getName());
         } catch (IOException e) {
             log.error("Error trying to retrieve inputstream");
@@ -160,10 +165,13 @@ public class FTPSource extends KeedioSource {
         return afile.isFile();
     }
 
-    @Override
+   
     /**
+     * This method calls completePendigCommand, mandatory for FTPClient
+     * @see <a href="http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html#completePendingCommand()">completePendigCommmand</a>
      * @return boolean
      */
+     @Override
     public boolean particularCommand() {
         boolean success = true;
         try {
@@ -239,5 +247,10 @@ public class FTPSource extends KeedioSource {
      */
     public Object getClientSource() {
         return ftpClient;
+    }
+
+    @Override
+    public void setFileType(int fileType) throws IOException {
+        ftpClient.setFileType(fileType);
     }
 } //endclass

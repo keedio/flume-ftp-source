@@ -302,4 +302,9 @@ public class SFTPSource extends KeedioSource {
     public Object getClientSource(){
         return sftpClient;
     }
+    
+    @Override   
+    public void setFileType(int fileType) throws IOException {
+        //do nothing        
+    }
 }

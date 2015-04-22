@@ -247,7 +247,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
                 }
             }
         }
-       // ftpSource.getKeedioSource().getClientSource().setFileType(FTP.BINARY_FILE_TYPE);
+        //ftpSource.getKeedioSource().getClientSource().setFileType(FTP.BINARY_FILE_TYPE);
         ftpSource.setListener(new MyEventListener());
 
         String[] directories = EmbeddedFTPServer.homeDirectory.toFile().list();
@@ -268,8 +268,8 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             PollableSource.Status proc0 = ftpSource.process();
             Assert.assertEquals(PollableSource.Status.READY, proc0);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-            //Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
-            //Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 1);
+//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
+//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 1);
         } catch (IOException|EventDeliveryException e) {
             Assert.fail();
         } finally {

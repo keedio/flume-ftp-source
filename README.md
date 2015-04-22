@@ -9,7 +9,7 @@ In main flume's agent configuration file must be specified if security for FTP i
 
 Files can be proccesed int two ways:
 - by lines, as one event is a full line.
-- by chunk of bytes, exactly 1024 KB is the size of one event.
+- by chunk of bytes, exactly 1 KB is the size of one event.
 
 Proccesed files's names will be "saved" into an external file (file.name). The file will be created in .folder.
 

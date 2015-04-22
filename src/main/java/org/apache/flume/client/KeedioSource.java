@@ -37,12 +37,12 @@ public abstract class KeedioSource {
     
     private static final Logger log = LoggerFactory.getLogger(KeedioSource.class);
       
-    private Map<String, Long> sizeFileList = new HashMap<>();
+    private Map<String, Long> fileList = new HashMap<>();
     private Set<String> existFileList = new HashSet<>();
     private Path pathTohasmap = Paths.get("");
     private Path hasmap = Paths.get("");
     private Path absolutePath = Paths.get("");   
-    
+
     
     protected String server;
     protected String user;
@@ -51,19 +51,19 @@ public abstract class KeedioSource {
     protected String fileName;
     protected Integer port;
     protected Integer bufferSize;
-    protected int runDiscoverDelay;
+    protected Integer runDiscoverDelay;
     protected String workingDirectory; //working directory specified in config.
-    private boolean flushLines;
-    
+    protected boolean flushLines;
     protected boolean connected;
     protected String dirToList;
     protected Object file;   //type of file the sources will use in each file-system-connection
      
+   
     public abstract boolean connect();
     public abstract void disconnect();
     public abstract List<Object> listFiles(String dirToList);
     public abstract void changeToDirectory(String directory);
-    public abstract InputStream getInputStream(Object File ) throws IOException;
+    public abstract InputStream getInputStream(Object file ) throws IOException;
     public abstract String getObjectName(Object file);
     public abstract boolean isDirectory(Object file);
     public abstract boolean isFile(Object file);
@@ -73,15 +73,16 @@ public abstract class KeedioSource {
     public abstract String getLink(Object file);
     public abstract String getDirectoryserver(); //the working directory retrieved by server
     public abstract Object getClientSource();
+    public abstract void setFileType(int fileType) throws IOException;
    
     /**
-     * @void Serialize hashmap
+     * @void save map of file's names proccesed
      */
     public void saveMap() {
         try {
             FileOutputStream fileOut = new FileOutputStream(getAbsolutePath().toString());
             try (ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-                out.writeObject((HashMap) this.getSizeFileList());
+                out.writeObject((HashMap) getFileList());
             }
         } catch (FileNotFoundException e) {
             log.error("Error saving map File", e);
@@ -93,21 +94,23 @@ public abstract class KeedioSource {
     /**
      * @return HashMap<String,Long> 
      * @param name
+     * @throws java.lang.ClassNotFoundException
+     * @throws java.io.IOException
      */
     public Map<String, Long> loadMap(String name) throws ClassNotFoundException, IOException {
-        FileInputStream map = new FileInputStream(name);
-        HashMap hasMap;
-        try (ObjectInputStream in = new ObjectInputStream(map)) {
-            hasMap = (HashMap) in.readObject();
+        FileInputStream fileIn = new FileInputStream(name);
+        Map map = new HashMap<>();
+        try (ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            map = (HashMap) in.readObject();
         }
-        return hasMap;
+        return map;
     }
 
     /**
      * @void, delete file from hashmaps if deleted from server
      */
     public void cleanList() {
-        for (Iterator<String> iter = this.getSizeFileList().keySet().iterator(); iter.hasNext();) {
+        for (Iterator<String> iter = this.getFileList().keySet().iterator(); iter.hasNext();) {
             final String filename = iter.next();
             if (!(existFileList.contains(filename))) {
                 iter.remove();
@@ -122,7 +125,7 @@ public abstract class KeedioSource {
         Path file1 = makeLocationFile();
         try {
             if (Files.exists(file1)) {
-                setSizeFileList(loadMap(file1.toString()));
+                setFileList(loadMap(file1.toString()));
                 log.info("Found previous map of files flumed");
             } else {
                 log.info("Not found preivous map of files flumed");
@@ -275,17 +278,17 @@ public abstract class KeedioSource {
     }
 
     /**
-     * @return the sizeFileList
+     * @return the fileList
      */
-    public Map<String, Long> getSizeFileList() {
-        return sizeFileList;
+    public Map<String, Long> getFileList() {
+        return fileList;
     }
 
     /**
-     * @param sizeFileList the sizeFileList to set
+     * @param fileList the fileList to set
      */
-    public void setSizeFileList(Map<String, Long> sizeFileList) {
-        this.sizeFileList = sizeFileList;
+    public void setFileList(Map<String, Long> fileList) {
+        this.fileList = fileList;
     }
 
     /**
@@ -317,7 +320,8 @@ public abstract class KeedioSource {
     }
 
     /**
-     * @return the hasmap
+     * 
+     * @return  path
      */
     public Path getHasmap() {
         return hasmap;
@@ -364,12 +368,13 @@ public abstract class KeedioSource {
      */
     public Path makeLocationFile(){
       hasmap = Paths.get(getFileName());
+      pathTohasmap = Paths.get(getFolder());
       absolutePath = Paths.get(pathTohasmap.toString(), hasmap.toString());
       return absolutePath;
     }
 
     /**
-     * @return the flushLines
+     * @return if flush lines instead chunk of bytes
      */
     public boolean isFlushLines() {
         return flushLines;
@@ -381,5 +386,7 @@ public abstract class KeedioSource {
     public void setFlushLines(boolean flushLines) {
         this.flushLines = flushLines;
     }
+
+      
     
 } //endclass

@@ -4,7 +4,7 @@
     <test name="FtpSource" preserve-order="true" parallel="false">
         <classes>
             <class name="org.apache.flume.source.ftp.EmbeddedFtpSourceTest" />
-            <!--class name="org.apache.flume.source.ftp.ExternalFtpSourceTests" /-->
+            <class name="org.apache.flume.source.ftp.ExternalFtpSourceTests" />
             <class name="org.apache.flume.source.TestFileUtilsTest" />
         </classes>
     </test>
