@@ -140,7 +140,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
     @Override
     public void start() {
-        log.info("Starting sql source {} ...", getName());
+        log.info("Starting ftp source {} ...", getName());
         log.info("FTP Source {} starting. Metrics: {}", getName(), ftpSourceCounter);
         super.start();
         ftpSourceCounter.start();
