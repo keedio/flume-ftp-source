@@ -1,7 +1,5 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * KEEDIO
  */
 package org.apache.flume.source;
 
@@ -11,11 +9,11 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 import org.apache.flume.Context;
 import org.apache.flume.PollableSource;
-import org.apache.flume.client.KeedioSource;
-import org.apache.flume.metrics.FtpSourceCounter;
-import org.apache.flume.source.utils.FTPSourceEventListener;
+import com.keedio.flume.client.KeedioSource;
+import com.keedio.flume.metrics.FtpSourceCounter;
+import com.keedio.flume.source.utils.FTPSourceEventListener;
 
-import org.apache.flume.client.factory.SourceFactory;
+import com.keedio.flume.client.factory.SourceFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,7 +29,7 @@ import static org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
-import org.apache.flume.client.sources.FTPSource;
+import com.keedio.flume.client.sources.FTPSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

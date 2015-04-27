@@ -65,7 +65,7 @@ Proccesed files's names will be "saved" into an external file (file.name). The f
 >       agent.sources.sftp1.port = 22
 >       agent.sources.sftp1.folder = /var/flume
 >       agent.sources.sftp1.file.name = status-sftp1-file.ser
->       agent.sources.sftp1.knownHosts = /home/username/.ssh/known_hosts
+>       agent.sources.sftp1.knownHosts = /home/<user launching flume>/.ssh/known_hosts
 
 
 ###### Discover delay, each configured milisecond directory will be explored

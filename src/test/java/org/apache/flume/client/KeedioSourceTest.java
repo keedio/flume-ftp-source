@@ -5,6 +5,7 @@
  */
 package org.apache.flume.client;
 
+import com.keedio.flume.client.KeedioSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;

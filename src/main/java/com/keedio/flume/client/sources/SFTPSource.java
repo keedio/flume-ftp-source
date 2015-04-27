@@ -1,9 +1,7 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * KEEDIO
  */
-package org.apache.flume.client.sources;
+package com.keedio.flume.client.sources;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -15,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.flume.client.KeedioSource;
+import com.keedio.flume.client.KeedioSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +32,12 @@ public class SFTPSource extends KeedioSource {
     private ChannelSftp sftpClient;
     //private ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
 
+    public SFTPSource(){}
+    
+    public SFTPSource(String knownHosts){
+        this.knownHosts = knownHosts;
+        jsch = new JSch();
+    }
     /**
      * @return boolean Opens a Socket connected to a server and login to return
      * True if successfully completed, false if not.
@@ -223,9 +227,9 @@ public class SFTPSource extends KeedioSource {
     public boolean isFile(Object file) {
         boolean isfile = false;
         if ((!isDirectory(file)) & (!isLink(file))) {
-            isfile = false;
-        } else {
             isfile = true;
+        } else {
+            isfile = false;
         }
         return isfile;
     }

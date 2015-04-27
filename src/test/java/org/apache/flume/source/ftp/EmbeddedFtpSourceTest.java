@@ -13,7 +13,7 @@ import org.apache.flume.PollableSource;
 import org.apache.flume.source.TestFileUtils;
 import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
 
-import org.apache.flume.source.utils.FTPSourceEventListener;
+import com.keedio.flume.source.utils.FTPSourceEventListener;
 import org.apache.ftpserver.ftplet.FtpException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

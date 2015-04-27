@@ -1,72 +1,62 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * KEEDIO
  */
-package org.apache.flume.client.sources;
+package com.keedio.flume.client.sources;
 
-import java.io.IOException;
+import com.keedio.flume.client.KeedioSource;
+
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.flume.client.KeedioSource;
-import org.apache.commons.net.ftp.FTPSClient;
-
-import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.apache.commons.net.util.TrustManagerUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import org.apache.commons.net.ftp.FTP;
 
 /**
  *
  * @author Luis Lázaro lalazaro@keedio.com Keedio
  */
-public class FTPSSource extends KeedioSource {
+public class FTPSource extends KeedioSource {
 
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
+    private FTPClient ftpClient = new FTPClient();
     //private FTPFile afile = (FTPFile) file;
-    
-    private boolean securityMode, securityCert;
-    private String protocolSec;
-    private FTPSClient ftpsClient;
-
-    
-    public FTPSSource() {
-        ftpsClient = new FTPSClient(protocolSec);
-        checkIfCertificate();
-    }
 
     /**
      * @return boolean Opens a Socket connected to a server and login to return
+     * True if successfully completed, false if not.
      */
     @Override
     public boolean connect() {
         setConnected(true);
         try {
-            ftpsClient.connect(getServer(), getPort());
-            int replyCode = ftpsClient.getReplyCode();
+            getFtpClient().connect(getServer(), getPort());
+            int replyCode = getFtpClient().getReplyCode();
 
             if (!FTPReply.isPositiveCompletion(replyCode)) {
-                ftpsClient.disconnect();
+                getFtpClient().disconnect();
                 log.error("Connect Failed due to FTP server refused connection.");
                 this.setConnected(false);
             }
 
-            if (!(ftpsClient.login(user, password))) {
+            if (!(ftpClient.login(user, password))) {
                 log.error("Could not login to the server");
                 this.setConnected(false);
             }
             
-            ftpsClient.enterLocalPassiveMode();
+            ftpClient.enterLocalPassiveMode();
             if (getWorkingDirectory() != null) {
-                ftpsClient.changeWorkingDirectory(getWorkingDirectory());
+                getFtpClient().changeWorkingDirectory(getWorkingDirectory());
             }
 
             if (getBufferSize() != null) {
-                ftpsClient.setBufferSize(getBufferSize());
+                getFtpClient().setBufferSize(getBufferSize());
             }
 
         } catch (IOException e) {
@@ -83,11 +73,12 @@ public class FTPSSource extends KeedioSource {
     @Override
     public void disconnect() {
         try {
-            ftpsClient.logout();
-            ftpsClient.disconnect();
+            getFtpClient().logout();
+            getFtpClient().disconnect();
             setConnected(false);
+
         } catch (IOException e) {
-            log.error("Source " + this.getClass().getName() + " failed disconnect");
+            log.error("Source " + this.getClass().getName() + " failed disconnect", e);
         }
     }
 
@@ -96,11 +87,11 @@ public class FTPSSource extends KeedioSource {
      * @return void
      * @param String destination
      */
-    public void changeToDirectory(String directory) {
+    public void changeToDirectory(String dir) {
         try {
-            ftpsClient.changeWorkingDirectory(directory);
+            ftpClient.changeWorkingDirectory(dir);
         } catch (IOException e) {
-            log.error("Could not change to directory " + directory);
+            log.error("Could not change to directory " + dir);
         }
     }
 
@@ -109,15 +100,15 @@ public class FTPSSource extends KeedioSource {
      * @return list with objects in directory
      * @param current directory
      */
-    public List<Object> listFiles(String directory) {
+    public List<Object> listFiles(String dir) {
         List<Object> list = new ArrayList<>();
         try {
-            FTPFile[] subFiles = ftpsClient.listFiles(directory);
+            FTPFile[] subFiles = getFtpClient().listFiles(dir);
             for (FTPFile file : subFiles) {
                 list.add((Object) file);
             }
         } catch (IOException e) {
-            log.error("Could not list list files from  " + directory);
+            log.error("Could not list list files from  " + dir);
         }
         return list;
     }
@@ -136,7 +127,7 @@ public class FTPSSource extends KeedioSource {
             } else {
                 this.setFileType(FTP.BINARY_FILE_TYPE);
             }
-            inputStream = ftpsClient.retrieveFileStream(afile.getName());
+            inputStream = getFtpClient().retrieveFileStream(afile.getName());
         } catch (IOException e) {
             log.error("Error trying to retrieve inputstream");
         }
@@ -173,17 +164,19 @@ public class FTPSSource extends KeedioSource {
         return afile.isFile();
     }
 
+   
     /**
-     * This method calls completePendigCommand, mandatory for FTPSClient
+     * This method calls completePendigCommand, mandatory for FTPClient
      * @see <a href="http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html#completePendingCommand()">completePendigCommmand</a>
      * @return boolean
      */
+     @Override
     public boolean particularCommand() {
         boolean success = true;
         try {
-            success = ftpsClient.completePendingCommand();
+            success = getFtpClient().completePendingCommand();
         } catch (IOException e) {
-            log.error("Error on command completePendingCommand of FTPClient");
+            log.error("Error on command completePendingCommand of FTPClient", e);
         }
         return success;
     }
@@ -218,73 +211,6 @@ public class FTPSSource extends KeedioSource {
         return afile.getLink();
     }
 
-    /**
-     * @return the ftpsClient
-     */
-    public FTPSClient getFtpsClient() {
-        return ftpsClient;
-    }
-
-    /**
-     * @param ftpsClient the ftpsClient to set
-     */
-    public void setFtpsClient(FTPSClient ftpsClient) {
-        this.ftpsClient = ftpsClient;
-    }
-
-    /**
-     * @return the securityMode
-     */
-    public boolean isSecurityMode() {
-        return securityMode;
-    }
-
-    /**
-     * @param securityMode the securityMode to set
-     */
-    public void setSecurityMode(boolean securityMode) {
-        this.securityMode = securityMode;
-    }
-
-    /**
-     * @return the securityCert
-     */
-    public boolean isSecurityCert() {
-        return securityCert;
-    }
-
-    /**
-     * @param securityCert the securityCert to set
-     */
-    public void setSecurityCert(boolean securityCert) {
-        this.securityCert = securityCert;
-    }
-
-    /**
-     * @return the protocolSec
-     */
-    public String getProtocolSec() {
-        return protocolSec;
-    }
-
-    /**
-     * @param protocolSec the protocolSec to set
-     */
-    public void setProtocolSec(String protocolSec) {
-        this.protocolSec = protocolSec;
-    }
-
-    /**
-     * @void, check if trust all certifcates.
-     */
-    public void checkIfCertificate() {
-        if (securityCert) {
-            ftpsClient.setTrustManager(TrustManagerUtils.getValidateServerCertificateTrustManager());
-        } else {
-            ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
-        }
-    }
-
     @Override
     /**
      *
@@ -293,23 +219,37 @@ public class FTPSSource extends KeedioSource {
     public String getDirectoryserver() {
         String printWorkingDirectory = "";
         try {
-            printWorkingDirectory = ftpsClient.printWorkingDirectory();
+            printWorkingDirectory = getFtpClient().printWorkingDirectory();
         } catch (IOException e) {
-            log.error("Error getting printworkingdirectory for server -ftpSsource");
+            log.error("Error getting printworkingdirectory for server -ftpsource");
         }
         return printWorkingDirectory;
     }
 
     /**
+     * @return the ftpClient
+     */
+    public FTPClient getFtpClient() {
+        return ftpClient;
+    }
+
+    /**
+     * @param ftpClient the ftpClient to set
+     */
+    public void setFtpClient(FTPClient ftpClient) {
+        this.ftpClient = ftpClient;
+    }
+
+    /**
      *
-     * @return object as cliente of ftpSsource
+     * @return object as cliente of ftpsource
      */
     public Object getClientSource() {
-        return ftpsClient;
+        return ftpClient;
     }
-    
-    @Override   
+
+    @Override
     public void setFileType(int fileType) throws IOException {
-        ftpsClient.setFileType(fileType);
+        ftpClient.setFileType(fileType);
     }
-}
+} //endclass
