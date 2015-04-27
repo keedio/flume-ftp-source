@@ -90,13 +90,7 @@
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
             <version>0.1.52</version>
-        </dependency>
-        <dependency>
-            <groupId>com.foundationdb</groupId>
-            <artifactId>fdb-java</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-
+        </dependency>        
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

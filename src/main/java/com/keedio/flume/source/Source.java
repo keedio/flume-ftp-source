@@ -370,20 +370,5 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         return keedioSource;
     }
 
-    /**
-     * Remove from from the byte[] data the last return carriage
-     *
-     * @param data
-     * @return mutated data without last return carriage
-     * @see
-     * <a href="https://foundationdb.com/key-value-store/documentation/javadoc/index.html?com/foundationdb/tuple/ByteArrayUtil.html">ByteArrayUtil</a>
-     */
-    public byte[] removeLastReturnCarriage(byte[] data) {
-        String lastCarriage = System.lineSeparator() + "";
-        byte[] lastCarriageByte = lastCarriage.getBytes();
-        String emptyString = "";
-        byte[] emptyBytes = emptyString.getBytes();
-        byte[] data_mutate = ByteArrayUtil.replace(data, 0, 1023, lastCarriageByte, emptyBytes);
-        return data_mutate;
-    }
+   
 } //endclass
