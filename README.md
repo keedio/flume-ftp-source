@@ -8,8 +8,8 @@ In main flume's agent configuration file must be specified if security for FTP i
 - SFTP: File Transfer Protocol that uses SSH V3, via a single channel (layer transport) and sending/receiving in binary. Port 22.(Recommended).
 
 Files can be proccesed int two ways:
-- by lines, as one event is a full line.
-- by chunk of bytes, exactly 1 KB is the size of one event.
+- by lines, as one event is a full line.(flushlines = true)
+- by chunk of bytes, exactly 1 KB is the size of one event. (flushlines = false) 
 
 Proccesed files's names will be "saved" into an external file (file.name). The file will be created in .folder.
 
@@ -73,10 +73,14 @@ Proccesed files's names will be "saved" into an external file (file.name). The f
 
 ###### Force flume-ftp to proccess lines instead of chunk of bytes
 ###### (Thanks to Erik Schmiegelow : https://github.com/schmiegelow/flume-ftp-source)
->     agent.sources.<fpt1 | ftps1 | sftp1>.flushlines = (true | false)
-      
+>     agent.sources.<fpt1 | ftps1 | sftp1>.flushlines = (true | false)      
+
+###### Force the size of events in bytes. The default size is 1024 bytes.Customizing this option is
+intended for particular cases.
+>     agent.sources.ftp1.chunk.size = 2048
 
 ### Version history #####
+2.0.1 new configurable parameters in flume's context
 2.0.0: sources integration
 1.1.5: flush lines from SFTPSource
 1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing)
@@ -96,4 +100,5 @@ https://github.com/keedio/flume-ftp-source/wiki/flume-ftp-source,-especificacion
 
 --
 Luis Lázaro <lalazaro@keedio.com>
+www.keedio.com
 
