@@ -75,9 +75,9 @@ Proccesed files's names will be "saved" into an external file (file.name). The f
 ###### (Thanks to Erik Schmiegelow : https://github.com/schmiegelow/flume-ftp-source)
 >     agent.sources.<fpt1 | ftps1 | sftp1>.flushlines = (true | false)      
 
-###### Force the size of events in bytes. The default size is 1024 bytes.Customizing this option is
-intended for particular cases.
->     agent.sources.ftp1.chunk.size = 2048
+###### Force the size of events in bytes. 
+The default size is 1024 bytes.Customizing this option is intended for particular cases.
+>     agent.sources.ftp1.chunk.size = 1024
 
 ### Version history #####
 2.0.1 new configurable parameters in flume's context
