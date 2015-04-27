@@ -3,7 +3,7 @@
  */
 package org.apache.flume.source;
 
-import com.foundationdb.tuple.ByteArrayUtil;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import junit.framework.TestCase;

@@ -25,16 +25,13 @@ import com.keedio.flume.source.utils.FTPSourceEventListener;
 import com.keedio.flume.metrics.FtpSourceCounter;
 import java.util.List;
 
-import com.foundationdb.tuple.ByteArrayUtil;
+
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.ByteArrayInputStream;
 
 import com.keedio.flume.client.factory.SourceFactory;
 import com.keedio.flume.client.KeedioSource;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.flume.source.AbstractSource;
 
 /**
