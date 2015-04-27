@@ -117,7 +117,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 }
             }
         }
-        keedioSource.saveMap();
+        //keedioSource.saveMap();
 
         try {
             Thread.sleep(keedioSource.getRunDiscoverDelay());
