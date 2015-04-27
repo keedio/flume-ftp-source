@@ -54,7 +54,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
-        when(mockContext.getString("file.name")).thenReturn(getFileName);
+        when(mockContext.getString("file.name")).thenReturn(getFileName) ;
         when(mockContext.getString("folder")).thenReturn(getFolder);
        
         

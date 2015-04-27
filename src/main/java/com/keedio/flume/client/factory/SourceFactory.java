@@ -20,6 +20,9 @@ public class SourceFactory {
     private KeedioSource keedioSource;
     private static final Logger log = LoggerFactory.getLogger(KeedioSource.class);
     private final Integer DISCOVERDELAY_DEFAULT = 10000;
+    private final boolean FLUSHLINES_DEFAULT = true;
+    private final String FOLDER_DEFAULT = System.getProperty("java.io.tmpdir");
+    
 
     /**
      * Create KeedioSource
@@ -82,7 +85,15 @@ public class SourceFactory {
         keedioSource.setPort(context.getInteger("port"));
         keedioSource.setFolder(context.getString("folder"));
         keedioSource.setFileName(context.getString("file.name"));
-        keedioSource.setFlushLines(context.getBoolean("flushlines"));
+        keedioSource.setFlushLines(context.getBoolean("flushlines", FLUSHLINES_DEFAULT));
     }
 
+    /**
+     * Generate a default file name for file track status.
+     * @param context
+     * @return String
+     */
+    public String generateDefaultFileName(Context context){
+        return context.getString("client.source") + "status.ser";        
+    }
 }
