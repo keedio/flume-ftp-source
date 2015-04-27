@@ -304,7 +304,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         byte[] data = baostream.toByteArray();
                         processMessage(data);
                         data = null;
-                        baostream.reset();
                     }
                 }
 
