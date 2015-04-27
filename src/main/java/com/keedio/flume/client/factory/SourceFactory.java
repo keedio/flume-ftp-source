@@ -22,6 +22,7 @@ public class SourceFactory {
     private final Integer DISCOVERDELAY_DEFAULT = 10000;
     private final boolean FLUSHLINES_DEFAULT = true;
     private final String FOLDER_DEFAULT = System.getProperty("java.io.tmpdir");
+    private final Integer CHUNKSIZE_DEFAULT = 1024;
     
 
     /**
@@ -83,9 +84,10 @@ public class SourceFactory {
         keedioSource.setRunDiscoverDelay(context.getInteger("run.discover.delay", DISCOVERDELAY_DEFAULT));
         keedioSource.setWorkingDirectory(context.getString("working.directory"));
         keedioSource.setPort(context.getInteger("port"));
-        keedioSource.setFolder(context.getString("folder"));
+        keedioSource.setFolder(context.getString("folder", FOLDER_DEFAULT));
         keedioSource.setFileName(context.getString("file.name"));
         keedioSource.setFlushLines(context.getBoolean("flushlines", FLUSHLINES_DEFAULT));
+        keedioSource.setChunkSize(context.getInteger("chunk.size", CHUNKSIZE_DEFAULT));
     }
 
     /**

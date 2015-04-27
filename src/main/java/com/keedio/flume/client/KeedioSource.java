@@ -55,6 +55,7 @@ public abstract class KeedioSource {
     protected boolean connected;
     protected String dirToList;
     protected Object file;   //type of file the sources will use in each file-system-connection
+    protected Integer chunkSize;
      
    
     public abstract boolean connect();
@@ -383,6 +384,20 @@ public abstract class KeedioSource {
      */
     public void setFlushLines(boolean flushLines) {
         this.flushLines = flushLines;
+    }
+
+    /**
+     * @return the chunkSize
+     */
+    public Integer getChunkSize() {
+        return chunkSize;
+    }
+
+    /**
+     * @param chunkSize the chunkSize to set
+     */
+    public void setChunkSize(Integer chunkSize) {
+        this.chunkSize = chunkSize;
     }
 
       

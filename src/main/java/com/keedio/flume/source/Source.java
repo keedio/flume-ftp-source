@@ -48,7 +48,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private KeedioSource keedioSource;
 
     private static final Logger log = LoggerFactory.getLogger(Source.class);
-    private static final int CHUNKSIZE = 1024;  //event size in bytes
+    //private int CHUNKSIZE = 0;  //event size in bytes
     private static final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
     private static final long EXTRA_DELAY = 10000;
     private static int COUNTER = 0;
@@ -298,6 +298,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
             try {
                 inputStream.skip(position);
+                int CHUNKSIZE = keedioSource.getChunkSize();
                 byte[] bytesArray = new byte[CHUNKSIZE];
                 int bytesRead = -1;
                 while ((bytesRead = inputStream.read(bytesArray)) != -1) {

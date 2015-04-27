@@ -36,8 +36,8 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getHost = "localhost";
     String getWorkingDirectory = null;
     String getFileName = "hasmap.ser";
-    String getFolder = System.getProperty("java.io.tmpdir");
-    String getAbsoutePath = getFolder + "hasmap.ser";
+    //String getFolder = System.getProperty("java.io.tmpdir");
+    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
     String getSource = "ftp";
     
     
@@ -54,8 +54,9 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
-        when(mockContext.getString("file.name")).thenReturn(getFileName) ;
-        when(mockContext.getString("folder")).thenReturn(getFolder);
+        when(mockContext.getString("file.name")).thenReturn(getFileName);
+        when(mockContext.getString("folder", System.getProperty("java.io.tmpdir"))).thenReturn(System.getProperty("java.io.tmpdir"));
+        when(mockContext.getInteger("chunk.size", 1024)).thenReturn(1024);
        
         
 
@@ -83,7 +84,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
             logger.info("Stopping FTP source");
             ftpSource.stop();
 
-            Paths.get(getFileName).toFile().delete();
+            Paths.get("hasmap.ser").toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }
