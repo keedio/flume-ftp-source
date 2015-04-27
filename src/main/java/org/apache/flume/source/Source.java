@@ -44,9 +44,12 @@ import com.foundationdb.tuple.ByteArrayUtil;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.ByteArrayInputStream;
 
 import org.apache.flume.client.factory.SourceFactory;
 import org.apache.flume.client.KeedioSource;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -281,8 +284,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @return boolean
      * @param inputStream
      * @param position
-     * @see
-     * <a href="https://foundationdb.com/key-value-store/documentation/javadoc/index.html?com/foundationdb/tuple/ByteArrayUtil.html">ByteArrayUtil</a>
      */
     public boolean readStream(InputStream inputStream, long position) {
         if (inputStream == null) {
@@ -294,12 +295,15 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         if (keedioSource.isFlushLines()) {
             try {
                 inputStream.skip(position);
-                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));                
                 String line = null;
 
                 while ((line = in.readLine()) != null) {
                     processMessage(line.getBytes());
                 }
+                
+                inputStream.close();
+                in.close();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 successRead = false;
@@ -314,14 +318,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(CHUNKSIZE)) {
                         baostream.write(bytesArray, 0, bytesRead);
                         byte[] data = baostream.toByteArray();
-                        String carriage = System.getProperty("line.separator");
-                        byte[] carriageB = carriage.getBytes();
-                        String emptyString = "";
-                        byte[] emptyB = emptyString.getBytes();
-                        byte[] data_mutate = ByteArrayUtil.replace(data, CHUNKSIZE - 1, 0, carriageB, emptyB);
-                        processMessage(data_mutate);
+                        processMessage(data);
                         data = null;
-                        data_mutate = null;
+                        baostream.reset();
                     }
                 }
 
@@ -329,6 +328,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             } catch (IOException e) {
                 log.error("on readStream", e);
                 successRead = false;
+
             }
         }
         return successRead;
@@ -381,5 +381,22 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      */
     public KeedioSource getKeedioSource() {
         return keedioSource;
+    }
+
+    /**
+     * Remove from from the byte[] data the last return carriage
+     *
+     * @param data
+     * @return mutated data without last return carriage
+     * @see
+     * <a href="https://foundationdb.com/key-value-store/documentation/javadoc/index.html?com/foundationdb/tuple/ByteArrayUtil.html">ByteArrayUtil</a>
+     */
+    public byte[] removeLastReturnCarriage(byte[] data) {
+        String lastCarriage = System.lineSeparator() + "";
+        byte[] lastCarriageByte = lastCarriage.getBytes();
+        String emptyString = "";
+        byte[] emptyBytes = emptyString.getBytes();
+        byte[] data_mutate = ByteArrayUtil.replace(data, 0, 1023, lastCarriageByte, emptyBytes);
+        return data_mutate;
     }
 } //endclass

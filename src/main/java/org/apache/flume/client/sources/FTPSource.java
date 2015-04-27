@@ -51,7 +51,8 @@ public class FTPSource extends KeedioSource {
                 log.error("Could not login to the server");
                 this.setConnected(false);
             }
-
+            
+            ftpClient.enterLocalPassiveMode();
             if (getWorkingDirectory() != null) {
                 getFtpClient().changeWorkingDirectory(getWorkingDirectory());
             }

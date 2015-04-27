@@ -36,8 +36,8 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getHost = "localhost";
     String getWorkingDirectory = null;
     String getFileName = "hasmap.ser";
-    String getFolder = "/var/tmp";
-    String getAbsoutePath = "/var/tmp/hasmap.ser";
+    String getFolder = System.getProperty("java.io.tmpdir");
+    String getAbsoutePath = getFolder + "hasmap.ser";
     String getSource = "ftp";
     
     
