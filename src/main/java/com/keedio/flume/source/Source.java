@@ -162,6 +162,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     @SuppressWarnings("UnnecessaryContinue")
     public void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws IOException {
 
+        long position = 0;
+        String infoStatus = "";
+
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
             dirToList += "/" + currentDir;
@@ -185,78 +188,61 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                 } else if (keedioSource.isFile(aFile)) { //aFile is a regular file
                     keedioSource.changeToDirectory(dirToList);
-                    keedioSource.getExistFileList().add(dirToList + "/" + currentFileName);  //control of deleted files in server                    
+                    keedioSource.getExistFileList().add(dirToList + "/" + currentFileName);  //control of deleted files in server  
+                    
+                    //test if file in new in collection
                     if (!(keedioSource.getFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
                         ftpSourceCounter.incrementFilesCount();
-                        InputStream inputStream = null;
-                        try {
-                            inputStream = keedioSource.getInputStream(aFile);
-                            listener.fileStreamRetrieved();
-                            readStream(inputStream, 0);
-                            boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
-                            if (success) {
-                                keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
-                                keedioSource.saveMap();
-                                ftpSourceCounter.incrementFilesProcCount();
-                                log.info("discovered: " + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile) + " ,total files: "
-                                        + this.keedioSource.getFileList().size());
-                                fileCounterDiscover++;
-                                if (fileCounterDiscover > 100) {
-                                    fileCounterDiscover = 0;
-                                    return;
-                                }
-                            } else {
-                                handleProcessError(currentFileName);
-                            }
-                        } catch (IOException e) {
-                            handleProcessError(currentFileName);
-                            log.error("Ftp server closed connection ", e);
-                            continue;
-                        }
-
-                        keedioSource.changeToDirectory(dirToList);
-                        continue;
-
+                        position = 0;
                     } else { //known file
+                        long prevSize = keedioSource.getFileList().get(dirToList + "/" + currentFileName);
+                        position = prevSize;
                         long dif = (keedioSource.getObjectSize(aFile) - keedioSource.getFileList().get(dirToList + "/" + currentFileName));
-                        if (dif > 0) { //known and modified
-                            long prevSize = keedioSource.getFileList().get(dirToList + "/" + currentFileName);
-                            InputStream inputStream = null;
-                            try {
-                                inputStream = keedioSource.getInputStream(aFile);
-                                listener.fileStreamRetrieved();
-                                readStream(inputStream, prevSize);
-
-                                boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
-                                if (success) {
-                                    keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
-                                    keedioSource.saveMap();
-                                    ftpSourceCounter.incrementCountModProc();
-                                    log.info("modified: " + currentFileName + " ,size" + keedioSource.getObjectSize(aFile)
-                                            + " ,total files: " + this.keedioSource.getFileList().size());
-                                    this.fileCounterModifier++;
-                                    if (fileCounterModifier > 100) {
-                                    fileCounterModifier = 0;
-                                    return;
-                                }
-                                } else {
-                                    handleProcessError(currentFileName);
-                                }
-                            } catch (FTPConnectionClosedException e) {
-                                log.error("Ftp server closed connection ", e);
-                                handleProcessError(currentFileName);
-                                continue;
-                            }
-                            keedioSource.changeToDirectory(dirToList);
-                            continue;
-                        } else if (dif < 0) { //known and full modified
+                        if (dif < 0) { //known and full modified
                             keedioSource.getExistFileList().remove(dirToList + "/" + currentFileName); //will be rediscovered as new file
                             keedioSource.saveMap();
                             continue;
                         }
-                        keedioSource.changeToDirectory(dirToList);
+                    }
+                    
+                    //common for all regular files
+                    InputStream inputStream = null;
+                    try {
+                        inputStream = keedioSource.getInputStream(aFile);
+                        listener.fileStreamRetrieved();
+                        readStream(inputStream, position);
+                        boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
+                        if (success) {
+                            keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
+                            keedioSource.saveMap();
+
+                            if (position != 0) {
+                                infoStatus = "Modified: ";
+                                ftpSourceCounter.incrementCountModProc();
+                            } else {
+                                infoStatus = "Discovered: ";
+                                ftpSourceCounter.incrementFilesProcCount();
+                            }
+                            log.info(infoStatus + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile) + " ,total files: "
+                                    + this.keedioSource.getFileList().size());
+                            fileCounterDiscover++;
+                            if (fileCounterDiscover > 100) {
+                                fileCounterDiscover = 0;
+                                return;
+                            }
+                        } else {
+                            handleProcessError(currentFileName);
+                        }
+                    } catch (IOException e) {
+                        handleProcessError(currentFileName);
+                        log.error("Ftp server closed connection ", e);
                         continue;
                     }
+
+                    keedioSource.changeToDirectory(dirToList);
+                    continue;
+
+                    //end condition is a regular file
                 } else if (keedioSource.isLink(aFile)) {
                     log.info(currentFileName + " is a link of " + this.keedioSource.getLink(aFile) + " access denied");
                     keedioSource.changeToDirectory(dirToList);
