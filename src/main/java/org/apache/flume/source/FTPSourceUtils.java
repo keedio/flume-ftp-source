@@ -87,6 +87,7 @@ public class FTPSourceUtils {
                 success = false;
             }
             ftpClient.enterLocalPassiveMode();
+            ftpClient.setControlKeepAliveTimeout(300);
             if (workingDirectory != null) {
                 ftpClient.changeWorkingDirectory(workingDirectory);
             }
