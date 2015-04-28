@@ -198,7 +198,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                                 keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
                                 keedioSource.saveMap();
                                 ftpSourceCounter.incrementFilesProcCount();
-                                log.info("discovered: " + currentFileName + " ," + this.keedioSource.getFileList().size());
+                                log.info("discovered: " + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile) + " ,total files: "
+                                        + this.keedioSource.getFileList().size());
                             } else {
                                 handleProcessError(currentFileName);
                             }
@@ -226,7 +227,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                                     keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
                                     keedioSource.saveMap();
                                     ftpSourceCounter.incrementCountModProc();
-                                    log.info("modified: " + currentFileName + " ," + this.keedioSource.getFileList().size());
+                                    log.info("modified: " + currentFileName + " ,size" + keedioSource.getObjectSize(aFile) 
+                                            + " ,total files: " + this.keedioSource.getFileList().size());
                                 } else {
                                     handleProcessError(currentFileName);
                                 }
