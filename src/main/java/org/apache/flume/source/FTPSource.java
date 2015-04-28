@@ -100,7 +100,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     public PollableSource.Status process() throws EventDeliveryException {
 
         try {
-            log.info( "Actual dir: "
+            log.info("Actual dir: "
                     + ftpSourceUtils.getFtpClient().printWorkingDirectory() + " files proccesed: " + sizeFileList.size());
             discoverElements(ftpSourceUtils.getFtpClient(), ftpSourceUtils.getFtpClient().printWorkingDirectory(), "", 0);
             cleanList(sizeFileList); //clean list according existing actual files
@@ -127,8 +127,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             }
         }
 
-        saveMap(sizeFileList);
-
+        //saveMap(sizeFileList);
         try {
             Thread.sleep(ftpSourceUtils.getRunDiscoverDelay());
             return PollableSource.Status.READY;     //source was successfully able to generate events
@@ -154,12 +153,13 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 ftpSourceUtils.getFtpClient().logout();
                 ftpSourceUtils.getFtpClient().disconnect();
             }
+            ftpSourceCounter.stop();
+            log.info("FTP Source " + this.getName() + " stopped. Metrics: {}", getName(), ftpSourceCounter);
+            super.stop();
         } catch (IOException ex) {
             log.error("Exception thrown stoping proccess", ex);
         }
-        ftpSourceCounter.stop();
-        log.info("FTP Source " + this.getName() + " stopped. Metrics: {}", getName(), ftpSourceCounter);
-        super.stop();
+
     }
 
     /*
@@ -352,6 +352,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 while ((line = in.readLine()) != null) {
                     processMessage(line.getBytes());
                 }
+                inputStream.close();
+                in.close();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 successRead = false;

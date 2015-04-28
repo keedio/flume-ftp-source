@@ -143,7 +143,7 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
 
     @Override
     public void start() {
-        log.info("Starting sql source {} ...", getName());
+        log.info("Starting ftp source {} ...", getName());
         log.info("FTP Source {} starting. Metrics: {}", getName(), ftpSourceCounter);
         super.start();
         ftpSourceCounter.start();
@@ -347,6 +347,8 @@ public class SFTPSource extends AbstractSource implements Configurable, Pollable
                 while ((line = in.readLine()) != null) {
                     processMessage(line.getBytes());
                 }
+                inputStream.close();
+                in.close();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 successRead = false;
