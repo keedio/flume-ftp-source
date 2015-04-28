@@ -23,7 +23,6 @@ public class SourceFactory {
     private final boolean FLUSHLINES_DEFAULT = true;
     private final String FOLDER_DEFAULT = System.getProperty("java.io.tmpdir");
     private final Integer CHUNKSIZE_DEFAULT = 1024;
-    
 
     /**
      * Create KeedioSource
@@ -92,10 +91,11 @@ public class SourceFactory {
 
     /**
      * Generate a default file name for file track status.
+     *
      * @param context
      * @return String
      */
-    public String generateDefaultFileName(Context context){
-        return context.getString("client.source") + "status.ser";        
+    public String generateDefaultFileName(Context context) {
+        return context.getString("client.source") + "status.ser";
     }
 }

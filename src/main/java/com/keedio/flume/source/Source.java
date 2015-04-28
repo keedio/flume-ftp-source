@@ -46,6 +46,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     //private int CHUNKSIZE = 0;  //event size in bytes
     private static final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
     private static final long EXTRA_DELAY = 10000;
+    private static final int FILES_MAX = 100; //max limit of undiscovered files to jump out 
     private int counterConnect = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private FtpSourceCounter ftpSourceCounter;
@@ -159,11 +160,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @param level, deep to search
      * @throws IOException
      */
-    @SuppressWarnings("UnnecessaryContinue")
+   // @SuppressWarnings("UnnecessaryContinue")
     public void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws IOException {
 
         long position = 0;
         String infoStatus = "";
+        int fileCount = 0;
 
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
@@ -190,9 +192,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     keedioSource.changeToDirectory(dirToList);
                     keedioSource.getExistFileList().add(dirToList + "/" + currentFileName);  //control of deleted files in server  
                     
-                    //test if file in new in collection
+                    //test if file is new in collection
                     if (!(keedioSource.getFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
-                        ftpSourceCounter.incrementFilesCount();
+                        ftpSourceCounter.incrementFilesCount(); //not yet proccesed, count files in the show.
                         position = 0;
                     } else { //known file
                         long prevSize = keedioSource.getFileList().get(dirToList + "/" + currentFileName);
@@ -219,30 +221,36 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                             if (position != 0) {
                                 infoStatus = "Modified: ";
                                 ftpSourceCounter.incrementCountModProc();
+                                this.fileCounterModifier++;
+                                fileCount = this.fileCounterModifier;
                             } else {
                                 infoStatus = "Discovered: ";
                                 ftpSourceCounter.incrementFilesProcCount();
+                                this.fileCounterDiscover++;
+                                fileCount = this.fileCounterDiscover;
                             }
+                            
                             log.info(infoStatus + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile) + " ,total files: "
                                     + this.keedioSource.getFileList().size());
-                            fileCounterDiscover++;
-                            if (fileCounterDiscover > 100) {
-                                fileCounterDiscover = 0;
-                                return;
+                            
+                            if (fileCount > FILES_MAX) {
+                                fileCount = 0;
+                                return;  //if there are a lot of files undiscovered, returning control to process() may help to reduce cpu.
                             }
+                            
                         } else {
                             handleProcessError(currentFileName);
                         }
                     } catch (IOException e) {
                         handleProcessError(currentFileName);
-                        log.error("Ftp server closed connection ", e);
+                        log.error("Failed retrieving inputStream on discoverElements ", e);
                         continue;
                     }
 
                     keedioSource.changeToDirectory(dirToList);
                     continue;
 
-                    //end condition is a regular file
+                    //end condition for a regular file
                 } else if (keedioSource.isLink(aFile)) {
                     log.info(currentFileName + " is a link of " + this.keedioSource.getLink(aFile) + " access denied");
                     keedioSource.changeToDirectory(dirToList);
@@ -253,7 +261,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     continue;
                 }
 
-            } //fin de bucle
+            } //fin de recorrido de elementos devueltos
         } //el listado no es vacío
     }//fin de método
 
