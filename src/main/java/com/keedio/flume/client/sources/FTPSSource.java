@@ -62,6 +62,7 @@ public class FTPSSource extends KeedioSource {
             }
             
             ftpsClient.enterLocalPassiveMode();
+            ftpsClient.setControlKeepAliveTimeout(300);
             if (getWorkingDirectory() != null) {
                 ftpsClient.changeWorkingDirectory(getWorkingDirectory());
             }
