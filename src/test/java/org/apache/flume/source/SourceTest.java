@@ -3,7 +3,6 @@
  */
 package org.apache.flume.source;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import junit.framework.TestCase;
@@ -233,8 +232,7 @@ public class SourceTest extends TestCase {
 //            log.error("", e);
 //        }
 //    }
-
-public void testReadStream4() {
+    public void testReadStream4() {
         System.out.println("readStream4");
         InputStream inputStream = null;
         long position = 0L;
@@ -264,11 +262,11 @@ public void testReadStream4() {
             inputStream.skip(0);
             byte[] bytesArray = new byte[1024];
             int bytesRead = -1;
-            
+
             while ((bytesRead = inputStream.read(bytesArray)) != -1) {
                 try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(1024)) {
                     baostream.write(bytesArray, 0, bytesRead);
-                    byte[] data = baostream.toByteArray(); 
+                    byte[] data = baostream.toByteArray();
                     ByteBuffer byteBuffer = ByteBuffer.wrap(data);
                     byteBuffer.compact();
                     event.setBody(byteBuffer.array());
@@ -276,21 +274,39 @@ public void testReadStream4() {
                     System.out.println(new String(event.getBody()));
                     System.out.println("end of body");
                 }
-                
+
             }
-            
-            
-             
-           inputStream.close();
+
+            inputStream.close();
         } catch (IOException e) {
             log.error("", e);
         }
-        
-        
-       
+
     }
 
-
-
+    public void testCounterFiles() {
+        int filesCount = 0;
+        int i = 0;
+        
+        while (i < 25){
+        filesCount++;
+        i++;  
+        discover(filesCount);
+        
+        
+        }
+        
+        log.info("reached " + filesCount);
+        
+    }
+    
+    public void discover(int filesCount){
+        if (filesCount > 10){
+            log.info("discovered " + filesCount);
+            return;
+        } else {
+            log.info("less files < 10");
+        }
+    }
 
 } //endclasstest

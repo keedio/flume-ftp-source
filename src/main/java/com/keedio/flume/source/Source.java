@@ -25,8 +25,6 @@ import com.keedio.flume.source.utils.FTPSourceEventListener;
 import com.keedio.flume.metrics.FtpSourceCounter;
 import java.util.List;
 
-
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -51,6 +49,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private static int COUNTER = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private FtpSourceCounter ftpSourceCounter;
+    private int fileCounterDiscover = 0;
+    private int fileCounterModifier = 0;
 
     /**
      * Request keedioSource to the factory
@@ -200,6 +200,11 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                                 ftpSourceCounter.incrementFilesProcCount();
                                 log.info("discovered: " + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile) + " ,total files: "
                                         + this.keedioSource.getFileList().size());
+                                fileCounterDiscover++;
+                                if (fileCounterDiscover > 100) {
+                                    fileCounterDiscover = 0;
+                                    return;
+                                }
                             } else {
                                 handleProcessError(currentFileName);
                             }
@@ -227,8 +232,13 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                                     keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
                                     keedioSource.saveMap();
                                     ftpSourceCounter.incrementCountModProc();
-                                    log.info("modified: " + currentFileName + " ,size" + keedioSource.getObjectSize(aFile) 
+                                    log.info("modified: " + currentFileName + " ,size" + keedioSource.getObjectSize(aFile)
                                             + " ,total files: " + this.keedioSource.getFileList().size());
+                                    this.fileCounterModifier++;
+                                    if (fileCounterModifier > 100) {
+                                    fileCounterModifier = 0;
+                                    return;
+                                }
                                 } else {
                                     handleProcessError(currentFileName);
                                 }
@@ -280,13 +290,13 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         if (keedioSource.isFlushLines()) {
             try {
                 inputStream.skip(position);
-                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));                
+                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                 String line = null;
 
                 while ((line = in.readLine()) != null) {
                     processMessage(line.getBytes());
                 }
-                
+
                 inputStream.close();
                 in.close();
             } catch (IOException e) {
@@ -368,5 +378,4 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         return keedioSource;
     }
 
-   
 } //endclass

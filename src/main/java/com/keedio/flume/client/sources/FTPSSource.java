@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
 import com.keedio.flume.client.KeedioSource;
 import org.apache.commons.net.ftp.FTPSClient;
 
