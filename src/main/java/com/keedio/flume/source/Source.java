@@ -46,7 +46,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     //private int CHUNKSIZE = 0;  //event size in bytes
     private static final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
     private static final long EXTRA_DELAY = 10000;
-    private static int COUNTER = 0;
+    private int counterConnect = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private FtpSourceCounter ftpSourceCounter;
     private int fileCounterDiscover = 0;
@@ -94,21 +94,21 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             keedioSource.cleanList(); //clean list according existing actual files
             keedioSource.getExistFileList().clear();
         } catch (IOException e) {
-            log.error("Exception thrown in proccess, try to reconnect " + COUNTER, e);
+            log.error("Exception thrown in proccess, try to reconnect " + counterConnect, e);
 
             if (!keedioSource.connect()) {
-                COUNTER++;
+                counterConnect++;
             } else {
                 keedioSource.checkPreviousMap();
             }
 
-            if (COUNTER < ATTEMPTS_MAX) {
+            if (counterConnect < ATTEMPTS_MAX) {
                 process();
             } else {
-                log.error("Server connection closed without indication, reached limit reconnections " + COUNTER);
+                log.error("Server connection closed without indication, reached limit reconnections " + counterConnect);
                 try {
                     Thread.sleep(keedioSource.getRunDiscoverDelay() + EXTRA_DELAY);
-                    COUNTER = 0;
+                    counterConnect = 0;
                 } catch (InterruptedException ce) {
                     log.error("InterruptedException", ce);
                 }
