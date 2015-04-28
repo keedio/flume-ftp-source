@@ -70,6 +70,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private Path hasmap = Paths.get("");
     private Path absolutePath = Paths.get("");
     private int counter = 0;
+    private int fileCounter = 0;
 
     public void setListener(FTPSourceEventListener listener) {
         this.listener = listener;
@@ -127,7 +128,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
             }
         }
 
-        //saveMap(sizeFileList);
+        saveMap(sizeFileList);
         try {
             Thread.sleep(ftpSourceUtils.getRunDiscoverDelay());
             return PollableSource.Status.READY;     //source was successfully able to generate events
@@ -222,9 +223,15 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                 sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                 saveMap(sizeFileList);
                                 ftpSourceCounter.incrementFilesProcCount();
-                                log.info("discovered: " + fileName + " ,size: "+ aFile.getSize() + " ,total files:  " + sizeFileList.size());
+                                log.info("discovered: " + fileName + " ,size: " + aFile.getSize()
+                                        + " ,total files:  " + sizeFileList.size());
+                                fileCounter++;
                             } else {
                                 handleProcessError(fileName);
+                            }
+                            if (fileCounter > 100) {
+                                fileCounter = 0;
+                                return;
                             }
                         } catch (FTPConnectionClosedException e) {
                             handleProcessError(fileName);
@@ -419,6 +426,20 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
 
     public FTPClient getFTPClient() {
         return ftpSourceUtils.getFtpClient();
+    }
+
+    /**
+     * @return the fileCounter
+     */
+    public int getFileCounter() {
+        return fileCounter;
+    }
+
+    /**
+     * @param fileCounter the fileCounter to set
+     */
+    public void setFileCounter(int fileCounter) {
+        this.fileCounter = fileCounter;
     }
 
 } //end of class
