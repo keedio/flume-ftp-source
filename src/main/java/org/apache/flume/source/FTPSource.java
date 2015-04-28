@@ -70,7 +70,8 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private Path hasmap = Paths.get("");
     private Path absolutePath = Paths.get("");
     private int counter = 0;
-    private int fileCounter = 0;
+    private int fileCounterDiscover = 0;
+    private int fileCounterModifier = 0;
 
     public void setListener(FTPSourceEventListener listener) {
         this.listener = listener;
@@ -225,14 +226,15 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                 ftpSourceCounter.incrementFilesProcCount();
                                 log.info("discovered: " + fileName + " ,size: " + aFile.getSize()
                                         + " ,total files:  " + sizeFileList.size());
-                                fileCounter++;
+                                fileCounterDiscover++;
+                                if (fileCounterDiscover > 100) {
+                                    fileCounterDiscover = 0;
+                                    return;
+                                }
                             } else {
                                 handleProcessError(fileName);
                             }
-                            if (fileCounter > 100) {
-                                fileCounter = 0;
-                                return;
-                            }
+
                         } catch (FTPConnectionClosedException e) {
                             handleProcessError(fileName);
                             log.error("Ftp server closed connection ", e);
@@ -258,9 +260,15 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     saveMap(sizeFileList);
                                     ftpSourceCounter.incrementCountModProc();
                                     log.info("modified: " + fileName + " ," + sizeFileList.size());
+                                    this.fileCounterModifier++;
+                                    if (fileCounterModifier > 100) {
+                                    fileCounterModifier = 0;
+                                    return;
+                                }
                                 } else {
                                     handleProcessError(fileName);
                                 }
+                                
                             } catch (FTPConnectionClosedException e) {
                                 log.error("Ftp server closed connection ", e);
                                 handleProcessError(fileName);
@@ -432,14 +440,14 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
      * @return the fileCounter
      */
     public int getFileCounter() {
-        return fileCounter;
+        return fileCounterDiscover;
     }
 
     /**
      * @param fileCounter the fileCounter to set
      */
     public void setFileCounter(int fileCounter) {
-        this.fileCounter = fileCounter;
+        this.fileCounterDiscover = fileCounter;
     }
 
 } //end of class
