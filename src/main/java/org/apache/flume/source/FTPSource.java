@@ -356,12 +356,14 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                 while ((line = in.readLine()) != null) {
                     processMessage(line.getBytes());
                 }
-                inputStream.close();
+                
                 in.close();
+                inputStream.close();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 successRead = false;
-            }
+                
+            } 
         } else {
 
             try {
@@ -425,19 +427,6 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
         return ftpSourceUtils.getFtpClient();
     }
 
-    /**
-     * @return the fileCounter
-     */
-    public int getFileCounter() {
-        return fileCounterDiscover;
-    }
-
-    /**
-     * @param fileCounter the fileCounter to set
-     */
-    public void setFileCounter(int fileCounter) {
-        this.fileCounterDiscover = fileCounter;
-    }
-
+   
 } //end of class
 
