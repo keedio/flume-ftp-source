@@ -70,8 +70,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
     private Path hasmap = Paths.get("");
     private Path absolutePath = Paths.get("");
     private int counter = 0;
-    private int fileCounterDiscover = 0;
-    private int fileCounterModifier = 0;
+    
 
     public void setListener(FTPSourceEventListener listener) {
         this.listener = listener;
@@ -225,12 +224,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                 saveMap(sizeFileList);
                                 ftpSourceCounter.incrementFilesProcCount();
                                 log.info("discovered: " + fileName + " ,size: " + aFile.getSize()
-                                        + " ,total files:  " + sizeFileList.size());
-                                fileCounterDiscover++;
-                                if (fileCounterDiscover > 100) {
-                                    fileCounterDiscover = 0;
-                                    return;
-                                }
+                                        + " ,total files:  " + sizeFileList.size());                               
                             } else {
                                 handleProcessError(fileName);
                             }
@@ -259,12 +253,7 @@ public class FTPSource extends AbstractSource implements Configurable, PollableS
                                     sizeFileList.put(dirToList + "/" + aFile.getName(), aFile.getSize());
                                     saveMap(sizeFileList);
                                     ftpSourceCounter.incrementCountModProc();
-                                    log.info("modified: " + fileName + " ," + sizeFileList.size());
-                                    this.fileCounterModifier++;
-                                    if (fileCounterModifier > 100) {
-                                    fileCounterModifier = 0;
-                                    return;
-                                }
+                                    log.info("modified: " + fileName + " ," + sizeFileList.size());                                    
                                 } else {
                                     handleProcessError(fileName);
                                 }
