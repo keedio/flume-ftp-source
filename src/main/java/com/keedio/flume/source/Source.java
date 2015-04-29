@@ -43,10 +43,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private KeedioSource keedioSource;
 
     private static final Logger log = LoggerFactory.getLogger(Source.class);
-    //private int CHUNKSIZE = 0;  //event size in bytes
     private static final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
     private static final long EXTRA_DELAY = 10000;
-    private static final int FILES_MAX = 100; //max limit of undiscovered files to jump out 
     private int counterConnect = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private FtpSourceCounter ftpSourceCounter;
