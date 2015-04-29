@@ -50,8 +50,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private int counterConnect = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private FtpSourceCounter ftpSourceCounter;
-    private int fileCounterDiscover = 0;
-    private int fileCounterModifier = 0;
 
     /**
      * Request keedioSource to the factory
@@ -221,22 +219,13 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                             if (position != 0) {
                                 infoStatus = "Modified: ";
                                 ftpSourceCounter.incrementCountModProc();
-                                this.fileCounterModifier++;
-                                fileCount = this.fileCounterModifier;
                             } else {
                                 infoStatus = "Discovered: ";
                                 ftpSourceCounter.incrementFilesProcCount();
-                                this.fileCounterDiscover++;
-                                fileCount = this.fileCounterDiscover;
                             }
                             
                             log.info(infoStatus + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile) + " ,total files: "
                                     + this.keedioSource.getFileList().size());
-                            
-                            if (fileCount > FILES_MAX) {
-                                fileCount = 0;
-                                return;  //if there are a lot of files undiscovered, returning control to process() may help to reduce cpu.
-                            }
                             
                         } else {
                             handleProcessError(currentFileName);
@@ -290,9 +279,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 while ((line = in.readLine()) != null) {
                     processMessage(line.getBytes());
                 }
-
-                inputStream.close();
+                
                 in.close();
+                inputStream.close();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
                 successRead = false;
