@@ -1,6 +1,5 @@
-//package org.apache.flume.source.ssh;
+//package org.apache.flume.source.ftps;
 //
-//import com.keedio.flume.client.sources.SFTPSource;
 //import java.io.IOException;
 //import java.nio.file.Path;
 //import java.nio.file.Paths;
@@ -14,84 +13,88 @@
 //import com.keedio.flume.source.Source;
 //import com.keedio.flume.metrics.SourceCounter;
 //import org.apache.flume.source.TestFileUtils;
-//import org.apache.flume.source.sshd.server.EmbeddedSSHDServer;
+//import org.apache.flume.source.ftps.server.EmbeddedFTPSserver;
 //import org.apache.log4j.Logger;
 //import org.mockito.MockitoAnnotations;
 //import org.mockito.Mock;
-//import org.slf4j.LoggerFactory;
 //import org.testng.annotations.AfterMethod;
 //import org.testng.annotations.BeforeMethod;
 //
-//public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
-//
+//public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver{
 //    private Logger logger = Logger.getLogger(getClass());
 //
 //    @Mock
 //    Context mockContext = new Context();
 //
-//    Source sftpSource;
-//    SourceCounter sourceCounter;
+//    Source ftpsSource;
+//    SourceCounter ftpSourceCounter;
 //
-//    String getSource = "sftp";
-//    Integer getPort = 2222;
+//    int getPort = 2221;
+//
 //    String getUser = "flumetest";
 //    String getPassword = "flumetest";
 //    String getHost = "localhost";
-//    String getWorkingDirectory = "/var/tmp/";
-//    String getFileName = "hasmap.ser";
-//    String getFolder = System.getProperty("java.io.tmpdir");
-//    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
-//    String getKnownHosts = "/var/tmp/known_hosts";
-//    Integer getBuffer = 1024;
-//    Integer getDiscover = 1000;
-//    Integer getChunkSize = 1024;
-//        
+//    String getWorkingDirectory = null;
+//    String getFileName = "hasmapFTS.ser";
+//    //String getFolder = System.getProperty("java.io.tmpdir");
+//    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmapFTS.ser";
+//    String getSource = "ftps";
+//    Boolean getSecurity = true;
+//    String getCipher = "TLS";
+//    Boolean getCertificate = false;
+//    
+//     
 //
 //    @BeforeMethod
 //    public void beforeMethod() {
 //        MockitoAnnotations.initMocks(this);
 //
 //        when(mockContext.getString("client.source")).thenReturn(getSource);
-//        when(mockContext.getInteger("port")).thenReturn(getPort);
+//        when(mockContext.getInteger("buffer.size")).thenReturn(0);
+//        when(mockContext.getString("name.server")).thenReturn(getHost);
 //        when(mockContext.getString("user")).thenReturn(getUser);
 //        when(mockContext.getString("password")).thenReturn(getPassword);
-//        when(mockContext.getString("name.server")).thenReturn(getHost);
+//        when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
+//        when(mockContext.getInteger("port")).thenReturn(getPort);
 //        when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
 //        when(mockContext.getString("file.name")).thenReturn(getFileName);
 //        when(mockContext.getString("folder", System.getProperty("java.io.tmpdir"))).thenReturn(System.getProperty("java.io.tmpdir"));
-//        when(mockContext.getString("knownHosts")).thenReturn(getKnownHosts);
-//        when(mockContext.getInteger("buffer.size")).thenReturn(getBuffer);
-//        when(mockContext.getInteger("run.discover.delay")).thenReturn(getDiscover);
-//        when(mockContext.getInteger("chunk.size", 1024)).thenReturn(getChunkSize);
+//        when(mockContext.getInteger("chunk.size", 1024)).thenReturn(1024);
+//        
+//        when(mockContext.getBoolean("security.enabled")).thenReturn(getSecurity);
+//        when(mockContext.getString("security.cipher")).thenReturn(getCipher);
+//        when(mockContext.getBoolean("security.certificate.enabled")).thenReturn(getCertificate);
+//        
+//        
+//        
+//       
+//        
 //
-//        logger.info("Creating SFTP source");
+//        logger.info("Creating FTPS source");
 //
-//        sftpSource = new Source();
-//        sftpSource.configure(mockContext);
-//        sourceCounter = new SourceCounter("SOURCE.");
-//        sftpSource.setFtpSourceCounter(sourceCounter);
+//        ftpsSource = new Source();
+//        ftpsSource.configure(mockContext);
+//        ftpSourceCounter = new SourceCounter("SOURCE.");
+//        ftpsSource.setFtpSourceCounter(ftpSourceCounter);
 //
 //        class DummyChannelProcessor extends ChannelProcessor {
-//
 //            public DummyChannelProcessor() {
 //                super(null);
 //            }
-//
 //            @Override
-//            public void processEvent(Event event) {
-//            }
+//            public void processEvent(Event event) {}
 //        }
 //
-//        sftpSource.setChannelProcessor(new DummyChannelProcessor());
+//        ftpsSource.setChannelProcessor(new DummyChannelProcessor());
 //    }
 //
 //    @AfterMethod
 //    public void afterMethod() {
 //        try {
-//            logger.info("Stopping SFTP source");
-//            sftpSource.stop();
+//            logger.info("Stopping FTPS source");
+//            ftpsSource.stop();
 //
-//            Paths.get("hasmap.ser").toFile().delete();
+//            Paths.get("hasmapFTS.ser").toFile().delete();
 //        } catch (Throwable e) {
 //            e.printStackTrace();
 //        }
