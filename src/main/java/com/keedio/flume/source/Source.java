@@ -21,7 +21,7 @@ import java.io.ByteArrayOutputStream;
 
 import com.keedio.flume.source.utils.FTPSourceEventListener;
 
-import com.keedio.flume.metrics.FtpSourceCounter;
+import com.keedio.flume.metrics.SourceCounter;
 import java.util.List;
 
 import java.io.BufferedReader;
@@ -46,7 +46,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private static final long EXTRA_DELAY = 10000;
     private int counterConnect = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
-    private FtpSourceCounter ftpSourceCounter;
+    private SourceCounter sourceCounter;
 
     /**
      * Request keedioSource to the factory
@@ -73,7 +73,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             System.exit(1);
         }
         keedioSource.connect();
-        ftpSourceCounter = new FtpSourceCounter("SOURCE." + getName());
+        sourceCounter = new SourceCounter("SOURCE." + getName());
         keedioSource.checkPreviousMap();
     }
 
@@ -127,9 +127,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     @Override
     public synchronized void start() {
         log.info("Starting Keedio source ...", this.getName());
-        log.info("FTP Source {} starting. Metrics: {}", getName(), ftpSourceCounter);
+        log.info("FTP Source {} starting. Metrics: {}", getName(), sourceCounter);
         super.start();
-        ftpSourceCounter.start();
+        sourceCounter.start();
     }
 
     /**
@@ -141,7 +141,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         if (keedioSource.isConnected()) {
             keedioSource.disconnect();
         }
-        ftpSourceCounter.stop();
+        sourceCounter.stop();
         super.stop();
     }
 
@@ -187,7 +187,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                     //test if file is new in collection
                     if (!(keedioSource.getFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
-                        ftpSourceCounter.incrementFilesCount(); //not yet proccesed, count files in the show.
+                        sourceCounter.incrementFilesCount(); //not yet proccesed, count files in the show.
                         position = 0;
                         log.info("Discovered: " + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile));
                     } else { //known file
@@ -218,9 +218,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                             keedioSource.saveMap();
 
                             if (position != 0) {
-                                ftpSourceCounter.incrementCountModProc();
+                                sourceCounter.incrementCountModProc();
                             } else {
-                                ftpSourceCounter.incrementFilesProcCount();
+                                sourceCounter.incrementFilesProcCount();
                             }
 
                             log.info("Processed:  " + currentFileName + " ,total files: " + this.keedioSource.getFileList().size() + "\n");
@@ -331,8 +331,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         } catch (ChannelException e) {
             log.error("ChannelException", e);
         }
-        ftpSourceCounter.incrementCountSizeProc(message.length);
-        ftpSourceCounter.incrementEventCount();
+        sourceCounter.incrementCountSizeProc(message.length);
+        sourceCounter.incrementEventCount();
     }
 
     /**
@@ -347,15 +347,15 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      */
     public void handleProcessError(String fileName) {
         log.info("failed retrieving stream from file, will try in next poll :" + fileName);
-        ftpSourceCounter.incrementFilesProcCountError();
+        sourceCounter.incrementFilesProcCountError();
     }
 
     /**
      *
      * @param ftpSourceCounter
      */
-    public void setFtpSourceCounter(FtpSourceCounter ftpSourceCounter) {
-        this.ftpSourceCounter = ftpSourceCounter;
+    public void setFtpSourceCounter(SourceCounter ftpSourceCounter) {
+        this.sourceCounter = ftpSourceCounter;
     }
 
     /**

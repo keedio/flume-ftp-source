@@ -11,7 +11,7 @@ import junit.framework.TestCase;
 import org.apache.flume.Context;
 import org.apache.flume.PollableSource;
 import com.keedio.flume.client.KeedioSource;
-import com.keedio.flume.metrics.FtpSourceCounter;
+import com.keedio.flume.metrics.SourceCounter;
 import com.keedio.flume.source.utils.FTPSourceEventListener;
 
 import com.keedio.flume.client.factory.SourceFactory;

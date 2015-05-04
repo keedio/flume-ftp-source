@@ -46,9 +46,9 @@
 //            }
 //            PollableSource.Status proc = this.sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 0);
 //        } catch (EventDeliveryException e) {
 //            Assert.fail();
 //        }
@@ -61,9 +61,9 @@
 //            tmpFile = TestFileUtils.createTmpFile(EmbeddedSSHDServer.homeDirectory);
 //            PollableSource.Status proc = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 0);
 //        } catch (IOException|EventDeliveryException e) {
 //            Assert.fail();
 //        } finally {
@@ -81,9 +81,9 @@
 //
 //            PollableSource.Status proc = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 0);
 //        } catch (IOException|EventDeliveryException e) {
 //            Assert.fail();
 //        } finally {
@@ -108,9 +108,9 @@
 //
 //            PollableSource.Status proc = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 2);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 2);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 2);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 2);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 0);
 //        } catch (IOException|EventDeliveryException e) {
 //            Assert.fail();
 //        } finally {
@@ -131,9 +131,9 @@
 //
 //            PollableSource.Status proc = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 1);
 //        } catch (IOException|EventDeliveryException e) {
 //            Assert.fail();
 //        } finally {
@@ -151,11 +151,11 @@
 //            TestFileUtils.appendASCIIGarbageToFile(tmpFile0);
 //            PollableSource.Status proc = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 0);
 //
-//           // Map<String, Long> map = ftpSource.loadMap(this.getAbsoutePath);
+//            Map<String, Long> map = ftpSource.loadMap(this.getAbsoutePath);
 //            Map<String, Long> map = sftpSource.getKeedioSource().loadMap(this.getAbsoutePath);
 //            String filename = "//"+tmpFile0.toFile().getName();
 //
@@ -175,17 +175,17 @@
 //            TestFileUtils.appendASCIIGarbageToFile(tmpFile0);
 //            PollableSource.Status proc0 = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 0);
 //
 //            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
 //
 //            PollableSource.Status proc1 = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 0);
 //
 //            Map<String, Long> map = sftpSource.getKeedioSource().loadMap(this.getAbsoutePath);
 //
@@ -224,9 +224,9 @@
 //
 //            PollableSource.Status proc0 = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), totFiles);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), totFiles - 1);
-//            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), totFiles);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), totFiles - 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 1);
 //        } catch (IOException|EventDeliveryException e) {
 //            Assert.fail();
 //        } finally {
@@ -255,7 +255,7 @@
 //                }
 //            }
 //        }
-//        //ftpSource.getKeedioSource().getClientSource().setFileType(FTP.BINARY_FILE_TYPE);
+//        ftpSource.getKeedioSource().getClientSource().setFileType(FTP.BINARY_FILE_TYPE);
 //        sftpSource.setListener(new MyEventListener());
 //
 //        String[] directories = EmbeddedSSHDServer.homeDirectory.toFile().list();
@@ -270,14 +270,14 @@
 //        try {
 //            tmpFile0 = TestFileUtils.createTmpFile(EmbeddedSSHDServer.homeDirectory);
 //            TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100000, 1000);
-//          // TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100, 10);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 0);
+//           TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 100, 10);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 0);
 //
 //            PollableSource.Status proc0 = sftpSource.process();
 //            Assert.assertEquals(PollableSource.Status.READY, proc0);
-//            Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
-////            Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 0);
-////            Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesCount(), 1);
+//            Assert.assertEquals(sourceCounter.getFilesProcCount(), 0);
+//            Assert.assertEquals(sourceCounter.getFilesProcCountError(), 1);
 //        } catch (IOException|EventDeliveryException e) {
 //            Assert.fail();
 //        } finally {

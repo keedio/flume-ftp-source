@@ -1,5 +1,6 @@
 package org.apache.flume.source.ssh;
 
+import com.keedio.flume.client.sources.SFTPSource;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,70 +12,74 @@ import org.apache.flume.channel.ChannelProcessor;
 import static org.mockito.Mockito.*;
 
 import com.keedio.flume.source.Source;
-import com.keedio.flume.metrics.FtpSourceCounter;
+import com.keedio.flume.metrics.SourceCounter;
 import org.apache.flume.source.TestFileUtils;
 import org.apache.flume.source.sshd.server.EmbeddedSSHDServer;
 import org.apache.log4j.Logger;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
-public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer{
+public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
+
     private Logger logger = Logger.getLogger(getClass());
 
     @Mock
     Context mockContext = new Context();
 
     Source sftpSource;
-    FtpSourceCounter ftpSourceCounter;
+    SourceCounter sourceCounter;
 
-    int getPort = 2222;
-
+    String getSource = "sftp";
+    Integer getPort = 2222;
     String getUser = "flumetest";
     String getPassword = "flumetest";
     String getHost = "localhost";
-    String getWorkingDirectory = null;
+    String getWorkingDirectory = "/var/tmp/";
     String getFileName = "hasmap.ser";
-    //String getFolder = System.getProperty("java.io.tmpdir");
+    String getFolder = System.getProperty("java.io.tmpdir");
     String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
-    String getSource = "sftp";
-   String getKnownHosts = "/var/tmp/known_hosts";
-    //String getKnownHosts = "";
-    
+    String getKnownHosts = "/var/tmp/known_hosts";
+    Integer getBuffer = 1024;
+    Integer getDiscover = 1000;
+    Integer getChunkSize = 1024;
+        
 
     @BeforeMethod
     public void beforeMethod() {
         MockitoAnnotations.initMocks(this);
 
         when(mockContext.getString("client.source")).thenReturn(getSource);
-        when(mockContext.getInteger("buffer.size")).thenReturn(0);
-        when(mockContext.getString("name.server")).thenReturn(getHost);
+        when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("user")).thenReturn(getUser);
         when(mockContext.getString("password")).thenReturn(getPassword);
-        when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
-        when(mockContext.getInteger("port")).thenReturn(getPort);
+        when(mockContext.getString("name.server")).thenReturn(getHost);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
         when(mockContext.getString("file.name")).thenReturn(getFileName);
         when(mockContext.getString("folder", System.getProperty("java.io.tmpdir"))).thenReturn(System.getProperty("java.io.tmpdir"));
-        when(mockContext.getInteger("chunk.size", 1024)).thenReturn(1024);
         when(mockContext.getString("knownHosts")).thenReturn(getKnownHosts);
-       
-        
+        when(mockContext.getInteger("buffer.size")).thenReturn(getBuffer);
+        when(mockContext.getInteger("run.discover.delay")).thenReturn(getDiscover);
+        when(mockContext.getInteger("chunk.size", 1024)).thenReturn(getChunkSize);
 
         logger.info("Creating SFTP source");
 
         sftpSource = new Source();
         sftpSource.configure(mockContext);
-        ftpSourceCounter = new FtpSourceCounter("SOURCE.");
-        sftpSource.setFtpSourceCounter(ftpSourceCounter);
+        sourceCounter = new SourceCounter("SOURCE.");
+        sftpSource.setFtpSourceCounter(sourceCounter);
 
         class DummyChannelProcessor extends ChannelProcessor {
+
             public DummyChannelProcessor() {
                 super(null);
             }
+
             @Override
-            public void processEvent(Event event) {}
+            public void processEvent(Event event) {
+            }
         }
 
         sftpSource.setChannelProcessor(new DummyChannelProcessor());

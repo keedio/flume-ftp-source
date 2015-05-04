@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SFTPSource extends KeedioSource {
 
-    private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
+    private static final Logger log = LoggerFactory.getLogger(SFTPSource.class);
 
     private String knownHosts;
     private JSch jsch;

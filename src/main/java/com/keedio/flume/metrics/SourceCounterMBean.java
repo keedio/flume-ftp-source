@@ -6,7 +6,7 @@ package com.keedio.flume.metrics;
  *
  * @author Luis Lázaro <lalazaro@keedio.com>
  */
-public interface FtpSourceCounterMBean {
+public interface SourceCounterMBean {
     public long getFilesCount();
     public void incrementFilesCount();
     public long getFilesProcCount();

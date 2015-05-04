@@ -26,6 +26,8 @@ import org.testng.annotations.BeforeSuite;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.apache.sshd.server.shell.ProcessShellFactory;
+
 /**
  *
  * @author Luis Lázaro lalazaro@keedio.com Keedio
@@ -38,22 +40,28 @@ public class EmbeddedSSHDServer {
 
     static {
         try {
-            sshServer.setPort(2222);
             homeDirectory = TestFileUtils.createTmpDir();
-            sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("/var/tmp/hostkey.ser", SimpleGeneratorHostKeyProvider.SSH_RSA));
-            List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
-            userAuthFactories.add(new UserAuthPassword.Factory());
-            sshServer.setUserAuthFactories(userAuthFactories);
-
-            sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
-                public boolean authenticate(String username, String password, ServerSession session) {
-                    return "flumetest".equals(username) && "flumetest".equals(password);
-                }
-            });
-
-        } catch(IOException e){
-            log.error("",e);
+        } catch (IOException e) {
+            log.error("homeDirectoy", e);
         }
+        sshServer.setPort(2222);
+        sshServer.setHost("localhost");
+        sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("/var/tmp/hostkey.ser"));
+
+        sshServer.setShellFactory(new ProcessShellFactory(new String[]{"/bin/sh", "-i", "-l"}));
+        sshServer.setCommandFactory(new ScpCommandFactory());
+
+        List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
+        
+        UserAuthPassword.Factory userFactory = new UserAuthPassword.Factory();
+        userAuthFactories.add(userFactory);
+        sshServer.setUserAuthFactories(userAuthFactories);
+
+        sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
+            public boolean authenticate(String username, String password, ServerSession session) {
+                return "flumetest".equals(username) && "flumetest".equals(password);
+            }
+        });
 
     }
 

@@ -11,7 +11,7 @@ import org.apache.flume.channel.ChannelProcessor;
 import static org.mockito.Mockito.*;
 
 import com.keedio.flume.source.Source;
-import com.keedio.flume.metrics.FtpSourceCounter;
+import com.keedio.flume.metrics.SourceCounter;
 import org.apache.flume.source.TestFileUtils;
 import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
 import org.apache.log4j.Logger;
@@ -27,7 +27,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     Context mockContext = new Context();
 
     Source ftpSource;
-    FtpSourceCounter ftpSourceCounter;
+    SourceCounter ftpSourceCounter;
 
     int getPort = 2121;
 
@@ -64,7 +64,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
 
         ftpSource = new Source();
         ftpSource.configure(mockContext);
-        ftpSourceCounter = new FtpSourceCounter("SOURCE.");
+        ftpSourceCounter = new SourceCounter("SOURCE.");
         ftpSource.setFtpSourceCounter(ftpSourceCounter);
 
         class DummyChannelProcessor extends ChannelProcessor {
