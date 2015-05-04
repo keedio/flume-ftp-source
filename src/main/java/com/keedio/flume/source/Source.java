@@ -18,7 +18,6 @@ import org.apache.flume.ChannelException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
-import org.apache.commons.net.ftp.FTPConnectionClosedException;
 
 import com.keedio.flume.source.utils.FTPSourceEventListener;
 
@@ -156,12 +155,10 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @param level, deep to search
      * @throws IOException
      */
-   // @SuppressWarnings("UnnecessaryContinue")
+    // @SuppressWarnings("UnnecessaryContinue")
     public void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws IOException {
 
         long position = 0;
-        String infoStatus = "";
-        int fileCount = 0;
 
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
@@ -187,44 +184,47 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 } else if (keedioSource.isFile(aFile)) { //aFile is a regular file
                     keedioSource.changeToDirectory(dirToList);
                     keedioSource.getExistFileList().add(dirToList + "/" + currentFileName);  //control of deleted files in server  
-                    
+
                     //test if file is new in collection
                     if (!(keedioSource.getFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
                         ftpSourceCounter.incrementFilesCount(); //not yet proccesed, count files in the show.
                         position = 0;
+                        log.info("Discovered: " + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile));
                     } else { //known file
                         long prevSize = keedioSource.getFileList().get(dirToList + "/" + currentFileName);
                         position = prevSize;
                         long dif = (keedioSource.getObjectSize(aFile) - keedioSource.getFileList().get(dirToList + "/" + currentFileName));
+                        log.info("Modified: " + currentFileName + " ,size: " + dif);
                         if (dif < 0) { //known and full modified
                             keedioSource.getExistFileList().remove(dirToList + "/" + currentFileName); //will be rediscovered as new file
                             keedioSource.saveMap();
                             continue;
                         }
                     }
-                    
+
                     //common for all regular files
                     InputStream inputStream = null;
                     try {
                         inputStream = keedioSource.getInputStream(aFile);
                         listener.fileStreamRetrieved();
-                        readStream(inputStream, position);
+                        
+                        if (!readStream(inputStream, position)){
+                            inputStream = null;
+                        }
+                        
                         boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
                         if (success) {
                             keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
                             keedioSource.saveMap();
 
                             if (position != 0) {
-                                infoStatus = "Modified: ";
                                 ftpSourceCounter.incrementCountModProc();
                             } else {
-                                infoStatus = "Discovered: ";
                                 ftpSourceCounter.incrementFilesProcCount();
                             }
-                            
-                            log.info(infoStatus + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile) + " ,total files: "
-                                    + this.keedioSource.getFileList().size());
-                            
+
+                            log.info("Processed:  " + currentFileName + " ,total files: " + this.keedioSource.getFileList().size() + "\n");
+
                         } else {
                             handleProcessError(currentFileName);
                         }
@@ -273,11 +273,16 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 inputStream.skip(position);
                 BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                 String line = null;
-
-                while ((line = in.readLine()) != null) {
-                    processMessage(line.getBytes());
-                }
                 
+                if (in.ready()) {
+                    while ((line = in.readLine()) != null) {
+                        processMessage(line.getBytes());
+                    }
+
+                } else {
+                   successRead = false;
+                }
+
                 in.close();
                 inputStream.close();
             } catch (IOException e) {
@@ -326,7 +331,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         } catch (ChannelException e) {
             log.error("ChannelException", e);
         }
-
+        ftpSourceCounter.incrementCountSizeProc(message.length);
+        ftpSourceCounter.incrementEventCount();
     }
 
     /**

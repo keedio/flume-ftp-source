@@ -1,27 +1,71 @@
 package org.apache.flume.source.sshd.server;
 
-
-
 import org.apache.sshd.SshServer;
+import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
+
+import org.apache.sshd.common.*;
+import org.apache.sshd.server.UserAuth;
+import org.apache.sshd.server.auth.UserAuthNone;
+import org.apache.sshd.server.auth.UserAuthPassword;
+import org.apache.sshd.server.PasswordAuthenticator;
+import org.apache.sshd.server.session.*;
+
+import org.apache.sshd.server.command.ScpCommandFactory;
+import org.apache.sshd.server.Command;
+import org.apache.sshd.server.sftp.SftpSubsystem;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import org.apache.flume.source.TestFileUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+
+import java.util.List;
+import java.util.ArrayList;
+
 /**
  *
- * @author Luis Lázaro lalazaro@keedio.com
- * Keedio
+ * @author Luis Lázaro lalazaro@keedio.com Keedio
  */
 public class EmbeddedSSHDServer {
-    private SshServer sshServer = SshServer.setUpDefaultServer();
+
     private static final Logger log = LoggerFactory.getLogger(EmbeddedSSHDServer.class);
-    
-    public EmbeddedSSHDServer(){
-        sshServer.setPort(2200);
+    public static Path homeDirectory;
+    public static SshServer sshServer = SshServer.setUpDefaultServer();
+
+    static {
         try {
-        sshServer.start();
+            sshServer.setPort(2222);
+            homeDirectory = TestFileUtils.createTmpDir();
+            sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("/var/tmp/hostkey.ser", SimpleGeneratorHostKeyProvider.SSH_RSA));
+            List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
+            userAuthFactories.add(new UserAuthPassword.Factory());
+            sshServer.setUserAuthFactories(userAuthFactories);
+
+            sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
+                public boolean authenticate(String username, String password, ServerSession session) {
+                    return "flumetest".equals(username) && "flumetest".equals(password);
+                }
+            });
+
         } catch(IOException e){
-            log.error("", e);
+            log.error("",e);
+        }
+
+    }
+
+    @BeforeSuite
+    public void initServer() throws IOException {
+        sshServer.start();
+    }
+
+    @AfterSuite
+    public void destroyServer() throws IOException, InterruptedException {
+        if (sshServer != null && !this.sshServer.isClosed()) {
+            sshServer.stop();
         }
     }
 }

@@ -72,7 +72,7 @@ public class SourceFactory {
     }
 
     /**
-     * @void initialize common parameters for all sources
+     * initialize common parameters for all sources.
      * @param context of source
      */
     public void initCommonParam(Context context) {

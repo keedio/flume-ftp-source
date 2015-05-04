@@ -1,6 +1,6 @@
 /*
- * KEEDIO
- */
+    KEEDIO
+*/
 package com.keedio.flume.metrics;
 /**
  *
@@ -18,7 +18,9 @@ public interface FtpSourceCounterMBean {
     public long getSendThroughput();
     public void incrementCountModProc();
     public long getCountModProc();
-    public long getMbProcessed();
-    public long getKbProcessed();
     public long getLastSent();
+    public void incrementCountSizeProc(long size);
+    public long getCountSizeProc();
+    public long getCountSizeProcKb();
+    public long getCountSizeProcMb();
 }

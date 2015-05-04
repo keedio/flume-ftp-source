@@ -32,12 +32,14 @@ public class SFTPSource extends KeedioSource {
     private ChannelSftp sftpClient;
     //private ChannelSftp.LsEntry afile = (ChannelSftp.LsEntry) file;
 
-    public SFTPSource(){}
-    
-    public SFTPSource(String knownHosts){
+    public SFTPSource() {
+    }
+
+    public SFTPSource(String knownHosts) {
         this.knownHosts = knownHosts;
         jsch = new JSch();
     }
+
     /**
      * @return boolean Opens a Socket connected to a server and login to return
      * True if successfully completed, false if not.
@@ -283,31 +285,31 @@ public class SFTPSource extends KeedioSource {
         }
         return link;
     }
-    
-     @Override
+
+    @Override
     /**
-     * 
+     *
      * @return String directory retrieved for server on connect
      */
-    public String getDirectoryserver(){
+    public String getDirectoryserver() {
         String printWorkingDirectory = "";
         try {
-        printWorkingDirectory = sftpClient.pwd();
-        } catch(SftpException e){
+            printWorkingDirectory = sftpClient.pwd();
+        } catch (SftpException e) {
             log.error("Error getting printworkingdirectory for server -sftpsource");
         }
         return printWorkingDirectory;
     }
-    
+
     /**
-     * 
+     *
      * @return object as cliente of ftpsource
      */
-    public Object getClientSource(){
+    public Object getClientSource() {
         return sftpClient;
     }
-    
-    @Override   
+
+    @Override
     public void setFileType(int fileType) throws IOException {
         //do nothing        
     }

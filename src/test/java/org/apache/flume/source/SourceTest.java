@@ -4,6 +4,8 @@
 package org.apache.flume.source;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.InputStream;
 import junit.framework.TestCase;
 import org.apache.flume.Context;
@@ -284,24 +286,76 @@ public class SourceTest extends TestCase {
 
     }
 
+    public void testReadStream5() {
+        System.out.println("readStream5");
+        InputStream inputStream = null;
+        long position = 0L;
+        try {
+            inputStream = new FileInputStream("/var/tmp/file.txt");
+            assertNotNull(inputStream);
+        } catch (FileNotFoundException e) {
+            log.error("", e);
+            fail();
+        }
+
+        class DummyChannelProcessor extends ChannelProcessor {
+
+            public DummyChannelProcessor() {
+                super(null);
+            }
+
+            @Override
+            public void processEvent(Event event) {
+            }
+        }
+
+        ChannelProcessor chanel = new DummyChannelProcessor();
+
+        Event event = new SimpleEvent();
+        try {
+            inputStream.skip(position);
+            BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+            String line = null;
+
+            if (in.ready()) {
+                while ((line = in.readLine()) != null) {
+                    //processMessage(line.getBytes());
+                    event.setBody(line.getBytes());
+                    System.out.println(new String(event.getBody()));
+                    System.out.println("end of body");
+
+                }
+            } else {
+                System.out.println("buffereader no ready");
+            }
+
+            in.close();
+            inputStream.close();
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+                //successRead = false;
+
+        }
+
+    }
+
     public void testCounterFiles() {
         int filesCount = 0;
         int i = 0;
-        
-        while (i < 25){
-        filesCount++;
-        i++;  
-        discover(filesCount);
-        
-        
+
+        while (i < 25) {
+            filesCount++;
+            i++;
+            discover(filesCount);
+
         }
-        
+
         log.info("reached " + filesCount);
-        
+
     }
-    
-    public void discover(int filesCount){
-        if (filesCount > 10){
+
+    public void discover(int filesCount) {
+        if (filesCount > 10) {
             log.info("discovered " + filesCount);
             return;
         } else {
