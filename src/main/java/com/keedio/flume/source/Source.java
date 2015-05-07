@@ -29,6 +29,7 @@ import java.io.InputStreamReader;
 
 import com.keedio.flume.client.factory.SourceFactory;
 import com.keedio.flume.client.KeedioSource;
+import java.nio.charset.Charset;
 import org.apache.flume.source.AbstractSource;
 
 /**
@@ -207,11 +208,11 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     try {
                         inputStream = keedioSource.getInputStream(aFile);
                         listener.fileStreamRetrieved();
-                        
-                        if (!readStream(inputStream, position)){
+
+                        if (!readStream(inputStream, position)) {
                             inputStream = null;
                         }
-                        
+
                         boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
                         if (success) {
                             keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
@@ -271,19 +272,18 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         if (keedioSource.isFlushLines()) {
             try {
                 inputStream.skip(position);
-                BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-                String line = null;
-                
-                if (in.ready()) {
-                    while ((line = in.readLine()) != null) {
-                        processMessage(line.getBytes());
+                try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
+                    String line = null;
+
+                    if (in.ready()) {
+                        while ((line = in.readLine()) != null) {
+                            processMessage(line.getBytes());
+                        }
+
+                    } else {
+                        successRead = false;
                     }
-
-                } else {
-                   successRead = false;
                 }
-
-                in.close();
                 inputStream.close();
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
@@ -301,7 +301,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         baostream.write(bytesArray, 0, bytesRead);
                         byte[] data = baostream.toByteArray();
                         processMessage(data);
-                        data = null;
                     }
                 }
 
