@@ -2,11 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.flume.flume-ng-sources</groupId>
+    <groupId>org.keedio.flume.source.ftp</groupId>
     <artifactId>flume-ftp-source</artifactId>
     <version>2.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>flume-ftp-source</name>
+
+    <parent>
+        <groupId>org.keedio</groupId>
+        <artifactId>keedio-shaded-parent</artifactId>
+        <version>0.1.0</version>
+    </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,28 +22,12 @@
         <flume.version>1.5.2</flume.version>
     </properties>
 
-    <build>
-
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.18.1</version>
-                <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-
     <dependencies>
         <dependency>
             <groupId>org.apache.flume</groupId>
             <artifactId>flume-ng-core</artifactId>
             <version>${flume.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>commons-net</groupId>
@@ -48,6 +38,7 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -55,11 +46,6 @@
             <artifactId>testng</artifactId>
             <version>6.1.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.typesafe.scala-logging</groupId>
-            <artifactId>scala-logging-slf4j_2.10</artifactId>
-            <version>2.1.2</version>
         </dependency>
 
         <dependency>
@@ -95,6 +81,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.12</version>
+            <scope>provided</scope>
         </dependency>        
         
     </dependencies>
