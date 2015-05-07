@@ -1,7 +1,7 @@
 /*
  * KEEDIO
  */
-package com.keedio.flume.source.utils;
+package org.keedio.flume.source.utils;
 
 import java.util.EventListener;
 

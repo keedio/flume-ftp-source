@@ -1,13 +1,13 @@
 /*
  * KEEDIO
  */
-package com.keedio.flume.client.factory;
+package org.keedio.flume.client.factory;
 
 import org.apache.flume.Context;
-import com.keedio.flume.client.KeedioSource;
-import com.keedio.flume.client.sources.FTPSSource;
-import com.keedio.flume.client.sources.FTPSource;
-import com.keedio.flume.client.sources.SFTPSource;
+import org.keedio.flume.client.KeedioSource;
+import org.keedio.flume.client.sources.FTPSSource;
+import org.keedio.flume.client.sources.FTPSource;
+import org.keedio.flume.client.sources.SFTPSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

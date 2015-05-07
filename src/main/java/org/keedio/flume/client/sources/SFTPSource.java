@@ -1,7 +1,7 @@
 /*
  * KEEDIO
  */
-package com.keedio.flume.client.sources;
+package org.keedio.flume.client.sources;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import com.keedio.flume.client.KeedioSource;
+import org.keedio.flume.client.KeedioSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

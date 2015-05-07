@@ -1,14 +1,14 @@
 /*
  * KEEDIO
  */
-package com.keedio.flume.client.sources;
+package org.keedio.flume.client.sources;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.net.ftp.FTP;
-import com.keedio.flume.client.KeedioSource;
+import org.keedio.flume.client.KeedioSource;
 import org.apache.commons.net.ftp.FTPSClient;
 
 import org.apache.commons.net.ftp.FTPFile;

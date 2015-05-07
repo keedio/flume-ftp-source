@@ -2,7 +2,7 @@
 * FptSourceCounter exposes custom metrics for specific source FTP
 ************/
 
-package com.keedio.flume.metrics;
+package org.keedio.flume.metrics;
 
 import org.apache.flume.instrumentation.MonitoredCounterGroup;
 /**

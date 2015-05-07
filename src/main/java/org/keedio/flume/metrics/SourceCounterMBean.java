@@ -1,7 +1,7 @@
 /*
     KEEDIO
 */
-package com.keedio.flume.metrics;
+package org.keedio.flume.metrics;
 /**
  *
  * @author Luis Lázaro <lalazaro@keedio.com>

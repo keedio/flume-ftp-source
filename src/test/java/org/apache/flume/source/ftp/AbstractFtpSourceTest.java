@@ -10,8 +10,8 @@ import org.apache.flume.Context;
 import org.apache.flume.channel.ChannelProcessor;
 import static org.mockito.Mockito.*;
 
-import com.keedio.flume.source.Source;
-import com.keedio.flume.metrics.SourceCounter;
+import org.keedio.flume.source.Source;
+import org.keedio.flume.metrics.SourceCounter;
 import org.apache.flume.source.TestFileUtils;
 import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
 import org.apache.log4j.Logger;

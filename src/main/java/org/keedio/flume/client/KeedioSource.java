@@ -2,7 +2,7 @@
  * KEEDIO
  */
 
-package com.keedio.flume.client;
+package org.keedio.flume.client;
 
 
 import java.io.FileInputStream;

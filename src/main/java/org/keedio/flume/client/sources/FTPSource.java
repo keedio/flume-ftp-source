@@ -1,9 +1,9 @@
 /*
  * KEEDIO
  */
-package com.keedio.flume.client.sources;
+package org.keedio.flume.client.sources;
 
-import com.keedio.flume.client.KeedioSource;
+import org.keedio.flume.client.KeedioSource;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;

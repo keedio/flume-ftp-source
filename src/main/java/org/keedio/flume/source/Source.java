@@ -1,7 +1,7 @@
 /*
  * KEEDIO
  */
-package com.keedio.flume.source;
+package org.keedio.flume.source;
 
 import java.util.*;
 
@@ -19,16 +19,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ByteArrayOutputStream;
 
-import com.keedio.flume.source.utils.FTPSourceEventListener;
+import org.keedio.flume.source.utils.FTPSourceEventListener;
 
-import com.keedio.flume.metrics.SourceCounter;
+import org.keedio.flume.metrics.SourceCounter;
 import java.util.List;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import com.keedio.flume.client.factory.SourceFactory;
-import com.keedio.flume.client.KeedioSource;
+import org.keedio.flume.client.factory.SourceFactory;
+import org.keedio.flume.client.KeedioSource;
 import java.nio.charset.Charset;
 import org.apache.flume.source.AbstractSource;
 

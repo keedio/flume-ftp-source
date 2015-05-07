@@ -10,11 +10,11 @@ import java.io.InputStream;
 import junit.framework.TestCase;
 import org.apache.flume.Context;
 import org.apache.flume.PollableSource;
-import com.keedio.flume.client.KeedioSource;
-import com.keedio.flume.metrics.SourceCounter;
-import com.keedio.flume.source.utils.FTPSourceEventListener;
+import org.keedio.flume.client.KeedioSource;
+import org.keedio.flume.metrics.SourceCounter;
+import org.keedio.flume.source.utils.FTPSourceEventListener;
 
-import com.keedio.flume.client.factory.SourceFactory;
+import org.keedio.flume.client.factory.SourceFactory;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeMethod;
-import com.keedio.flume.client.sources.FTPSource;
+import org.keedio.flume.client.sources.FTPSource;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
