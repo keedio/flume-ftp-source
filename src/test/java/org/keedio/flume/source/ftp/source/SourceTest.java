@@ -222,7 +222,7 @@ public class SourceTest extends TestCase {
         InputStream inputStream = null;
         long position = 0L;
         try {
-            inputStream = new FileInputStream("/var/tmp/file.txt");
+            inputStream = new FileInputStream("src/test/resources/file.txt");
             assertNotNull(inputStream);
         } catch (FileNotFoundException e) {
             log.error("", e);
@@ -274,7 +274,7 @@ public class SourceTest extends TestCase {
         InputStream inputStream = null;
         long position = 0L;
         try {
-            inputStream = new FileInputStream("/var/tmp/file.txt");
+            inputStream = new FileInputStream("src/test/resources/file.txt");
             assertNotNull(inputStream);
         } catch (FileNotFoundException e) {
             log.error("", e);

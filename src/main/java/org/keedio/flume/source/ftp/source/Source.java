@@ -240,7 +240,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                     //end condition for a regular file
                 } else if (keedioSource.isLink(aFile)) {
-                    log.info(currentFileName + " is a link of " + this.keedioSource.getLink(aFile) + " access denied");
+                    log.info(currentFileName + " is a link of " + this.keedioSource.getLink(aFile) + " could not retrieve size");
                     keedioSource.changeToDirectory(dirToList);
                     continue;
                 } else {

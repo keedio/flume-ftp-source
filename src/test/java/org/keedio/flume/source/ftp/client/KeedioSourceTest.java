@@ -44,12 +44,12 @@ public class KeedioSourceTest extends TestCase {
         System.out.println("saveMap");
         KeedioSource instance = new KeedioSourceImpl();
         //check for the file is created 
-        instance.setAbsolutePath(Paths.get(System.getProperty("java.io.tmpdir")+"file.ser"));
+        instance.setAbsolutePath(Paths.get("src/test/resources/file.ser"));
         Map<String, Long> map = new HashMap<>();
         map.put("file1.log", 156L);
         instance.setFileList(map);
         instance.saveMap();
-        assertTrue("no existe", Files.exists(Paths.get(System.getProperty("java.io.tmpdir")+"file.ser")));
+        assertTrue("no existe", Files.exists(Paths.get("src/test/resources/file.ser")));
 
         //now check that the map saved into file contains what we expect
         ObjectInputStream ois = null;
@@ -57,7 +57,7 @@ public class KeedioSourceTest extends TestCase {
         String result1 = "";
         String result2 = "";
         try {
-            ois = new ObjectInputStream(new FileInputStream(System.getProperty("java.io.tmpdir")+"file.ser"));
+            ois = new ObjectInputStream(new FileInputStream("src/test/resources/file.ser"));
         } catch (IOException e) {
             log.error("", e);
         }
@@ -92,7 +92,7 @@ public class KeedioSourceTest extends TestCase {
         Map<String, Long> mapExp = new HashMap<>();
 
         try {
-            mapExp = instance.loadMap(System.getProperty("java.io.tmpdir")+"file.ser");
+            mapExp = instance.loadMap("src/test/resources/file.ser");
         } catch (ClassNotFoundException | IOException e) {
             log.error("", e);
         }
@@ -151,8 +151,8 @@ public class KeedioSourceTest extends TestCase {
         System.out.println("makeLocationFile");
         KeedioSource instance = new KeedioSourceImpl();
         instance.setFileName("file.ser");
-        instance.setFolder(System.getProperty("java.io.tmpdir"));
-        assertEquals(instance.makeLocationFile().toString(), System.getProperty("java.io.tmpdir")+"file.ser");
+        instance.setFolder("src/test/resources");
+        assertEquals(instance.makeLocationFile().toString(), "src/test/resources/file.ser");
     }
 
     /**
@@ -161,7 +161,7 @@ public class KeedioSourceTest extends TestCase {
     public void testExistFolder() {
         System.out.println("existFolder");
         KeedioSource instance = new KeedioSourceImpl();
-        instance.setFolder(System.getProperty("java.io.tmpdir"));
+        instance.setFolder("src/test/resources/file.ser");
         assertTrue(instance.existFolder());
     }
 
@@ -173,7 +173,7 @@ public class KeedioSourceTest extends TestCase {
         KeedioSource instance = new KeedioSourceImpl();
         instance.setFileList(null);
         instance.setFileName("file.ser");
-        instance.setFolder(System.getProperty("java.io.tmpdir"));
+        instance.setFolder("src/test/resources");
         instance.makeLocationFile();
         instance.checkPreviousMap();
         assertNotNull(instance.getFileList());
