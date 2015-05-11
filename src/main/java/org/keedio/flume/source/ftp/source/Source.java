@@ -195,13 +195,18 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         long prevSize = keedioSource.getFileList().get(dirToList + "/" + currentFileName);
                         position = prevSize;
                         long dif = (keedioSource.getObjectSize(aFile) - keedioSource.getFileList().get(dirToList + "/" + currentFileName));
-                        log.info("Modified: " + currentFileName + " ,size: " + dif);
-                        if (dif < 0) { //known and full modified
+                        
+                        if (dif > 0){
+                            log.info("Modified: " + currentFileName + " ,size: " + dif);
+                        } else if (dif < 0) { //known and full modified
                             keedioSource.getExistFileList().remove(dirToList + "/" + currentFileName); //will be rediscovered as new file
                             keedioSource.saveMap();
                             continue;
+                        } else {
+                            continue;
                         }
-                    }
+                        
+                    } //end if known file
 
                     //common for all regular files
                     InputStream inputStream = null;
