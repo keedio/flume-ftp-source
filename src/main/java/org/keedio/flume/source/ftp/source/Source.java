@@ -287,6 +287,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                     } else {
                         successRead = false;
+                        log.error("BufferedReader is not ready. ");
                     }
                 }
                 inputStream.close();
