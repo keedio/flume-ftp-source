@@ -188,7 +188,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                     //test if file is new in collection
                     if (!(keedioSource.getFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
-                        sourceCounter.incrementFilesCount(); //not yet proccesed, count files in the show.
+                        sourceCounter.incrementFilesCount(); //include all files, even not yet processed
                         position = 0;
                         log.info("Discovered: " + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile));
                     } else { //known file
