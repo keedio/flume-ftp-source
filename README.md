@@ -24,7 +24,7 @@ Proccesed files's names will be "saved" into an external file (file.name). The f
 
 ###### Example configuration for FTP source
 
->       agent.sources.ftp1.type = org.apache.flume.source.Source 
+>       agent.sources.ftp1.type = org.keedio.flume.source.ftp.source.Source
 
 >       agent.sources.ftp1.client.sources = ftp
 
@@ -38,7 +38,7 @@ Proccesed files's names will be "saved" into an external file (file.name). The f
 
 ###### Example configuration for FTPS source
 
->       agent.sources.ftps1.type = org.apache.flume.source.Source 
+>       agent.sources.ftps1.type = org.keedio.flume.source.ftp.source.Source
 
 >       agent.sources.ftps1.client.sources = ftps
 
@@ -55,7 +55,7 @@ Proccesed files's names will be "saved" into an external file (file.name). The f
 
 ###### Example configuration for SFTP source
 
->       agent.sources.sftp1.type = org.apache.flume.source.Source 
+>       agent.sources.sftp1.type = org.keedio.flume.source.ftp.source.Source
 
 >       agent.sources.sftp1.client.sources = sftp
  
