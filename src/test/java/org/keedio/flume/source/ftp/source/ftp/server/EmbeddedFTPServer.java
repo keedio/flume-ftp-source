@@ -1,9 +1,9 @@
-package org.apache.flume.source.ftp.server;
+package org.keedio.flume.source.ftp.source.ftp.server;
 
 import java.io.IOException;
 import java.nio.file.Path;
 
-import org.apache.flume.source.TestFileUtils;
+import org.keedio.flume.source.ftp.source.TestFileUtils;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.FtpException;

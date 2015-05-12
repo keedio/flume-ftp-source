@@ -1,4 +1,4 @@
-package org.apache.flume.source;
+package org.keedio.flume.source.ftp.source;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -2,14 +2,14 @@
 * FptSourceCounter exposes custom metrics for specific source FTP
 ************/
 
-package org.apache.flume.source;
+package org.keedio.flume.source.ftp.metrics;
 
 import org.apache.flume.instrumentation.MonitoredCounterGroup;
 /**
  * 
  * @author Luis Lázaro <lalazaro@keedio.com>
  */
-public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSourceCounterMBean {
+public class SourceCounter extends MonitoredCounterGroup implements SourceCounterMBean {
     
     private static  long files_count                        /* contador de ficheros descubiertos */
                                 , filesProcCount                   /* contador de ficheros descubiertos y procesados con éxito */
@@ -27,7 +27,7 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
         "eventCount","start_time","last_sent", "sendThroughput", "countModProc", "bytesProcessed", "KbProcessed", "MbProcessed"
     };                 
         
-    public FtpSourceCounter(String name){
+    public SourceCounter(String name){
        super(MonitoredCounterGroup.Type.SOURCE, name, ATTRIBUTES);
        files_count = 0;
        filesProcCount = 0;

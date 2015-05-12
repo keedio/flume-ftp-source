@@ -2,3 +2,4 @@
 .idea/
 *.ser
 *.iml
+dependency-reduced-pom.xml

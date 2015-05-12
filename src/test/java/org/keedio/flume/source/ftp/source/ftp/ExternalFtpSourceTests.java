@@ -1,4 +1,4 @@
-package org.apache.flume.source.ftp;
+package org.keedio.flume.source.ftp.source.ftp;
 
 import org.apache.flume.EventDeliveryException;
 import org.apache.flume.PollableSource;

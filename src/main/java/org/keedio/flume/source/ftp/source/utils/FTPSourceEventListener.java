@@ -1,4 +1,7 @@
-package org.apache.flume.source.utils;
+/*
+ * KEEDIO
+ */
+package org.keedio.flume.source.ftp.source.utils;
 
 import java.util.EventListener;
 

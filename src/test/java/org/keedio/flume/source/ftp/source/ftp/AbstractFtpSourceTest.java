@@ -1,4 +1,4 @@
-package org.apache.flume.source.ftp;
+package org.keedio.flume.source.ftp.source.ftp;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -10,10 +10,10 @@ import org.apache.flume.Context;
 import org.apache.flume.channel.ChannelProcessor;
 import static org.mockito.Mockito.*;
 
-import org.apache.flume.source.FTPSource;
-import org.apache.flume.source.FtpSourceCounter;
-import org.apache.flume.source.TestFileUtils;
-import org.apache.flume.source.ftp.server.EmbeddedFTPServer;
+import org.keedio.flume.source.ftp.source.Source;
+import org.keedio.flume.source.ftp.metrics.SourceCounter;
+import org.keedio.flume.source.ftp.source.TestFileUtils;
+import org.keedio.flume.source.ftp.source.ftp.server.EmbeddedFTPServer;
 import org.apache.log4j.Logger;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mock;
@@ -26,8 +26,8 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     @Mock
     Context mockContext = new Context();
 
-    FTPSource ftpSource;
-    FtpSourceCounter ftpSourceCounter;
+    Source ftpSource;
+    SourceCounter ftpSourceCounter;
 
     int getPort = 2121;
 
@@ -36,13 +36,17 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getHost = "localhost";
     String getWorkingDirectory = null;
     String getFileName = "hasmap.ser";
-    String getFolder = "/var/tmp";
-    String getAbsoutePath = "/var/tmp/hasmap.ser";
+    //String getFolder = System.getProperty("java.io.tmpdir");
+    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
+    String getSource = "ftp";
+    
+    
 
     @BeforeMethod
     public void beforeMethod() {
         MockitoAnnotations.initMocks(this);
 
+        when(mockContext.getString("client.source")).thenReturn(getSource);
         when(mockContext.getInteger("buffer.size")).thenReturn(0);
         when(mockContext.getString("name.server")).thenReturn(getHost);
         when(mockContext.getString("user")).thenReturn(getUser);
@@ -51,14 +55,16 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
         when(mockContext.getString("file.name")).thenReturn(getFileName);
-        when(mockContext.getString("folder")).thenReturn(getFolder);
+        when(mockContext.getString("folder", System.getProperty("java.io.tmpdir"))).thenReturn(System.getProperty("java.io.tmpdir"));
+        when(mockContext.getInteger("chunk.size", 1024)).thenReturn(1024);
+       
         
 
         logger.info("Creating FTP source");
 
-        ftpSource = new FTPSource();
+        ftpSource = new Source();
         ftpSource.configure(mockContext);
-        ftpSourceCounter = new FtpSourceCounter("SOURCE.");
+        ftpSourceCounter = new SourceCounter("SOURCE.");
         ftpSource.setFtpSourceCounter(ftpSourceCounter);
 
         class DummyChannelProcessor extends ChannelProcessor {
@@ -78,7 +84,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
             logger.info("Stopping FTP source");
             ftpSource.stop();
 
-            Paths.get(getFileName).toFile().delete();
+            Paths.get("hasmap.ser").toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }
