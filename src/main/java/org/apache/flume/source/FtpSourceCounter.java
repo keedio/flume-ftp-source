@@ -18,12 +18,14 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
                                 , sendThroughput                /* tasa de eventos por segundo */
                                 , start_time                          /* milisegundos desde EPOC hasta creación de contador */
                                 , last_sent                            /* milisegundos desde EPOC hasta generación de último evento */
-                                , countModProc                    /* contador de modificaciones que se han procesado con éxito */ 
-                                , mbProcessed                     /* megabytes de datos procesados*/
-                                , kbProcessed;                     /* kbytes de datos procesados*/
+                                , countModProc                   /* contador de modificaciones que se han procesado con éxito */  
+                                , bytesProcessed                   /* bytes de datos procesados*/
+                                , KbProcessed
+                                , MbProcessed;
     
-    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", "eventCount","start_time","last_sent", 
-                                                                        "sendThroughput", "countModProc", "mbProcessed", "kbProcessed"};                 
+    private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", 
+        "eventCount","start_time","last_sent", "sendThroughput", "countModProc", "bytesProcessed", "KbProcessed", "MbProcessed"
+    };                 
         
     public FtpSourceCounter(String name){
        super(MonitoredCounterGroup.Type.SOURCE, name, ATTRIBUTES);
@@ -35,8 +37,9 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
        start_time = System.currentTimeMillis();
        sendThroughput = 0;
        countModProc = 0;
-       mbProcessed = 0;
-       kbProcessed = 0;
+       bytesProcessed = 0;
+       KbProcessed = 0;
+       MbProcessed = 0;
     }
             
     /*
@@ -118,19 +121,33 @@ public class FtpSourceCounter extends MonitoredCounterGroup implements FtpSource
     }
     
     @Override
-    public long getMbProcessed(){
-        mbProcessed = getEventCount() /(1024);
-        return mbProcessed;
-    }
-    
-    @Override
-    public long getKbProcessed(){
-        kbProcessed = getEventCount();
-        return kbProcessed;
-    }
-    
-    @Override
     public long getLastSent(){
         return last_sent;
     }
+    
+    @Override
+    public void incrementCountSizeProc(long size){
+        bytesProcessed+= size;
+    }
+
+    @Override
+    public long getCountSizeProc(){
+        return bytesProcessed;
+    }
+    
+    @Override
+    public long getCountSizeProcKb(){
+        KbProcessed = getCountSizeProc() / 1024;
+        return KbProcessed;
+    }
+    
+    @Override
+    public long getCountSizeProcMb(){
+        MbProcessed = getCountSizeProc() / (1024 * 1024);
+        return MbProcessed;
+    }
+       
+    
+    
+   
 }
