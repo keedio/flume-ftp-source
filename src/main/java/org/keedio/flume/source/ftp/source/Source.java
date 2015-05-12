@@ -172,7 +172,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             for (T element : list) {
                 String elementName = keedioSource.getObjectName(element);
                 if (elementName.equals(".") || elementName.equals("..")) {
-                   // log.info("Skip parent directory and directory itself");
                     continue;
                 }
 
@@ -183,7 +182,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     discoverElements(keedioSource, dirToList, elementName, level + 1);
                     continue;
 
-                } else if (keedioSource.isFile(element)) { //aFile is a regular file
+                } else if (keedioSource.isFile(element)) { //element is a regular file
                     keedioSource.changeToDirectory(dirToList);
                     keedioSource.getExistFileList().add(dirToList + "/" + elementName);  //control of deleted files in server  
 

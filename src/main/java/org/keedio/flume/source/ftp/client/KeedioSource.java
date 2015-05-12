@@ -37,8 +37,6 @@ import java.util.*;
  */
 public abstract class KeedioSource<T> {
     
-    protected T file;   //type of file the sources will use in each file-system-connection
-    
     private static final Logger log = LoggerFactory.getLogger(KeedioSource.class);
       
     private Map<String, Long> fileList = new HashMap<>();
