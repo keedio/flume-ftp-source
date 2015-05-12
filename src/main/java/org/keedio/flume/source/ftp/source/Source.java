@@ -153,7 +153,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @param keedioSource
      * @param parentDir, will be the directory retrieved by the server when
      * connected
-     * @param currentDir, actual dir int the recursive method
+     * @param currentDir, actual dir in the recursive method
      * @param level, deep to search
      * @throws IOException
      */

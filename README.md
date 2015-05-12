@@ -1,6 +1,6 @@
 Flume-ftp-source
 ================
-A network server on port 21 (FTP) will be source of events for Apache-flume. Files in main directory's server will be discovered and proccessed. The source is implemented as pollable source in terms of Flume, as the polling time is configurable in the main configuration of flume's file.
+A network server with FTP will be source of events for Apache-flume. Files in main directory's server will be discovered and processed. The source is implemented as pollable source in terms of Flume, as the polling time is configurable in the main configuration of flume's file.
 In main flume's agent configuration file must be specified if security for FTP is required. There are two kind of protocol security supported by the plugin:
 
 - FTP: File Transfer Protocol, normal plain text (insecure) but available for common use. Port 21.
@@ -35,7 +35,6 @@ located in parameter .folder of the config.
 >       agent.sources.ftp1.port = 21
 >       agent.sources.ftp1.folder = /var/flume
 >       agent.sources.ftp1.file.name = status-ftp1-file.ser
-<<<<<<< HEAD
 >       agent.sources.ftp1.security.enabled = false
 >       agent.sources.ftp1.security.cipher = TLS
 >       agent.sources.ftp1.security.certificate.enabled = false 
@@ -51,9 +50,7 @@ located in parameter .folder of the config.
 >       agent.sources.ftp1.file.name = status-ftp1-file.ser
 >       agent.sources.ftp1.security.enabled = true 
 >       agent.sources.ftp1.security.cipher = TLS
->       agent.sources.ftp1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
-=======
-
+>       agent.sources.ftp1.security.certificate.enabled = (false | true)  
 
 ###### Example configuration for FTPS source
 
@@ -69,8 +66,7 @@ located in parameter .folder of the config.
 >       agent.sources.ftps1.file.name = status-ftp1-file.ser
 >       agent.sources.ftps1.security.enabled = true 
 >       agent.sources.ftps1.security.cipher = TLS
->       agent.sources.ftps1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
->>>>>>> feature/source-integration
+>       agent.sources.ftps1.security.certificate.enabled = (false | true)  
 >       certificate sent by the server, validated or not).
 
 ###### Example configuration for SFTP source
