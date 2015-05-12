@@ -11,7 +11,8 @@ Files can be proccesed int two ways:
 - by lines, as one event is a full line.(flushlines = true)
 - by chunk of bytes, exactly 1 KB is the size of one event. (flushlines = false) 
 
-Proccesed files's names will be "saved" into an external file (file.name). The file will be created in .folder.
+Proccesed files's name and size will be tracked into a Map, this one will be "saved" into an external file (file.name),
+located in parameter .folder of the config.
 
 ### Requirements ######
 
