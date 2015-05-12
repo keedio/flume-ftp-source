@@ -84,12 +84,12 @@ The default size is 1024 bytes.Customizing this option is intended for particula
  https://github.com/keedio/flume-ftp-source/tree/feature/source-integration/src/main/resources/example-configs
 
 ### Version history #####
-2.0.4 new package name convention, check for above examples. 
-2.0.1 new configurable parameters in flume's context
-2.0.0: sources integration
-1.1.5: flush lines from SFTPSource
-1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing)
-1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls
+- 2.0.4 new package name convention, check for above examples. 
+- 2.0.1 new configurable parameters in flume's context.
+- 2.0.0: sources integration.
+- 1.1.5: flush lines from SFTPSource.
+- 1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing).
+- 1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls.
 
 ### License ######
 
