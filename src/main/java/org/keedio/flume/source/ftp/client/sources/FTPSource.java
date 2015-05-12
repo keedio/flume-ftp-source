@@ -16,17 +16,18 @@ import java.util.List;
 import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.IOException;
+import java.util.Arrays;
 import org.apache.commons.net.ftp.FTP;
 
 /**
  *
  * @author Luis Lázaro lalazaro@keedio.com Keedio
  */
-public class FTPSource extends KeedioSource {
+public class FTPSource extends KeedioSource<FTPFile> {
 
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
     private FTPClient ftpClient = new FTPClient();
-    //private FTPFile afile = (FTPFile) file;
+    
 
     /**
      * @return boolean Opens a Socket connected to a server and login to return
@@ -101,15 +102,13 @@ public class FTPSource extends KeedioSource {
      * @return list with objects in directory
      * @param current directory
      */
-    public List<Object> listFiles(String dir) {
-        List<Object> list = new ArrayList<>();
+    public List<FTPFile> listElements(String dir) {
+        List<FTPFile> list = new ArrayList<>();
         try {
             FTPFile[] subFiles = getFtpClient().listFiles(dir);
-            for (FTPFile file : subFiles) {
-                list.add((Object) file);
-            }
+            list = Arrays.asList(subFiles);
         } catch (IOException e) {
-            log.error("Could not list list files from  " + dir);
+            log.error("Could not list files from  " + dir);
         }
         return list;
     }
@@ -119,16 +118,15 @@ public class FTPSource extends KeedioSource {
      * @param Object
      * @return InputStream
      */
-    public InputStream getInputStream(Object file) throws IOException {
+    public InputStream getInputStream(FTPFile file) throws IOException {
         InputStream inputStream = null;
-        FTPFile afile = (FTPFile) file;
         try {
             if (isFlushLines()) {
                 this.setFileType(FTP.ASCII_FILE_TYPE);
             } else {
                 this.setFileType(FTP.BINARY_FILE_TYPE);
             }
-            inputStream = getFtpClient().retrieveFileStream(afile.getName());
+            inputStream = getFtpClient().retrieveFileStream(file.getName());
         } catch (IOException e) {
             log.error("Error trying to retrieve inputstream");
         }
@@ -140,29 +138,26 @@ public class FTPSource extends KeedioSource {
      * @return name of the file
      * @param object as file
      */
-    public String getObjectName(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.getName();
+    public String getObjectName(FTPFile file) {
+        return file.getName();
     }
 
     @Override
     /**
      * @return boolean
-     * @param Object to check
+     * @param FTPFile to check
      */
-    public boolean isDirectory(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.isDirectory();
+    public boolean isDirectory(FTPFile file) {
+        return file.isDirectory();
     }
 
     @Override
-    /**
-     * @return boolean
-     * @param Object to check
-     */
-    public boolean isFile(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.isFile();
+   /**
+    * @param FTPFile
+    * @return boolean
+    */
+    public boolean isFile(FTPFile file) {
+        return file.isFile();
     }
 
    
@@ -187,9 +182,8 @@ public class FTPSource extends KeedioSource {
      * @return long size
      * @param object file
      */
-    public long getObjectSize(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.getSize();
+    public long getObjectSize(FTPFile file) {
+        return file.getSize();
     }
 
     @Override
@@ -197,9 +191,8 @@ public class FTPSource extends KeedioSource {
      * @return boolean is a link
      * @param object as file
      */
-    public boolean isLink(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.isSymbolicLink();
+    public boolean isLink(FTPFile file) {
+        return file.isSymbolicLink();
     }
 
     @Override
@@ -207,9 +200,8 @@ public class FTPSource extends KeedioSource {
      * @return String name of the link
      * @param object as file
      */
-    public String getLink(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.getLink();
+    public String getLink(FTPFile file) {
+        return file.getLink();
     }
 
     @Override
@@ -245,6 +237,7 @@ public class FTPSource extends KeedioSource {
      *
      * @return object as cliente of ftpsource
      */
+    @Override
     public Object getClientSource() {
         return ftpClient;
     }
@@ -253,4 +246,6 @@ public class FTPSource extends KeedioSource {
     public void setFileType(int fileType) throws IOException {
         ftpClient.setFileType(fileType);
     }
+    
+   
 } //endclass

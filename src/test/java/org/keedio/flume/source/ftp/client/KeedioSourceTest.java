@@ -203,7 +203,7 @@ public class KeedioSourceTest extends TestCase {
         public void disconnect() {
         }
 
-        public List<Object> listFiles(String dirToList) {
+        public List<Object> listElements(String dirToList) {
             return null;
         }
 

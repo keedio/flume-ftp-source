@@ -53,7 +53,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * Request keedioSource to the factory
      *
      * @param context
-     * @return
+     * @return KeedioSource
      */
     public KeedioSource orderKeedioSource(Context context) {
         keedioSource = sourceFactory.createKeedioSource(context);
@@ -149,6 +149,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     /**
      * discoverElements: find files to process them
      *
+     * @param <T>
      * @param keedioSource
      * @param parentDir, will be the directory retrieved by the server when
      * connected
@@ -157,61 +158,61 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @throws IOException
      */
     // @SuppressWarnings("UnnecessaryContinue")
-    public void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws IOException {
+    public <T> void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws IOException {
 
-        long position = 0;
+        long position = 0L;
 
         String dirToList = parentDir;
         if (!currentDir.equals("")) {
             dirToList += "/" + currentDir;
         }
-        List<Object> list = keedioSource.listFiles(dirToList);
+        List<T> list = keedioSource.listElements(dirToList);
         if (list != null && list.size() > 0) {
 
-            for (Object aFile : list) {
-                String currentFileName = keedioSource.getObjectName(aFile);
-                if (currentFileName.equals(".") || currentFileName.equals("..")) {
-                    log.info("Skip parent directory and directory itself");
+            for (T element : list) {
+                String elementName = keedioSource.getObjectName(element);
+                if (elementName.equals(".") || elementName.equals("..")) {
+                   // log.info("Skip parent directory and directory itself");
                     continue;
                 }
 
-                if (keedioSource.isDirectory(aFile)) {
-                    log.info("[" + currentFileName + "]");
+                if (keedioSource.isDirectory(element)) {
+                    log.info("[" + elementName + "]");
                     keedioSource.changeToDirectory(parentDir);
 
-                    discoverElements(keedioSource, dirToList, currentFileName, level + 1);
+                    discoverElements(keedioSource, dirToList, elementName, level + 1);
                     continue;
 
-                } else if (keedioSource.isFile(aFile)) { //aFile is a regular file
+                } else if (keedioSource.isFile(element)) { //aFile is a regular file
                     keedioSource.changeToDirectory(dirToList);
-                    keedioSource.getExistFileList().add(dirToList + "/" + currentFileName);  //control of deleted files in server  
+                    keedioSource.getExistFileList().add(dirToList + "/" + elementName);  //control of deleted files in server  
 
                     //test if file is new in collection
-                    if (!(keedioSource.getFileList().containsKey(dirToList + "/" + currentFileName))) { //new file
+                    if (!(keedioSource.getFileList().containsKey(dirToList + "/" + elementName))) { //new file
                         sourceCounter.incrementFilesCount(); //include all files, even not yet processed
-                        position = 0;
-                        log.info("Discovered: " + currentFileName + " ,size: " + keedioSource.getObjectSize(aFile));
+                        position = 0L;
+                        log.info("Discovered: " + elementName + " ,size: " + keedioSource.getObjectSize(element));
                     } else { //known file
-                        long prevSize = keedioSource.getFileList().get(dirToList + "/" + currentFileName);
+                        long prevSize = (long) keedioSource.getFileList().get(dirToList + "/" + elementName);
                         position = prevSize;
-                        long dif = (keedioSource.getObjectSize(aFile) - keedioSource.getFileList().get(dirToList + "/" + currentFileName));
-                        
-                        if (dif > 0){
-                            log.info("Modified: " + currentFileName + " ,size: " + dif);
+                        long dif = (keedioSource.getObjectSize(element) - (long) keedioSource.getFileList().get(dirToList + "/" + elementName));
+
+                        if (dif > 0) {
+                            log.info("Modified: " + elementName + " ,size: " + dif);
                         } else if (dif < 0) { //known and full modified
-                            keedioSource.getExistFileList().remove(dirToList + "/" + currentFileName); //will be rediscovered as new file
+                            keedioSource.getExistFileList().remove(dirToList + "/" + elementName); //will be rediscovered as new file
                             keedioSource.saveMap();
                             continue;
                         } else {
                             continue;
                         }
-                        
+
                     } //end if known file
 
                     //common for all regular files
                     InputStream inputStream = null;
                     try {
-                        inputStream = keedioSource.getInputStream(aFile);
+                        inputStream = keedioSource.getInputStream(element);
                         listener.fileStreamRetrieved();
 
                         if (!readStream(inputStream, position)) {
@@ -220,7 +221,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                         boolean success = inputStream != null && keedioSource.particularCommand(); //mandatory if FTPClient
                         if (success) {
-                            keedioSource.getFileList().put(dirToList + "/" + currentFileName, keedioSource.getObjectSize(aFile));
+                            keedioSource.getFileList().put(dirToList + "/" + elementName, keedioSource.getObjectSize(element));
                             keedioSource.saveMap();
 
                             if (position != 0) {
@@ -229,13 +230,13 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                                 sourceCounter.incrementFilesProcCount();
                             }
 
-                            log.info("Processed:  " + currentFileName + " ,total files: " + this.keedioSource.getFileList().size() + "\n");
+                            log.info("Processed:  " + elementName + " ,total files: " + this.keedioSource.getFileList().size() + "\n");
 
                         } else {
-                            handleProcessError(currentFileName);
+                            handleProcessError(elementName);
                         }
                     } catch (IOException e) {
-                        handleProcessError(currentFileName);
+                        handleProcessError(elementName);
                         log.error("Failed retrieving inputStream on discoverElements ", e);
                         continue;
                     }
@@ -244,12 +245,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     continue;
 
                     //end condition for a regular file
-                } else if (keedioSource.isLink(aFile)) {
-                    log.info(currentFileName + " is a link of " + this.keedioSource.getLink(aFile) + " could not retrieve size");
+                } else if (keedioSource.isLink(element)) {
+                    log.info(elementName + " is a link of " + this.keedioSource.getLink(element) + " could not retrieve size");
                     keedioSource.changeToDirectory(dirToList);
                     continue;
                 } else {
-                    log.info(currentFileName + " unknown type of file");
+                    log.info(elementName + " unknown type of file");
                     keedioSource.changeToDirectory(dirToList);
                     continue;
                 }
@@ -279,16 +280,11 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 inputStream.skip(position);
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
                     String line = null;
-
-                    if (in.ready()) {
-                        while ((line = in.readLine()) != null) {
-                            processMessage(line.getBytes());
-                        }
-
-                    } else {
-                        successRead = false;
-                        log.error("BufferedReader is not ready. ");
+                    
+                    while ((line = in.readLine()) != null) {
+                        processMessage(line.getBytes());
                     }
+                    
                 }
                 inputStream.close();
             } catch (IOException e) {

@@ -30,8 +30,14 @@ import java.util.*;
  *
  * @author Luis Lázaro lalazaro@keedio.com
  * Keedio
+ 
+ /**
+ * Abstract class for sources that need a network connection before process.
+ * @param <T>
  */
-public abstract class KeedioSource {
+public abstract class KeedioSource<T> {
+    
+    protected T file;   //type of file the sources will use in each file-system-connection
     
     private static final Logger log = LoggerFactory.getLogger(KeedioSource.class);
       
@@ -40,7 +46,6 @@ public abstract class KeedioSource {
     private Path pathTohasmap = Paths.get("");
     private Path hasmap = Paths.get("");
     private Path absolutePath = Paths.get("");   
-
     
     protected String server;
     protected String user;
@@ -53,23 +58,21 @@ public abstract class KeedioSource {
     protected String workingDirectory; //working directory specified in config.
     protected boolean flushLines;
     protected boolean connected;
-    protected String dirToList;
-    protected Object file;   //type of file the sources will use in each file-system-connection
-    protected Integer chunkSize;
-     
+    protected String dirToList;    
+    protected Integer chunkSize;     
    
     public abstract boolean connect();
     public abstract void disconnect();
-    public abstract List<Object> listFiles(String dirToList);
+    public abstract List<T> listElements(String dirToList);
     public abstract void changeToDirectory(String directory);
-    public abstract InputStream getInputStream(Object file ) throws IOException;
-    public abstract String getObjectName(Object file);
-    public abstract boolean isDirectory(Object file);
-    public abstract boolean isFile(Object file);
+    public abstract InputStream getInputStream(T file ) throws IOException;
+    public abstract String getObjectName(T file);
+    public abstract boolean isDirectory(T file);
+    public abstract boolean isFile(T file);
     public abstract boolean particularCommand();
-    public abstract long getObjectSize(Object file);
-    public abstract boolean isLink(Object file);
-    public abstract String getLink(Object file);
+    public abstract long getObjectSize(T file);
+    public abstract boolean isLink(T file);
+    public abstract String getLink(T file);
     public abstract String getDirectoryserver(); //the working directory retrieved by server
     public abstract Object getClientSource();
     public abstract void setFileType(int fileType) throws IOException;

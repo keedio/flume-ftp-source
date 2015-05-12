@@ -6,6 +6,7 @@ package org.keedio.flume.source.ftp.client.sources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.net.ftp.FTP;
 import org.keedio.flume.source.ftp.client.KeedioSource;
@@ -21,10 +22,9 @@ import org.slf4j.LoggerFactory;
  *
  * @author Luis Lázaro lalazaro@keedio.com Keedio
  */
-public class FTPSSource extends KeedioSource {
+public class FTPSSource extends KeedioSource<FTPFile> {
 
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
-    //private FTPFile afile = (FTPFile) file;
     
     private boolean securityMode, securityCert;
     private String protocolSec;
@@ -106,20 +106,18 @@ public class FTPSSource extends KeedioSource {
         }
     }
 
-    @Override
+   @Override
     /**
      * @return list with objects in directory
      * @param current directory
      */
-    public List<Object> listFiles(String directory) {
-        List<Object> list = new ArrayList<>();
+    public List<FTPFile> listElements(String dir) {
+        List<FTPFile> list = new ArrayList<>();
         try {
-            FTPFile[] subFiles = ftpsClient.listFiles(directory);
-            for (FTPFile file : subFiles) {
-                list.add((Object) file);
-            }
+            FTPFile[] subFiles = getFtpsClient().listFiles(dir);
+            list = Arrays.asList(subFiles);
         } catch (IOException e) {
-            log.error("Could not list list files from  " + directory);
+            log.error("Could not list files from  " + dir);
         }
         return list;
     }
@@ -129,16 +127,15 @@ public class FTPSSource extends KeedioSource {
      * @param Object
      * @return InputStream
      */
-    public InputStream getInputStream(Object file) throws IOException {
+    public InputStream getInputStream(FTPFile file) throws IOException {
         InputStream inputStream = null;
-        FTPFile afile = (FTPFile) file;
         try {
             if (isFlushLines()) {
                 this.setFileType(FTP.ASCII_FILE_TYPE);
             } else {
                 this.setFileType(FTP.BINARY_FILE_TYPE);
             }
-            inputStream = ftpsClient.retrieveFileStream(afile.getName());
+            inputStream = getFtpsClient().retrieveFileStream(file.getName());
         } catch (IOException e) {
             log.error("Error trying to retrieve inputstream");
         }
@@ -150,42 +147,41 @@ public class FTPSSource extends KeedioSource {
      * @return name of the file
      * @param object as file
      */
-    public String getObjectName(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.getName();
+    public String getObjectName(FTPFile file) {
+        return file.getName();
     }
 
     @Override
     /**
      * @return boolean
-     * @param Object to check
+     * @param FTPFile to check
      */
-    public boolean isDirectory(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.isDirectory();
+    public boolean isDirectory(FTPFile file) {
+        return file.isDirectory();
     }
 
     @Override
-    /**
-     * @return boolean
-     * @param Object to check
-     */
-    public boolean isFile(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.isFile();
+   /**
+    * @param FTPFile
+    * @return boolean
+    */
+    public boolean isFile(FTPFile file) {
+        return file.isFile();
     }
 
+   
     /**
-     * This method calls completePendigCommand, mandatory for FTPSClient
+     * This method calls completePendigCommand, mandatory for FTPClient
      * @see <a href="http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html#completePendingCommand()">completePendigCommmand</a>
      * @return boolean
      */
+     @Override
     public boolean particularCommand() {
         boolean success = true;
         try {
-            success = ftpsClient.completePendingCommand();
+            success = getFtpsClient().completePendingCommand();
         } catch (IOException e) {
-            log.error("Error on command completePendingCommand of FTPClient");
+            log.error("Error on command completePendingCommand of FTPClient", e);
         }
         return success;
     }
@@ -195,9 +191,8 @@ public class FTPSSource extends KeedioSource {
      * @return long size
      * @param object file
      */
-    public long getObjectSize(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.getSize();
+    public long getObjectSize(FTPFile file) {
+        return file.getSize();
     }
 
     @Override
@@ -205,9 +200,8 @@ public class FTPSSource extends KeedioSource {
      * @return boolean is a link
      * @param object as file
      */
-    public boolean isLink(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.isSymbolicLink();
+    public boolean isLink(FTPFile file) {
+        return file.isSymbolicLink();
     }
 
     @Override
@@ -215,23 +209,51 @@ public class FTPSSource extends KeedioSource {
      * @return String name of the link
      * @param object as file
      */
-    public String getLink(Object file) {
-        FTPFile afile = (FTPFile) file;
-        return afile.getLink();
+    public String getLink(FTPFile file) {
+        return file.getLink();
+    }
+
+    @Override
+    /**
+     *
+     * @return String directory retrieved for server on connect
+     */
+    public String getDirectoryserver() {
+        String printWorkingDirectory = "";
+        try {
+            printWorkingDirectory = getFtpsClient().printWorkingDirectory();
+        } catch (IOException e) {
+            log.error("Error getting printworkingdirectory for server -ftpsource");
+        }
+        return printWorkingDirectory;
     }
 
     /**
-     * @return the ftpsClient
+     * @return the ftpClient
      */
     public FTPSClient getFtpsClient() {
         return ftpsClient;
     }
 
     /**
-     * @param ftpsClient the ftpsClient to set
+     * @param ftpClient the ftpClient to set
      */
-    public void setFtpsClient(FTPSClient ftpsClient) {
-        this.ftpsClient = ftpsClient;
+    public void setFtpsClient(FTPSClient ftpClient) {
+        this.ftpsClient = ftpClient;
+    }
+
+    /**
+     *
+     * @return object as cliente of ftpsource
+     */
+    @Override
+    public Object getClientSource() {
+        return ftpsClient;
+    }
+
+    @Override
+    public void setFileType(int fileType) throws IOException {
+        ftpsClient.setFileType(fileType);
     }
 
     /**
@@ -287,31 +309,6 @@ public class FTPSSource extends KeedioSource {
         }
     }
 
-    @Override
-    /**
-     *
-     * @return String directory retrieved for server on connect
-     */
-    public String getDirectoryserver() {
-        String printWorkingDirectory = "";
-        try {
-            printWorkingDirectory = ftpsClient.printWorkingDirectory();
-        } catch (IOException e) {
-            log.error("Error getting printworkingdirectory for server -ftpSsource");
-        }
-        return printWorkingDirectory;
-    }
+   
 
-    /**
-     *
-     * @return object as cliente of ftpSsource
-     */
-    public Object getClientSource() {
-        return ftpsClient;
-    }
-    
-    @Override   
-    public void setFileType(int fileType) throws IOException {
-        ftpsClient.setFileType(fileType);
-    }
 }
