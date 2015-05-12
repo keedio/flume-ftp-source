@@ -79,8 +79,12 @@ Proccesed files's names will be "saved" into an external file (file.name). The f
 The default size is 1024 bytes.Customizing this option is intended for particular cases.
 >     agent.sources.ftp1.chunk.size = 1024
 
+
+###### For example config files check:
+ https://github.com/keedio/flume-ftp-source/tree/feature/source-integration/src/main/resources/example-configs
+
 ### Version history #####
-2.0.4 new package name convention, check for above examples.
+2.0.4 new package name convention, check for above examples. 
 2.0.1 new configurable parameters in flume's context
 2.0.0: sources integration
 1.1.5: flush lines from SFTPSource
