@@ -12,8 +12,7 @@
         <groupId>org.keedio</groupId>
         <artifactId>keedio-shaded-parent</artifactId>
         <version>0.1.0</version>
-    </parent>-->
-    
+    </parent>-->    
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
