@@ -4,15 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.keedio.flume.source.ftp</groupId>
     <artifactId>flume-ftp-source</artifactId>
-    <version>2.0.3-SNAPSHOT</version>
+    <version>2.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>flume-ftp-source</name>
-
-    <parent>
+    
+    <!---<parent>
         <groupId>org.keedio</groupId>
         <artifactId>keedio-shaded-parent</artifactId>
         <version>0.1.0</version>
-    </parent>
+    </parent>-->
+    
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
