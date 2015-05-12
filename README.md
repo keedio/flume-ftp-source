@@ -1,6 +1,6 @@
 Flume-ftp-source
 ================
-A network server with FTP will be source of events for Apache-flume. Files in main directory's server will be discovered and processed. The source is implemented as pollable source in terms of Flume, as the polling time is configurable in the main configuration of flume's file.
+A network server on port 21 (FTP) will be source of events for Apache-flume. Files in main directory's server will be discovered and proccessed. The source is implemented as pollable source in terms of Flume, as the polling time is configurable in the main configuration of flume's file.
 In main flume's agent configuration file must be specified if security for FTP is required. There are two kind of protocol security supported by the plugin:
 
 - FTP: File Transfer Protocol, normal plain text (insecure) but available for common use. Port 21.
@@ -35,22 +35,7 @@ located in parameter .folder of the config.
 >       agent.sources.ftp1.port = 21
 >       agent.sources.ftp1.folder = /var/flume
 >       agent.sources.ftp1.file.name = status-ftp1-file.ser
->       agent.sources.ftp1.security.enabled = false
->       agent.sources.ftp1.security.cipher = TLS
->       agent.sources.ftp1.security.certificate.enabled = false 
 
-
-###### Example configuration for FTPS source
->       agent.sources.ftp1.type = org.apache.flume.source.FTPSource (same source as FTP) 
->       agent.sources.ftp1.name.server = 127.0.0.1
->       agent.sources.ftp1.user = username
->       agent.sources.ftp1.password = password
->       agent.sources.ftp1.port = 21
->       agent.sources.ftp1.folder = /var/flume
->       agent.sources.ftp1.file.name = status-ftp1-file.ser
->       agent.sources.ftp1.security.enabled = true 
->       agent.sources.ftp1.security.cipher = TLS
->       agent.sources.ftp1.security.certificate.enabled = (false | true)  
 
 ###### Example configuration for FTPS source
 
@@ -66,7 +51,7 @@ located in parameter .folder of the config.
 >       agent.sources.ftps1.file.name = status-ftp1-file.ser
 >       agent.sources.ftps1.security.enabled = true 
 >       agent.sources.ftps1.security.cipher = TLS
->       agent.sources.ftps1.security.certificate.enabled = (false | true)  
+>       agent.sources.ftps1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
 >       certificate sent by the server, validated or not).
 
 ###### Example configuration for SFTP source
@@ -106,11 +91,6 @@ The default size is 1024 bytes.Customizing this option is intended for particula
 - 1.1.5: flush lines from SFTPSource.
 - 1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing).
 - 1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls.
-
-###### Force flume-ftp to proccess lines instead of chunk of bytes
-###### (thanks to schmiegelow : https://github.com/schmiegelow/flume-ftp-source)
->     agent.sources.ftp1.flushlines = true
-      
 
 ### License ######
 
