@@ -96,7 +96,7 @@ The default size is 1024 bytes.Customizing this option is intended for particula
 >     agent.sources.ftp1.chunk.size = 1024
 
 
-###### For example config files check:
+###### For examples configs files, check:
  https://github.com/keedio/flume-ftp-source/tree/feature/source-integration/src/main/resources/example-configs
 
 ### Version history #####
@@ -111,11 +111,6 @@ The default size is 1024 bytes.Customizing this option is intended for particula
 ###### (thanks to schmiegelow : https://github.com/schmiegelow/flume-ftp-source)
 >     agent.sources.ftp1.flushlines = true
       
-
-### Version history #####
-1.1.5 flush lines from SFTPSource
-1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing):
-1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls
 
 ### License ######
 
