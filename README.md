@@ -9,7 +9,7 @@ In main flume's agent configuration file must be specified if security for FTP i
 
 Files can be proccesed int two ways:
 - by lines, as one event is a full line.(flushlines = true)
-- by chunk of bytes, exactly 1 KB is the size of one event. (flushlines = false) 
+- by chunk of bytes, exactly 1 KB is the size of one event by default. (flushlines = false) 
 
 Proccesed files's name and size will be tracked into a Map, this one will be "saved" into an external file (file.name),
 located in parameter .folder of the config.

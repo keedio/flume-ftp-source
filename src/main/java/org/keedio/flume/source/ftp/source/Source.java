@@ -180,7 +180,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     keedioSource.changeToDirectory(parentDir);
 
                     discoverElements(keedioSource, dirToList, elementName, level + 1);
-                    continue;
+                    //continue;
 
                 } else if (keedioSource.isFile(element)) { //element is a regular file
                     keedioSource.changeToDirectory(dirToList);
@@ -241,18 +241,20 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     }
 
                     keedioSource.changeToDirectory(dirToList);
-                    continue;
+                    //continue;
 
                     //end condition for a regular file
                 } else if (keedioSource.isLink(element)) {
                     log.info(elementName + " is a link of " + this.keedioSource.getLink(element) + " could not retrieve size");
-                    keedioSource.changeToDirectory(dirToList);
+                    keedioSource.changeToDirectory(parentDir);
                     continue;
                 } else {
                     log.info(elementName + " unknown type of file");
-                    keedioSource.changeToDirectory(dirToList);
+                    keedioSource.changeToDirectory(parentDir);
                     continue;
                 }
+                keedioSource.changeToDirectory(parentDir);
+                //continue;
 
             } //fin de recorrido de elementos devueltos
         } //el listado no es vacío
@@ -279,11 +281,11 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 inputStream.skip(position);
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
                     String line = null;
-                    
+
                     while ((line = in.readLine()) != null) {
                         processMessage(line.getBytes());
                     }
-                    
+
                 }
                 inputStream.close();
             } catch (IOException e) {
