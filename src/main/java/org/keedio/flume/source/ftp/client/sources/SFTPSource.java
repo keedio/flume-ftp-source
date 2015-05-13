@@ -190,6 +190,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
             inputStream = sftpClient.get(file.getFilename());
         } catch (SftpException e) {
             log.error("Error trying to retrieve inputstream");
+            throw new IOException(e.getMessage());
         }
         return inputStream;
     }
@@ -290,6 +291,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
             printWorkingDirectory = sftpClient.pwd();
         } catch (SftpException e) {
             log.error("Error getting printworkingdirectory for server -sftpsource");
+            throw new IOException(e.getMessage());
         }
         return printWorkingDirectory;
     }

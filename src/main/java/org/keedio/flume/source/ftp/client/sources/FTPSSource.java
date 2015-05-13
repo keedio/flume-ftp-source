@@ -25,13 +25,14 @@ import org.slf4j.LoggerFactory;
 public class FTPSSource extends KeedioSource<FTPFile> {
 
     private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
-    
+
     private boolean securityMode, securityCert;
     private String protocolSec;
     private FTPSClient ftpsClient;
 
-    public FTPSSource(){}
-    
+    public FTPSSource() {
+    }
+
     public FTPSSource(boolean securityMode, String protocolSec, boolean securityCert) {
         this.securityMode = securityMode;
         this.protocolSec = protocolSec;
@@ -60,7 +61,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
                 log.error("Could not login to the server");
                 this.setConnected(false);
             }
-            
+
             ftpsClient.enterLocalPassiveMode();
             ftpsClient.setControlKeepAliveTimeout(300);
             if (getWorkingDirectory() != null) {
@@ -106,7 +107,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
         }
     }
 
-   @Override
+    @Override
     /**
      * @return list with objects in directory
      * @param current directory
@@ -129,16 +130,14 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      */
     public InputStream getInputStream(FTPFile file) throws IOException {
         InputStream inputStream = null;
-        try {
-            if (isFlushLines()) {
-                this.setFileType(FTP.ASCII_FILE_TYPE);
-            } else {
-                this.setFileType(FTP.BINARY_FILE_TYPE);
-            }
-            inputStream = getFtpsClient().retrieveFileStream(file.getName());
-        } catch (IOException e) {
-            log.error("Error trying to retrieve inputstream");
+
+        if (isFlushLines()) {
+            this.setFileType(FTP.ASCII_FILE_TYPE);
+        } else {
+            this.setFileType(FTP.BINARY_FILE_TYPE);
         }
+        inputStream = getFtpsClient().retrieveFileStream(file.getName());
+
         return inputStream;
     }
 
@@ -161,21 +160,22 @@ public class FTPSSource extends KeedioSource<FTPFile> {
     }
 
     @Override
-   /**
-    * @param FTPFile
-    * @return boolean
-    */
+    /**
+     * @param FTPFile
+     * @return boolean
+     */
     public boolean isFile(FTPFile file) {
         return file.isFile();
     }
 
-   
     /**
      * This method calls completePendigCommand, mandatory for FTPClient
-     * @see <a href="http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html#completePendingCommand()">completePendigCommmand</a>
+     *
+     * @see
+     * <a href="http://commons.apache.org/proper/commons-net/apidocs/org/apache/commons/net/ftp/FTPClient.html#completePendingCommand()">completePendigCommmand</a>
      * @return boolean
      */
-     @Override
+    @Override
     public boolean particularCommand() {
         boolean success = true;
         try {
@@ -219,8 +219,8 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      * @return String directory retrieved for server on connect
      */
     public String getDirectoryserver() throws IOException {
-        String printWorkingDirectory = "";        
-            printWorkingDirectory = getFtpsClient().printWorkingDirectory();       
+        String printWorkingDirectory = "";
+        printWorkingDirectory = getFtpsClient().printWorkingDirectory();
         return printWorkingDirectory;
     }
 
@@ -304,7 +304,5 @@ public class FTPSSource extends KeedioSource<FTPFile> {
             ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
         }
     }
-
-   
 
 }
