@@ -218,13 +218,9 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      *
      * @return String directory retrieved for server on connect
      */
-    public String getDirectoryserver() {
-        String printWorkingDirectory = "";
-        try {
-            printWorkingDirectory = getFtpsClient().printWorkingDirectory();
-        } catch (IOException e) {
-            log.error("Error getting printworkingdirectory for server -ftpsource");
-        }
+    public String getDirectoryserver() throws IOException {
+        String printWorkingDirectory = "";        
+            printWorkingDirectory = getFtpsClient().printWorkingDirectory();       
         return printWorkingDirectory;
     }
 

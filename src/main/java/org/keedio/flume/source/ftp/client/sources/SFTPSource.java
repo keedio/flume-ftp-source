@@ -284,7 +284,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      *
      * @return String directory retrieved for server on connect
      */
-    public String getDirectoryserver() {
+    public String getDirectoryserver() throws IOException {
         String printWorkingDirectory = "";
         try {
             printWorkingDirectory = sftpClient.pwd();

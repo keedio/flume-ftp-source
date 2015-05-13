@@ -71,7 +71,7 @@ public abstract class KeedioSource<T> {
     public abstract long getObjectSize(T file);
     public abstract boolean isLink(T file);
     public abstract String getLink(T file);
-    public abstract String getDirectoryserver(); //the working directory retrieved by server
+    public abstract String getDirectoryserver() throws IOException; //the working directory retrieved by server
     public abstract Object getClientSource();
     public abstract void setFileType(int fileType) throws IOException;
    
