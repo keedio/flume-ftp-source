@@ -156,11 +156,12 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      * @return void
      * @param String destination
      */
-    public void changeToDirectory(String directory) {
+    public void changeToDirectory(String directory) throws IOException {
         try {
             sftpClient.cd(directory);
         } catch (SftpException e) {
             log.error("Could not change to directory " + directory);
+            throw new IOException(e.getMessage());
         }
     }
 
@@ -169,12 +170,13 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      * @return list with objects in directory
      * @param current directory
      */
-    public List<ChannelSftp.LsEntry> listElements(String directory) {
+    public List<ChannelSftp.LsEntry> listElements(String directory) throws IOException{
         List<ChannelSftp.LsEntry> list = new ArrayList<>();
         try {
             list = sftpClient.ls(directory);          
         } catch (SftpException e) {
             log.error("Could not list files from  " + directory);
+            throw new IOException(e.getMessage());
         }
         return list;
     }

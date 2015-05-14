@@ -61,8 +61,8 @@ public abstract class KeedioSource<T> {
    
     public abstract boolean connect();
     public abstract void disconnect();
-    public abstract List<T> listElements(String dirToList);
-    public abstract void changeToDirectory(String directory);
+    public abstract List<T> listElements(String dirToList) throws IOException;
+    public abstract void changeToDirectory(String directory)throws IOException;
     public abstract InputStream getInputStream(T file ) throws IOException;
     public abstract String getObjectName(T file);
     public abstract boolean isDirectory(T file);

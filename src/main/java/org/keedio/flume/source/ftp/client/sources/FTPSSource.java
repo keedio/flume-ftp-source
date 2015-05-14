@@ -99,12 +99,8 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      * @return void
      * @param String destination
      */
-    public void changeToDirectory(String directory) {
-        try {
-            ftpsClient.changeWorkingDirectory(directory);
-        } catch (IOException e) {
-            log.error("Could not change to directory " + directory);
-        }
+    public void changeToDirectory(String directory) throws IOException {        
+            ftpsClient.changeWorkingDirectory(directory);        
     }
 
     @Override
@@ -112,14 +108,12 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      * @return list with objects in directory
      * @param current directory
      */
-    public List<FTPFile> listElements(String dir) {
+    public List<FTPFile> listElements(String dir) throws IOException {
         List<FTPFile> list = new ArrayList<>();
-        try {
-            FTPFile[] subFiles = getFtpsClient().listFiles(dir);
-            list = Arrays.asList(subFiles);
-        } catch (IOException e) {
-            log.error("Could not list files from  " + dir);
-        }
+
+        FTPFile[] subFiles = getFtpsClient().listFiles(dir);
+        list = Arrays.asList(subFiles);
+
         return list;
     }
 

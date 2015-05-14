@@ -128,9 +128,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @return void
      */
     @Override
-    public synchronized void start() {
+    public synchronized void start() { 
         log.info("Starting Keedio source ...", this.getName());
-        log.info("FTP Source {} starting. Metrics: {}", getName(), sourceCounter);
+        log.info("Source {} starting. Metrics: {}", getName(), sourceCounter);
         super.start();
         sourceCounter.start();
     }
@@ -180,9 +180,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 if (keedioSource.isDirectory(element)) {
                     log.info("[" + elementName + "]");
                     keedioSource.changeToDirectory(parentDir);
-
                     discoverElements(keedioSource, dirToList, elementName, level + 1);
-                    //continue;
 
                 } else if (keedioSource.isFile(element)) { //element is a regular file
                     keedioSource.changeToDirectory(dirToList);
