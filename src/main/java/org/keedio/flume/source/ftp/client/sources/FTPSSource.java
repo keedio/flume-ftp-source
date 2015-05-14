@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FTPSSource extends KeedioSource<FTPFile> {
 
-    private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
+    private static final Logger log = LoggerFactory.getLogger(FTPSSource.class);
 
     private boolean securityMode, securityCert;
     private String protocolSec;
@@ -53,7 +53,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
 
             if (!FTPReply.isPositiveCompletion(replyCode)) {
                 ftpsClient.disconnect();
-                log.error("Connect Failed due to FTP server refused connection.");
+                log.error("Connect Failed due to FTPS, server refused connection.");
                 this.setConnected(false);
             }
 
@@ -74,7 +74,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
 
         } catch (IOException e) {
             this.setConnected(false);
-            log.error("IOException trying connect from configure source", e);
+            log.error("", e);
         }
         return isConnected();
     }

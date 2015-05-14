@@ -1,4 +1,4 @@
-//package org.apache.flume.source.ftps;
+//package org.keedio.flume.source.ftp.source.ftps;
 //
 //import java.io.IOException;
 //import java.nio.file.Path;
@@ -10,10 +10,10 @@
 //import org.apache.commons.net.ftp.FTP;
 //import org.apache.flume.EventDeliveryException;
 //import org.apache.flume.PollableSource;
-//import TestFileUtils;
-//import EmbeddedFTPSserver;
+//import org.keedio.flume.source.ftp.source.TestFileUtils;
+//import org.keedio.flume.source.ftp.source.ftps.server.EmbeddedFTPSserver;
 //
-//import com.keedio.flume.source.utils.FTPSourceEventListener;
+//import org.keedio.flume.source.ftp.source.utils.FTPSourceEventListener;
 //import org.apache.ftpserver.ftplet.FtpException;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;

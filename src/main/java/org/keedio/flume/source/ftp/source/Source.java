@@ -49,6 +49,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private SourceCounter sourceCounter;
 
+    
     /**
      * Request keedioSource to the factory
      *

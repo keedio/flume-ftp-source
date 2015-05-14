@@ -41,7 +41,7 @@ public class FTPSource extends KeedioSource<FTPFile> {
 
             if (!FTPReply.isPositiveCompletion(replyCode)) {
                 getFtpClient().disconnect();
-                log.error("Connect Failed due to FTP server refused connection.");
+                log.error("Connect Failed due to FTP, server refused connection.");
                 this.setConnected(false);
             }
 
@@ -62,7 +62,7 @@ public class FTPSource extends KeedioSource<FTPFile> {
 
         } catch (IOException e) {
             this.setConnected(false);
-            log.error("IOException trying connect from configure source", e);
+            log.error("", e);
         }
         return isConnected();
     }

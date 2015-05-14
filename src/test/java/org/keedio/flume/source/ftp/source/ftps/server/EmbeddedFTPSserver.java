@@ -42,9 +42,10 @@ public class EmbeddedFTPSserver {
             listenerFactory.setPort(2221);
             listenerFactory.setServerAddress("localhost");
             serverFactory.addListener("default", listenerFactory.createListener());
+            userManagerFactory.setFile(new File("src/test/resources/myusers.properties"));
 
             SslConfigurationFactory ssl = new SslConfigurationFactory();
-            ssl.setKeystoreFile(new File("/var/tmp/ftpserver.ser"));
+            ssl.setKeystoreFile(new File("src/test/resources/keystore.jks"));
             ssl.setKeystorePassword("flumetest");
 
             listenerFactory.setSslConfiguration(ssl.createSslConfiguration());
