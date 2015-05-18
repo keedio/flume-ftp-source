@@ -197,6 +197,7 @@ public class FTPSource extends KeedioSource<FTPFile> {
     /**
      *
      * @return String directory retrieved for server on connect
+     * @throws java.io.IOException
      */
     @Override
     public String getDirectoryserver() throws IOException {

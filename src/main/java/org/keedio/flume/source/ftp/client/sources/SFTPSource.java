@@ -31,9 +31,16 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     private Channel channel;
     private ChannelSftp sftpClient;
 
+    /**
+     *
+     */
     public SFTPSource() {
     }
 
+    /**
+     *
+     * @param knownHosts
+     */
     public SFTPSource(String knownHosts) {
         this.knownHosts = knownHosts;
         jsch = new JSch();
@@ -140,7 +147,6 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     /**
      * Disconnect and logout from current connection to server
      *
-     * @return void
      */
     @Override
     public void disconnect() {
