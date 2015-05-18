@@ -38,8 +38,8 @@ public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver{
     String getPassword = "flumetest";
     String getHost = "localhost";
     String getWorkingDirectory = null;
-    String getFileName = "hasmap.ser";
-    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
+    String getFileName = "hasmapFTPS.ser";
+    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "/hasmapFTPS.ser";
     String getSource = "ftps";
     boolean getSecurity = true;
     String getCipher = "TLS";
@@ -92,7 +92,7 @@ public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver{
             logger.info("Stopping FTPS source");
             ftpsSource.stop();
 
-            Paths.get("hasmap.ser").toFile().delete();
+            Paths.get("hasmapFTPS.ser").toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }
