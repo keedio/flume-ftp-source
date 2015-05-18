@@ -160,7 +160,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             sftpClient.cd(directory);
         } catch (SftpException e) {
-            log.error("Could not change to directory " + directory);
+            log.error("Could not change to directory " + directory, e);
             throw new IOException(e.getMessage());
         }
     }
@@ -175,7 +175,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             list = sftpClient.ls(directory);          
         } catch (SftpException e) {
-            log.error("Could not list files from  " + directory);
+            log.error("Could not list files from  " + directory, e);
             throw new IOException(e.getMessage());
         }
         return list;
@@ -191,7 +191,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             inputStream = sftpClient.get(file.getFilename());
         } catch (SftpException e) {
-            log.error("Error trying to retrieve inputstream");
+            log.error("Error trying to retrieve inputstream", e);
             throw new IOException(e.getMessage());
         }
         return inputStream;
@@ -220,7 +220,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      * There is no attribute to check isfile in SftpATTRS
      *
      * @return boolean
-     * @param Object to check
+     * @param file to check
      */
     public boolean isFile(ChannelSftp.LsEntry file) {
         boolean isfile = false;
@@ -253,7 +253,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             filesize = sftpClient.lstat(file.getFilename()).getSize();
         } catch (SftpException e) {
-            log.error("Could not lstat to get size of the file");
+            log.error("Could not lstat to get size of the file", e);
         }
         return filesize;
     }

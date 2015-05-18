@@ -77,7 +77,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
             log.error("", e);
         }
         return isConnected();
-    }
+    }   
 
     /**
      * Disconnect and logout from current connection to server
@@ -90,7 +90,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
             ftpsClient.disconnect();
             setConnected(false);
         } catch (IOException e) {
-            log.error("Source " + this.getClass().getName() + " failed disconnect");
+            log.error("Source " + this.getClass().getName() + " failed disconnect", e);
         }
     }
 
