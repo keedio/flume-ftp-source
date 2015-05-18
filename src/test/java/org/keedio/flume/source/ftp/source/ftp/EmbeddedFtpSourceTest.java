@@ -153,7 +153,9 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
 
             Assert.assertEquals( Long.valueOf(map.get(filename)), Long.valueOf(81L * 100L));
         } catch (IOException|ClassNotFoundException|EventDeliveryException e) {
+            logger.error("",e);
             Assert.fail();
+            
         } finally {
             cleanup(tmpFile0);
         }

@@ -35,9 +35,9 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getPassword = "flumetest";
     String getHost = "localhost";
     String getWorkingDirectory = null;
-    String getFileName = "hasmap.ser";
+    String getFileName = "hasmapFTP.ser";
     //String getFolder = System.getProperty("java.io.tmpdir");
-    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
+    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmapFTP.ser";
     String getSource = "ftp";
     
     
@@ -84,7 +84,7 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
             logger.info("Stopping FTP source");
             ftpSource.stop();
 
-            Paths.get("hasmap.ser").toFile().delete();
+            Paths.get("hasmapFTP.ser").toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }

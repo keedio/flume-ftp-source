@@ -157,6 +157,7 @@ public class EmbeddedFtpsSourceTest extends AbstractFtpsSourceTest {
 
             Assert.assertEquals( Long.valueOf(map.get(filename)), Long.valueOf(81L * 100L));
         } catch (IOException|ClassNotFoundException|EventDeliveryException e) {
+            logger.error("",e);
             Assert.fail();
         } finally {
             cleanup(tmpFile0);
@@ -178,7 +179,7 @@ public class EmbeddedFtpsSourceTest extends AbstractFtpsSourceTest {
             TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
 
             PollableSource.Status proc1 = ftpsSource.process();
-            Assert.assertEquals(PollableSource.Status.READY, proc0);
+            Assert.assertEquals(PollableSource.Status.READY, proc1);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
