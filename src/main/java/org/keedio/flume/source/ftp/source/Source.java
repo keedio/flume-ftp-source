@@ -165,8 +165,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         long position = 0L;
 
         String dirToList = parentDir;
-        if (!currentDir.equals("")) {
+        if (!("").equals(currentDir)){
             dirToList += "/" + currentDir;
+        } else {
         }
         List<T> list = keedioSource.listElements(dirToList);
         if (list != null && list.size() > 0) {
