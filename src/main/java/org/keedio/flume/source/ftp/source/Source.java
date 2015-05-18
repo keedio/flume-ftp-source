@@ -174,9 +174,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
             for (T element : list) {
                 String elementName = keedioSource.getObjectName(element);
-                if (elementName.equals(".") || elementName.equals("..")) {
-                    continue;
-                }
 
                 if (keedioSource.isDirectory(element)) {
                     log.info("[" + elementName + "]");
@@ -195,7 +192,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     } else { //known file
                         long prevSize = (long) keedioSource.getFileList().get(dirToList + "/" + elementName);
                         position = prevSize;
-                        long dif = (keedioSource.getObjectSize(element) - (long) keedioSource.getFileList().get(dirToList + "/" + elementName));
+                        long dif = keedioSource.getObjectSize(element) - (long) keedioSource.getFileList().get(dirToList + "/" + elementName);
 
                         if (dif > 0) {
                             log.info("Modified: " + elementName + " ,size: " + dif);
