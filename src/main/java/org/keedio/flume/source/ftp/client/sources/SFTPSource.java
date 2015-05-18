@@ -142,6 +142,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      *
      * @return void
      */
+    @Override
     public void disconnect() {
         channel.disconnect();
         sessionSftp.disconnect();
@@ -302,6 +303,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      *
      * @return object as cliente of ftpsource
      */
+    @Override
     public Object getClientSource() {
         return sftpClient;
     }
