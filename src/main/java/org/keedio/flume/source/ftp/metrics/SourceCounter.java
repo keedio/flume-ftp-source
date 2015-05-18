@@ -11,22 +11,28 @@ import org.apache.flume.instrumentation.MonitoredCounterGroup;
  */
 public class SourceCounter extends MonitoredCounterGroup implements SourceCounterMBean {
     
-    private static  long files_count                        /* contador de ficheros descubiertos */
-                                , filesProcCount                   /* contador de ficheros descubiertos y procesados con éxito */
-                                , filesProcCountError            /* contador de ficheros descubiertos y procesados con error */
-                                , eventCount                        /* contador de eventos */
-                                , sendThroughput                /* tasa de eventos por segundo */
-                                , start_time                          /* milisegundos desde EPOC hasta creación de contador */
-                                , last_sent                            /* milisegundos desde EPOC hasta generación de último evento */
-                                , countModProc                   /* contador de modificaciones que se han procesado con éxito */  
-                                , bytesProcessed                   /* bytes de datos procesados*/
-                                , KbProcessed
-                                , MbProcessed;
+    private static long files_count;    
+    private static long filesProcCount ;  
+    private static long filesProcCountError;
+    private static long eventCount;
+    private static long sendThroughput;
+    private static long start_time;
+    private static long last_sent;
+    private static long countModProc;
+    private static long bytesProcessed;
+    private static long KbProcessed;
+    private static long MbProcessed;
+            
+   
     
     private static  final String[] ATTRIBUTES = { "files_count" , "filesProcCount", "filesProcCountError", 
         "eventCount","start_time","last_sent", "sendThroughput", "countModProc", "bytesProcessed", "KbProcessed", "MbProcessed"
     };                 
         
+    /**
+     *
+     * @param name
+     */
     public SourceCounter(String name){
        super(MonitoredCounterGroup.Type.SOURCE, name, ATTRIBUTES);
        files_count = 0;
@@ -123,7 +129,6 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
     }
     
     /**
-     * @return
      */
     @Override
     public void incrementCountModProc(){

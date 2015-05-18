@@ -45,34 +45,171 @@ public abstract class KeedioSource<T> {
     private Path hasmap = Paths.get("");
     private Path absolutePath = Paths.get("");   
     
+    /**
+     *
+     */
     protected String server;
+
+    /**
+     *
+     */
     protected String user;
+
+    /**
+     *
+     */
     protected String password;
+
+    /**
+     *
+     */
     protected String folder;
+
+    /**
+     *
+     */
     protected String fileName;
+
+    /**
+     *
+     */
     protected Integer port;
+
+    /**
+     *
+     */
     protected Integer bufferSize;
+
+    /**
+     *
+     */
     protected Integer runDiscoverDelay;
+
+    /**
+     *
+     */
     protected String workingDirectory; //working directory specified in config.
+
+    /**
+     *
+     */
     protected boolean flushLines;
+
+    /**
+     *
+     */
     protected boolean connected;
+
+    /**
+     *
+     */
     protected String dirToList;    
+
+    /**
+     *
+     */
     protected Integer chunkSize;     
    
+    /**
+     *
+     * @return
+     */
     public abstract boolean connect();
+
+    /**
+     *
+     */
     public abstract void disconnect();
+
+    /**
+     *
+     * @param dirToList
+     * @return
+     * @throws IOException
+     */
     public abstract List<T> listElements(String dirToList) throws IOException;
+
+    /**
+     *
+     * @param directory
+     * @throws IOException
+     */
     public abstract void changeToDirectory(String directory)throws IOException;
+
+    /**
+     *
+     * @param file
+     * @return
+     * @throws IOException
+     */
     public abstract InputStream getInputStream(T file ) throws IOException;
+
+    /**
+     *
+     * @param file
+     * @return
+     */
     public abstract String getObjectName(T file);
+
+    /**
+     *
+     * @param file
+     * @return
+     */
     public abstract boolean isDirectory(T file);
+
+    /**
+     *
+     * @param file
+     * @return
+     */
     public abstract boolean isFile(T file);
+
+    /**
+     *
+     * @return
+     */
     public abstract boolean particularCommand();
+
+    /**
+     *
+     * @param file
+     * @return
+     */
     public abstract long getObjectSize(T file);
+
+    /**
+     *
+     * @param file
+     * @return
+     */
     public abstract boolean isLink(T file);
+
+    /**
+     *
+     * @param file
+     * @return
+     */
     public abstract String getLink(T file);
+
+    /**
+     *
+     * @return
+     * @throws IOException
+     */
     public abstract String getDirectoryserver() throws IOException; //the working directory retrieved by server
+
+    /**
+     *
+     * @return
+     */
     public abstract Object getClientSource();
+
+    /**
+     *
+     * @param fileType
+     * @throws IOException
+     */
     public abstract void setFileType(int fileType) throws IOException;
    
     /**
