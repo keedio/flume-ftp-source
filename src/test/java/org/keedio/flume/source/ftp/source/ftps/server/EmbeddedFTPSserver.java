@@ -49,7 +49,7 @@ public class EmbeddedFTPSserver {
             ssl.setKeystorePassword("flumetest");
 
             listenerFactory.setSslConfiguration(ssl.createSslConfiguration());
-            listenerFactory.setImplicitSsl(true);
+            listenerFactory.setImplicitSsl(false);
 
             serverFactory.addListener("default", listenerFactory.createListener());
 
