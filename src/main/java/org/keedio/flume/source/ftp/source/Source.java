@@ -72,7 +72,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             keedioSource.makeLocationFile();
         } else {
             log.error("Folder " + keedioSource.getPathTohasmap().toString() + " not exists");
-            System.exit(1);
         }
         keedioSource.connect();
         sourceCounter = new SourceCounter("SOURCE." + getName());

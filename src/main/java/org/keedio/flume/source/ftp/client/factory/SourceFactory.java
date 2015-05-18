@@ -66,7 +66,6 @@ public class SourceFactory {
                 break;
             default:
                 log.error("Source not found in context");
-                System.exit(1);
         }
         return keedioSource;
     }
