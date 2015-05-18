@@ -41,9 +41,9 @@ public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver{
     String getFileName = "hasmap.ser";
     String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
     String getSource = "ftps";
-    Boolean getSecurity = true;
+    boolean getSecurity = true;
     String getCipher = "TLS";
-    Boolean getCertificate = false;
+    boolean getCertificate = false;
     
      
 
