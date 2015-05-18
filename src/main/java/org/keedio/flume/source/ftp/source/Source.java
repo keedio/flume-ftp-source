@@ -242,9 +242,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     }
 
                     keedioSource.changeToDirectory(dirToList);
-                    //continue;
 
-                    //end condition for a regular file
                 } else if (keedioSource.isLink(element)) {
                     log.info(elementName + " is a link of " + this.keedioSource.getLink(element) + " could not retrieve size");
                     keedioSource.changeToDirectory(parentDir);
@@ -255,11 +253,10 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     continue;
                 }
                 keedioSource.changeToDirectory(parentDir);
-                //continue;
 
-            } //fin de recorrido de elementos devueltos
-        } //el listado no es vacío
-    }//fin de método
+            } 
+        } 
+    }
 
     /**
      * Read retrieved stream from ftpclient into byte[] and process. If
