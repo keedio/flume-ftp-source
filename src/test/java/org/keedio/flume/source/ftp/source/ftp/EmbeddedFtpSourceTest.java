@@ -174,7 +174,7 @@ public class EmbeddedFtpSourceTest extends AbstractFtpSourceTest {
             TestFileUtils.appendASCIIGarbageToFile(tmpFile0, 1000, 100);
 
             PollableSource.Status proc1 = ftpSource.process();
-            Assert.assertEquals(PollableSource.Status.READY, proc0);
+            Assert.assertEquals(PollableSource.Status.READY, proc1);
             Assert.assertEquals(ftpSourceCounter.getFilesCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCount(), 1);
             Assert.assertEquals(ftpSourceCounter.getFilesProcCountError(), 0);
