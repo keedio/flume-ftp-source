@@ -25,7 +25,7 @@ import org.apache.commons.net.ftp.FTP;
  */
 public class FTPSource extends KeedioSource<FTPFile> {
 
-    private static final Logger log = LoggerFactory.getLogger(FTPSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSource.class);
     private FTPClient ftpClient = new FTPClient();
 
     /**
@@ -41,12 +41,12 @@ public class FTPSource extends KeedioSource<FTPFile> {
 
             if (!FTPReply.isPositiveCompletion(replyCode)) {
                 getFtpClient().disconnect();
-                log.error("Connect Failed due to FTP, server refused connection.");
+                logger.error("Connect Failed due to FTP, server refused connection.");
                 this.setConnected(false);
             }
 
             if (!(ftpClient.login(user, password))) {
-                log.error("Could not login to the server");
+                logger.error("Could not login to the server");
                 this.setConnected(false);
             }
 
@@ -62,7 +62,7 @@ public class FTPSource extends KeedioSource<FTPFile> {
 
         } catch (IOException e) {
             this.setConnected(false);
-            log.error("", e);
+            logger.error("", e);
         }
         return isConnected();
     }
@@ -79,7 +79,7 @@ public class FTPSource extends KeedioSource<FTPFile> {
             setConnected(false);
 
         } catch (IOException e) {
-            log.error("Source " + this.getClass().getName() + " failed disconnect", e);
+            logger.error("Source " + this.getClass().getName() + " failed disconnect", e);
         }
     }
 
@@ -162,7 +162,7 @@ public class FTPSource extends KeedioSource<FTPFile> {
         try {
             success = getFtpClient().completePendingCommand();
         } catch (IOException e) {
-            log.error("Error on command completePendingCommand of FTPClient", e);
+            logger.error("Error on command completePendingCommand of FTPClient", e);
         }
         return success;
     }

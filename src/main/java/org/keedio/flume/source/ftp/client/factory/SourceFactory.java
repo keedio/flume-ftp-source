@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public class SourceFactory {
 
     private KeedioSource keedioSource;
-    private static final Logger log = LoggerFactory.getLogger(KeedioSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(KeedioSource.class);
     private final Integer discoverDelay = 10000;
     private final boolean flushlinesDefault = true;
     private final String folderDefault = System.getProperty("java.io.tmpdir");
@@ -65,7 +65,7 @@ public class SourceFactory {
                 initCommonParam(context);
                 break;
             default:
-                log.error("Source not found in context");
+                logger.error("Source not found in context");
         }
         return keedioSource;
     }

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FTPSSource extends KeedioSource<FTPFile> {
 
-    private static final Logger log = LoggerFactory.getLogger(FTPSSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(FTPSSource.class);
 
     private boolean securityMode, securityCert;
     private String protocolSec;
@@ -53,12 +53,12 @@ public class FTPSSource extends KeedioSource<FTPFile> {
 
             if (!FTPReply.isPositiveCompletion(replyCode)) {
                 ftpsClient.disconnect();
-                log.error("Connect Failed due to FTPS, server refused connection.");
+                logger.error("Connect Failed due to FTPS, server refused connection.");
                 this.setConnected(false);
             }
 
             if (!(ftpsClient.login(user, password))) {
-                log.error("Could not login to the server");
+                logger.error("Could not login to the server");
                 this.setConnected(false);
             }
 
@@ -74,7 +74,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
 
         } catch (IOException e) {
             this.setConnected(false);
-            log.error("", e);
+            logger.error("", e);
         }
         return isConnected();
     }   
@@ -90,7 +90,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
             ftpsClient.disconnect();
             setConnected(false);
         } catch (IOException e) {
-            log.error("Source " + this.getClass().getName() + " failed disconnect", e);
+            logger.error("Source " + this.getClass().getName() + " failed disconnect", e);
         }
     }
 
@@ -175,7 +175,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
         try {
             success = getFtpsClient().completePendingCommand();
         } catch (IOException e) {
-            log.error("Error on command completePendingCommand of FTPClient", e);
+            logger.error("Error on command completePendingCommand of FTPClient", e);
         }
         return success;
     }

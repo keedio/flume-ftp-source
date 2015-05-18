@@ -37,7 +37,7 @@ import java.util.*;
  */
 public abstract class KeedioSource<T> {
     
-    private static final Logger log = LoggerFactory.getLogger(KeedioSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(KeedioSource.class);
       
     private Map<String, Long> fileList = new HashMap<>();
     private Set<String> existFileList = new HashSet<>();
@@ -85,9 +85,9 @@ public abstract class KeedioSource<T> {
                 out.writeObject((HashMap) getFileList());
             }
         } catch (FileNotFoundException e) {
-            log.error("Error saving map File", e);
+            logger.error("Error saving map File", e);
         } catch (IOException e) {
-            log.error("Error saving map IO:", e);
+            logger.error("Error saving map IO:", e);
         }
     }
 
@@ -126,14 +126,14 @@ public abstract class KeedioSource<T> {
         try {
             if (Files.exists(file1)) {
                 setFileList(loadMap(file1.toString()));
-                log.info("Found previous map of files flumed");
+                logger.info("Found previous map of files flumed");
             } else {
-                log.info("Not found preivous map of files flumed");
+                logger.info("Not found preivous map of files flumed");
 
             }
 
         } catch (IOException | ClassNotFoundException e) {
-            log.info("Exception thrown checking previous map ", e);
+            logger.info("Exception thrown checking previous map ", e);
         }
     }
 

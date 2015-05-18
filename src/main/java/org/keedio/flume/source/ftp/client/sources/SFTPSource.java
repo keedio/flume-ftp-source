@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
 
-    private static final Logger log = LoggerFactory.getLogger(SFTPSource.class);
+    private static final Logger logger = LoggerFactory.getLogger(SFTPSource.class);
 
     private String knownHosts;
     private JSch jsch;
@@ -60,7 +60,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
             }
         } catch (JSchException e) {
             if (!(sessionSftp.isConnected())) {
-                log.info("JSchException ", e);
+                logger.info("JSchException ", e);
                 this.setConnected(false);
             }
         }
@@ -147,7 +147,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         sessionSftp.disconnect();
         setConnected(false);
         if (isConnected()) {
-            log.error("Source " + this.getClass().getName() + " failed disconnect");
+            logger.error("Source " + this.getClass().getName() + " failed disconnect");
         }
     }
 
@@ -160,7 +160,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             sftpClient.cd(directory);
         } catch (SftpException e) {
-            log.error("Could not change to directory " + directory, e);
+            logger.error("Could not change to directory " + directory, e);
             throw new IOException(e.getMessage());
         }
     }
@@ -175,7 +175,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             list = sftpClient.ls(directory);          
         } catch (SftpException e) {
-            log.error("Could not list files from  " + directory, e);
+            logger.error("Could not list files from  " + directory, e);
             throw new IOException(e.getMessage());
         }
         return list;
@@ -191,7 +191,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             inputStream = sftpClient.get(file.getFilename());
         } catch (SftpException e) {
-            log.error("Error trying to retrieve inputstream", e);
+            logger.error("Error trying to retrieve inputstream", e);
             throw new IOException(e.getMessage());
         }
         return inputStream;
@@ -253,7 +253,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             filesize = sftpClient.lstat(file.getFilename()).getSize();
         } catch (SftpException e) {
-            log.error("Could not lstat to get size of the file", e);
+            logger.error("Could not lstat to get size of the file", e);
         }
         return filesize;
     }
@@ -277,7 +277,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             link = sftpClient.readlink(file.getFilename());
         } catch (SftpException e) {
-            log.error("Could not readLink to get name");
+            logger.error("Could not readLink to get name");
         }
         return link;
     }
@@ -292,7 +292,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             printWorkingDirectory = sftpClient.pwd();
         } catch (SftpException e) {
-            log.error("Error getting printworkingdirectory for server -sftpsource");
+            logger.error("Error getting printworkingdirectory for server -sftpsource");
             throw new IOException(e.getMessage());
         }
         return printWorkingDirectory;

@@ -42,7 +42,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
        MbProcessed = 0;
     }
             
-    /*
+    /**
     @return long, number of files discovered
     */
     @Override
@@ -50,7 +50,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
         return files_count;
     }
     
-    /*
+    /**
     @void, increment count of files
     */
     @Override
@@ -58,7 +58,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
         files_count++;
     }
     
-    /*
+    /**
     @return long, files succesfully
     */
     @Override
@@ -66,7 +66,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
         return filesProcCount;
     }
     
-    /*
+    /**
     @void, increment count of proc files    
     */
     @Override
@@ -74,7 +74,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
         filesProcCount++;
     }
     
-     /*
+     /**
     @return long, files proc with error
     */
     @Override
@@ -82,7 +82,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
         return filesProcCountError;
     }
     
-    /*
+    /**
     @void, increment count of proc files with error    
     */
     @Override
@@ -90,6 +90,9 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
         filesProcCountError++;
     }
     
+    /**
+     *@void
+     */
     @Override
     public void incrementEventCount(){
         last_sent = System.currentTimeMillis();
@@ -100,47 +103,83 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
         }
     }
     
+    /**
+     * 
+     * @return  long
+     */
+    
     @Override
     public long getEventCount(){
         return eventCount;
     }
     
+    /**
+     * 
+     * @return 
+     */
     @Override
     public long getSendThroughput() {
         return sendThroughput;
     }
     
+    /**
+     * @return
+     */
     @Override
     public void incrementCountModProc(){
         countModProc++;
     }
     
+    /**
+     * 
+     * @return 
+     */
     @Override
     public long getCountModProc(){
         return countModProc;
     }
     
+    /**
+     * 
+     * @return 
+     */
     @Override
     public long getLastSent(){
         return last_sent;
     }
     
+    /**
+     * 
+     * @param size 
+     */
     @Override
     public void incrementCountSizeProc(long size){
         bytesProcessed+= size;
     }
 
+    /**
+     * 
+     * @return 
+     */
     @Override
     public long getCountSizeProc(){
         return bytesProcessed;
     }
     
+    /**
+     * 
+     * @return 
+     */
     @Override
     public long getCountSizeProcKb(){
         KbProcessed = getCountSizeProc() / 1024;
         return KbProcessed;
     }
     
+    /**
+     * 
+     * @return 
+     */
     @Override
     public long getCountSizeProcMb(){
         MbProcessed = getCountSizeProc() / (1024 * 1024);
