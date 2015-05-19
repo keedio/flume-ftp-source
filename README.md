@@ -21,7 +21,7 @@ located in parameter .folder of the config.
 - jsch-0.1.52.jar (channelSftp)
 
 
-### Parameters for flume ######
+### Mandatory Parameters for flume ######
 
 ###### Example configuration for FTP source
 
@@ -33,8 +33,6 @@ located in parameter .folder of the config.
 >       agent.sources.ftp1.user = username
 >       agent.sources.ftp1.password = password
 >       agent.sources.ftp1.port = 21
->       agent.sources.ftp1.folder = /var/flume
->       agent.sources.ftp1.file.name = status-ftp1-file.ser
 
 
 ###### Example configuration for FTPS source
@@ -47,8 +45,7 @@ located in parameter .folder of the config.
 >       agent.sources.ftps1.user = username
 >       agent.sources.ftps1.password = password
 >       agent.sources.ftps1.port = 21
->       agent.sources.ftps1.folder = /var/flume
->       agent.sources.ftps1.file.name = status-ftp1-file.ser
+>       
 >       agent.sources.ftps1.security.enabled = true 
 >       agent.sources.ftps1.security.cipher = TLS
 >       agent.sources.ftps1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
@@ -64,22 +61,34 @@ located in parameter .folder of the config.
 >       agent.sources.sftp1.user = username
 >       agent.sources.sftp1.password = password
 >       agent.sources.sftp1.port = 22
->       agent.sources.sftp1.folder = /var/flume
->       agent.sources.sftp1.file.name = status-sftp1-file.ser
+>      
 >       agent.sources.sftp1.knownHosts = /home/<user launching flume>/.ssh/known_hosts
 
 
-###### Discover delay, each configured milisecond directory will be explored
->     agent.sources.<fpt1 | ftps1 | sftp1>.run.discover.delay=10000
+### Optional Parameters for flume ######
 
-###### Force flume-ftp to proccess lines instead of chunk of bytes
+###### Discover delay, each configured milisecond directory will be explored.
+###### If this parameter is omitted, default value will be set to 10000 ms.
+>     agent.sources.<fpt1 | ftps1 | sftp1>.run.discover.delay=5000
+
+
+###### Force flume-ftp to proccess lines instead of chunk of bytes.
+###### If omitted: true.
 ###### (Thanks to Erik Schmiegelow : https://github.com/schmiegelow/flume-ftp-source)
 >     agent.sources.<fpt1 | ftps1 | sftp1>.flushlines = (true | false)      
 
-###### Force the size of events in bytes. 
+
+###### Force the size of events in bytes. I omitted, default is 1KB
 The default size is 1024 bytes.Customizing this option is intended for particular cases.
 >     agent.sources.ftp1.chunk.size = 1024
 
+###### File's name, that keeps track of files and sizes processed. If omitted,
+###### a default one will be created.
+>      agent.sources.ftp1.file.name = status-ftp1-file.ser
+
+###### Directory where to keep the file track status. If omitted, 
+###### java.io.tmpdir will be used.
+>      agent.sources.ftp1.folder = /var/flume
 
 ###### For examples configs files, check:
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
