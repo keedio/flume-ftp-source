@@ -67,8 +67,8 @@ located in parameter .folder of the config.
 
 ### Optional Parameters for flume ######
 
-###### Discover delay, each configured milisecond directory will be explored.If
- this parameter is omitted, default value will be set to 10000 ms.
+###### Discover delay, each configured milisecond directory will be explored.
+If this parameter is omitted, default value will be set to 10000 ms.
 >     agent.sources.<fpt1 | ftps1 | sftp1>.run.discover.delay=5000
 
 
@@ -81,8 +81,8 @@ located in parameter .folder of the config.
 Customizing this option is intended for particular cases.
 >     agent.sources.ftp1.chunk.size = 1024
 
-###### File's name that keeps track of files and sizes processed. If omitted, a
- default one will be created.
+###### File's name that keeps track of files and sizes processed.
+ If omitted, a default one will be created.
 >      agent.sources.ftp1.file.name = status-ftp1-file.ser
 
 ###### Directory where to keep the file track status. If omitted, java.io.tmpdir will be used.
