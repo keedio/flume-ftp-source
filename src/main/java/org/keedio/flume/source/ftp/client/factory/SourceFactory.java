@@ -23,6 +23,8 @@ public class SourceFactory {
     private static final boolean FLUSHLINE_DEFAULT = true;
     private static final String FOLDER_DEFAULT = System.getProperty("java.io.tmpdir");
     private static final Integer CHUNKSIZE_DEFAULT = 1024;
+    private static final String FILENAME_DEFAULT = "default_file_track_status.ser";
+    
 
     /**
      * Create KeedioSource
@@ -83,18 +85,10 @@ public class SourceFactory {
         keedioSource.setWorkingDirectory(context.getString("working.directory"));
         keedioSource.setPort(context.getInteger("port"));
         keedioSource.setFolder(context.getString("folder", FOLDER_DEFAULT));
-        keedioSource.setFileName(context.getString("file.name"));
+        keedioSource.setFileName(context.getString("file.name", FILENAME_DEFAULT));
         keedioSource.setFlushLines(context.getBoolean("flushlines", FLUSHLINE_DEFAULT));
         keedioSource.setChunkSize(context.getInteger("chunk.size", CHUNKSIZE_DEFAULT));
     }
 
-    /**
-     * Generate a default file name for file track status.
-     *
-     * @param context
-     * @return String
-     */
-    public String generateDefaultFileName(Context context) {
-        return context.getString("client.source") + "status.ser";
-    }
+   
 }

@@ -20,15 +20,13 @@ import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
+public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver {
 
-
-public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver{
     private Logger logger = Logger.getLogger(getClass());
 
     @Mock
     Context mockContext = new Context();
 
-  
     SourceCounter ftpSourceCounter;
     Source ftpsSource;
 
@@ -39,13 +37,12 @@ public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver{
     String getHost = "localhost";
     String getWorkingDirectory = null;
     String getFileName = "hasmapFTPS.ser";
-    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "/hasmapFTPS.ser";
+    String getFolder = System.getProperty("java.io.tmpdir");
+    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "/" + getFileName;
     String getSource = "ftps";
     boolean getSecurity = true;
     String getCipher = "TLS";
     boolean getCertificate = false;
-    
-     
 
     @BeforeMethod
     public void beforeMethod() {
@@ -59,28 +56,31 @@ public abstract class AbstractFtpsSourceTest extends EmbeddedFTPSserver{
         when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
-        when(mockContext.getString("file.name")).thenReturn(getFileName);
+        when(mockContext.getString("file.name", "default_file_track_status.ser")).thenReturn(getFileName);
         when(mockContext.getString("folder", System.getProperty("java.io.tmpdir"))).thenReturn(System.getProperty("java.io.tmpdir"));
         when(mockContext.getInteger("chunk.size", 1024)).thenReturn(1024);
-        
+
         when(mockContext.getBoolean("security.enabled")).thenReturn(getSecurity);
         when(mockContext.getString("security.cipher")).thenReturn(getCipher);
-        when(mockContext.getBoolean("security.certificate.enabled")).thenReturn(getCertificate);        
+        when(mockContext.getBoolean("security.certificate.enabled")).thenReturn(getCertificate);
 
         logger.info("Creating FTPS source");
-        
+
         ftpsSource = new Source();
-        
+
         ftpsSource.configure(mockContext);
         ftpSourceCounter = new SourceCounter("SOURCE.");
         ftpsSource.setFtpSourceCounter(ftpSourceCounter);
 
         class DummyChannelProcessor extends ChannelProcessor {
+
             public DummyChannelProcessor() {
                 super(null);
             }
+
             @Override
-            public void processEvent(Event event) {}
+            public void processEvent(Event event) {
+            }
         }
 
         ftpsSource.setChannelProcessor(new DummyChannelProcessor());

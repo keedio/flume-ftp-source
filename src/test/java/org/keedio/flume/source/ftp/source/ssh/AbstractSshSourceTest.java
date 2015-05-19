@@ -39,8 +39,9 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
     String getPassword = "flumetest";
     String getHost = "localhost";
     String getWorkingDirectory = null;
-    String getFileName = "hasmap.ser";
-    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "hasmap.ser";
+    String getFileName = "hasmapSFTP.ser";
+    String getFolder = System.getProperty("java.io.tmpdir");
+    String getAbsoutePath = System.getProperty("java.io.tmpdir") + "/" + getFileName;
     String getSource = "sftp";
     String getKnownHosts = "/Users/luislazaro/.ssh/known_hosts";
 
@@ -56,7 +57,7 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
         when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
         when(mockContext.getInteger("port")).thenReturn(getPort);
         when(mockContext.getString("working.directory")).thenReturn(getWorkingDirectory);
-        when(mockContext.getString("file.name")).thenReturn(getFileName);
+        when(mockContext.getString("file.name", "default_file_track_status.ser")).thenReturn(getFileName);
         when(mockContext.getString("folder", System.getProperty("java.io.tmpdir"))).thenReturn(System.getProperty("java.io.tmpdir"));
         when(mockContext.getInteger("chunk.size", 1024)).thenReturn(1024);
 
