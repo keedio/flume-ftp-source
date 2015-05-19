@@ -173,6 +173,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
             for (T element : list) {
                 String elementName = keedioSource.getObjectName(element);
+                if (elementName.equals(".") || elementName.equals("..")) {
+                    continue;
+                }
 
                 if (keedioSource.isDirectory(element)) {
                     LOGGER.info("[" + elementName + "]");
