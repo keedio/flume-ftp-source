@@ -34,11 +34,11 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
     Source sftpSource;
     SourceCounter sourceCounter;
 
-    Integer getPort = 2223;
+    int getPort = 2223;
     String getUser = "flumetest";
     String getPassword = "flumetest";
     String getServer = "127.0.0.1";
-    String getWorkingDirectory = null;
+    String getWorkingDirectory = "/";
     String getFileName = "hasmapSFTP.ser";
     String getFolder = System.getProperty("java.io.tmpdir");
     String getAbsoutePath = System.getProperty("java.io.tmpdir") + "/" + getFileName;
@@ -50,7 +50,7 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
         MockitoAnnotations.initMocks(this);
 
         when(mockContext.getString("client.source")).thenReturn(getSource);
-        when(mockContext.getInteger("buffer.size")).thenReturn(0);
+        when(mockContext.getInteger("buffer.size")).thenReturn(1024);
         when(mockContext.getString("name.server")).thenReturn(getServer);
         when(mockContext.getString("user")).thenReturn(getUser);
         when(mockContext.getString("password")).thenReturn(getPassword);
