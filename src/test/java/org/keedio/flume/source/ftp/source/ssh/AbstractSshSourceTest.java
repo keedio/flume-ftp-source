@@ -43,7 +43,7 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
     String getFolder = System.getProperty("java.io.tmpdir");
     String getAbsoutePath = System.getProperty("java.io.tmpdir") + "/" + getFileName;
     String getSource = "sftp";
-    String getKnownHosts = "/Users/luislazaro/.ssh/known_hosts";
+    String getKnownHosts = "src/test/resources/known_hosts";
 
     @BeforeMethod
     public void beforeMethod() {
