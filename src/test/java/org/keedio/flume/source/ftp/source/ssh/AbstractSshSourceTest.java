@@ -34,10 +34,10 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
     Source sftpSource;
     SourceCounter sourceCounter;
 
-    int getPort = 2223;
+    Integer getPort = 2223;
     String getUser = "flumetest";
     String getPassword = "flumetest";
-    String getHost = "localhost";
+    String getServer = "127.0.0.1";
     String getWorkingDirectory = null;
     String getFileName = "hasmapSFTP.ser";
     String getFolder = System.getProperty("java.io.tmpdir");
@@ -51,7 +51,7 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
 
         when(mockContext.getString("client.source")).thenReturn(getSource);
         when(mockContext.getInteger("buffer.size")).thenReturn(0);
-        when(mockContext.getString("name.server")).thenReturn(getHost);
+        when(mockContext.getString("name.server")).thenReturn(getServer);
         when(mockContext.getString("user")).thenReturn(getUser);
         when(mockContext.getString("password")).thenReturn(getPassword);
         when(mockContext.getInteger("run.discover.delay")).thenReturn(100);
@@ -90,7 +90,7 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
             logger.info("Stopping SFTP source");
             sftpSource.stop();
 
-            Paths.get("hasmap.ser").toFile().delete();
+            Paths.get("hasmapSFTP.ser").toFile().delete();
         } catch (Throwable e) {
             e.printStackTrace();
         }

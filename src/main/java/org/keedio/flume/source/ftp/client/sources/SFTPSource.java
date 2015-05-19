@@ -5,6 +5,7 @@ package org.keedio.flume.source.ftp.client.sources;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.*;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.JSchException;
@@ -55,7 +56,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         setConnected(true);
         try {
             jsch.setKnownHosts(knownHosts);
-            sessionSftp = jsch.getSession(user, server);
+            sessionSftp = jsch.getSession(user, server, port);
             sessionSftp.setPassword(password);
             sessionSftp.connect();
             if (sessionSftp.isConnected()) {

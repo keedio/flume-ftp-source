@@ -4,6 +4,7 @@ import org.apache.sshd.SshServer;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 
 import org.apache.sshd.common.*;
+import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
 import org.apache.sshd.server.UserAuth;
 import org.apache.sshd.server.auth.UserAuthNone;
 import org.apache.sshd.server.auth.UserAuthPassword;
@@ -25,6 +26,7 @@ import org.testng.annotations.BeforeSuite;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.sshd.server.shell.ProcessShellFactory;
 
@@ -46,11 +48,12 @@ public class EmbeddedSSHDServer {
         }
         
         sshServer.setPort(2223);
-        sshServer.setHost("localhost");
-        sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("/var/tmp/hostkey.ser"));
-
+        sshServer.setHost("127.0.0.1");
+        sshServer.setKeyPairProvider(new SimpleGeneratorHostKeyProvider("src/test/resources/hostkey.ser"));
         sshServer.setShellFactory(new ProcessShellFactory(new String[]{"/bin/sh", "-i", "-l"}));
         sshServer.setCommandFactory(new ScpCommandFactory());
+        sshServer.setFileSystemFactory(new VirtualFileSystemFactory(homeDirectory.toFile().getAbsolutePath()));
+        sshServer.setSubsystemFactories(Arrays.<NamedFactory<Command>>asList(new SftpSubsystem.Factory()));
         
         List<NamedFactory<UserAuth>> userAuthFactories = new ArrayList<NamedFactory<UserAuth>>();
         
