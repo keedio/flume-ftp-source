@@ -19,10 +19,10 @@ public class SourceFactory {
 
     private KeedioSource keedioSource;
     private static final Logger LOGGER = LoggerFactory.getLogger(KeedioSource.class);
-    private static final Integer discoverDelay = 10000;
-    private static final boolean flushlinesDefault = true;
-    private static final String folderDefault = System.getProperty("java.io.tmpdir");
-    private static final Integer chunksizeDefault = 1024;
+    private static final Integer DISCOVER_DELAY = 10000;
+    private static final boolean FLUSHLINE_DEFAULT = true;
+    private static final String FOLDER_DEFAULT = System.getProperty("java.io.tmpdir");
+    private static final Integer CHUNKSIZE_DEFAULT = 1024;
 
     /**
      * Create KeedioSource
@@ -79,13 +79,13 @@ public class SourceFactory {
         keedioSource.setServer(context.getString("name.server"));
         keedioSource.setUser(context.getString("user"));
         keedioSource.setPassword(context.getString("password"));
-        keedioSource.setRunDiscoverDelay(context.getInteger("run.discover.delay", discoverDelay));
+        keedioSource.setRunDiscoverDelay(context.getInteger("run.discover.delay", DISCOVER_DELAY));
         keedioSource.setWorkingDirectory(context.getString("working.directory"));
         keedioSource.setPort(context.getInteger("port"));
-        keedioSource.setFolder(context.getString("folder", folderDefault));
+        keedioSource.setFolder(context.getString("folder", FOLDER_DEFAULT));
         keedioSource.setFileName(context.getString("file.name"));
-        keedioSource.setFlushLines(context.getBoolean("flushlines", flushlinesDefault));
-        keedioSource.setChunkSize(context.getInteger("chunk.size", chunksizeDefault));
+        keedioSource.setFlushLines(context.getBoolean("flushlines", FLUSHLINE_DEFAULT));
+        keedioSource.setChunkSize(context.getInteger("chunk.size", CHUNKSIZE_DEFAULT));
     }
 
     /**
