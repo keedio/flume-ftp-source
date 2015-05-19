@@ -231,7 +231,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      */
     public boolean isFile(ChannelSftp.LsEntry file) {
         boolean isfile = false;
-        if ((!isDirectory(file)) & (!isLink(file))) {
+        if ((!isDirectory(file)) && (!isLink(file))) {
             isfile = true;
         } else {
             isfile = false;
@@ -284,7 +284,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             link = sftpClient.readlink(file.getFilename());
         } catch (SftpException e) {
-            logger.error("Could not readLink to get name");
+            logger.error("Could not readLink to get name",e);
         }
         return link;
     }
@@ -299,7 +299,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             printWorkingDirectory = sftpClient.pwd();
         } catch (SftpException e) {
-            logger.error("Error getting printworkingdirectory for server -sftpsource");
+            logger.error("Error getting printworkingdirectory for server -sftpsource",e);
             throw new IOException(e.getMessage());
         }
         return printWorkingDirectory;

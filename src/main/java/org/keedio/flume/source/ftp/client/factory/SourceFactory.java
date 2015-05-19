@@ -19,10 +19,10 @@ public class SourceFactory {
 
     private KeedioSource keedioSource;
     private static final Logger logger = LoggerFactory.getLogger(KeedioSource.class);
-    private final Integer discoverDelay = 10000;
-    private final boolean flushlinesDefault = true;
-    private final String folderDefault = System.getProperty("java.io.tmpdir");
-    private final Integer chunksizeDefault = 1024;
+    private static final Integer discoverDelay = 10000;
+    private static final boolean flushlinesDefault = true;
+    private static final String folderDefault = System.getProperty("java.io.tmpdir");
+    private static final Integer chunksizeDefault = 1024;
 
     /**
      * Create KeedioSource

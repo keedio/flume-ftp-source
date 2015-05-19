@@ -42,7 +42,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private SourceFactory sourceFactory = new SourceFactory();
     private KeedioSource keedioSource;
 
-    private static final Logger logger = LoggerFactory.getLogger(Source.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Source.class);
     private static final short ATTEMPTS_MAX = 3; //  max limit attempts reconnection
     private static final long EXTRA_DELAY = 10000;
     private int counterConnect = 0;
@@ -71,7 +71,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         if (keedioSource.existFolder()) {
             keedioSource.makeLocationFile();
         } else {
-            logger.error("Folder " + keedioSource.getPathTohasmap().toString() + " not exists");
+            LOGGER.error("Folder " + keedioSource.getPathTohasmap().toString() + " not exists");
         }
         keedioSource.connect();
         sourceCounter = new SourceCounter("SOURCE." + getName());
@@ -86,14 +86,14 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     public PollableSource.Status process() throws EventDeliveryException {
         
         try {            
-            logger.info("Actual dir:  " + keedioSource.getDirectoryserver() + " files: "
+            LOGGER.info("Actual dir:  " + keedioSource.getDirectoryserver() + " files: "
                     + keedioSource.getFileList().size());
             
             discoverElements(keedioSource, keedioSource.getDirectoryserver(), "", 0);
             keedioSource.cleanList(); //clean list according existing actual files
             keedioSource.getExistFileList().clear();
         } catch (IOException e) {
-            logger.error("Exception thrown in proccess, try to reconnect " + counterConnect, e);
+            LOGGER.error("Exception thrown in proccess, try to reconnect " + counterConnect, e);
 
             if (!keedioSource.connect()) {
                 counterConnect++;
@@ -104,12 +104,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             if (counterConnect < ATTEMPTS_MAX) {
                 process();
             } else {
-                logger.error("Server connection closed without indication, reached limit reconnections " + counterConnect);
+                LOGGER.error("Server connection closed without indication, reached limit reconnections " + counterConnect);
                 try {
                     Thread.sleep(keedioSource.getRunDiscoverDelay() + EXTRA_DELAY);
                     counterConnect = 0;
                 } catch (InterruptedException ce) {
-                    logger.error("InterruptedException", ce);
+                    LOGGER.error("InterruptedException", ce);
                 }
             }
         }
@@ -119,7 +119,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
             Thread.sleep(keedioSource.getRunDiscoverDelay());
             return PollableSource.Status.READY;     //source was successfully able to generate events
         } catch (InterruptedException inte) {
-            logger.error("Exception thrown in process while putting to sleep", inte);
+            LOGGER.error("Exception thrown in process while putting to sleep", inte);
             return PollableSource.Status.BACKOFF;   //inform the runner thread to back off for a bit
         }
     }
@@ -129,8 +129,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      */
     @Override
     public synchronized void start() { 
-        logger.info("Starting Keedio source ...", this.getName());
-        logger.info("Source {} starting. Metrics: {}", getName(), sourceCounter);
+        LOGGER.info("Starting Keedio source ...", this.getName());
+        LOGGER.info("Source {} starting. Metrics: {}", getName(), sourceCounter);
         super.start();
         sourceCounter.start();
     }
@@ -175,7 +175,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 String elementName = keedioSource.getObjectName(element);
 
                 if (keedioSource.isDirectory(element)) {
-                    logger.info("[" + elementName + "]");
+                    LOGGER.info("[" + elementName + "]");
                     keedioSource.changeToDirectory(parentDir);
                     discoverElements(keedioSource, dirToList, elementName, level + 1);
 
@@ -187,14 +187,14 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     if (!(keedioSource.getFileList().containsKey(dirToList + "/" + elementName))) { //new file
                         sourceCounter.incrementFilesCount(); //include all files, even not yet processed
                         position = 0L;
-                        logger.info("Discovered: " + elementName + " ,size: " + keedioSource.getObjectSize(element));
+                        LOGGER.info("Discovered: " + elementName + " ,size: " + keedioSource.getObjectSize(element));
                     } else { //known file
                         long prevSize = (long) keedioSource.getFileList().get(dirToList + "/" + elementName);
                         position = prevSize;
                         long dif = keedioSource.getObjectSize(element) - (long) keedioSource.getFileList().get(dirToList + "/" + elementName);
 
                         if (dif > 0) {
-                            logger.info("Modified: " + elementName + " ,size: " + dif);
+                            LOGGER.info("Modified: " + elementName + " ,size: " + dif);
                         } else if (dif < 0) { //known and full modified
                             keedioSource.getExistFileList().remove(dirToList + "/" + elementName); //will be rediscovered as new file
                             keedioSource.saveMap();
@@ -226,25 +226,25 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                                 sourceCounter.incrementFilesProcCount();
                             }
 
-                            logger.info("Processed:  " + elementName + " ,total files: " + this.keedioSource.getFileList().size() + "\n");
+                            LOGGER.info("Processed:  " + elementName + " ,total files: " + this.keedioSource.getFileList().size() + "\n");
 
                         } else {
                             handleProcessError(elementName);
                         }
                     } catch (IOException e) {
                         handleProcessError(elementName);
-                        logger.error("Failed retrieving inputStream on discoverElements ", e);
+                        LOGGER.error("Failed retrieving inputStream on discoverElements ", e);
                         continue;
                     }
 
                     keedioSource.changeToDirectory(dirToList);
 
                 } else if (keedioSource.isLink(element)) {
-                    logger.info(elementName + " is a link of " + this.keedioSource.getLink(element) + " could not retrieve size");
+                    LOGGER.info(elementName + " is a link of " + this.keedioSource.getLink(element) + " could not retrieve size");
                     keedioSource.changeToDirectory(parentDir);
                     continue;
                 } else {
-                    logger.info(elementName + " unknown type of file");
+                    LOGGER.info(elementName + " unknown type of file");
                     keedioSource.changeToDirectory(parentDir);
                     continue;
                 }
@@ -283,7 +283,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 }
                 inputStream.close();
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+                LOGGER.error(e.getMessage(), e);
                 successRead = false;
             }
         } else {
@@ -303,7 +303,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
 
                 inputStream.close();
             } catch (IOException e) {
-                logger.error("on readStream", e);
+                LOGGER.error("on readStream", e);
                 successRead = false;
 
             }
@@ -325,7 +325,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         try {
             getChannelProcessor().processEvent(event);
         } catch (ChannelException e) {
-            logger.error("ChannelException", e);
+            LOGGER.error("ChannelException", e);
         }
         sourceCounter.incrementCountSizeProc(message.length);
         sourceCounter.incrementEventCount();
@@ -342,7 +342,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @param fileName
      */
     public void handleProcessError(String fileName) {
-        logger.info("failed retrieving stream from file, will try in next poll :" + fileName);
+        LOGGER.info("failed retrieving stream from file, will try in next poll :" + fileName);
         sourceCounter.incrementFilesProcCountError();
     }
 
