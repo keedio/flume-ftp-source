@@ -263,7 +263,7 @@ public abstract class KeedioSource<T> {
         try {
             if (Files.exists(file1)) {
                 setFileList(loadMap(file1.toString()));
-                LOGGER.info("Found previous map of files flumed");
+                LOGGER.info("Found previous map of files flumed: " + file1.toString());
             } else {
                 LOGGER.info("Not found preivous map of files flumed");
 
