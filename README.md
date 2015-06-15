@@ -50,6 +50,8 @@ located in parameter .folder of the config.
 >       agent.sources.ftps1.security.cipher = TLS
 >       agent.sources.ftps1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
 >       certificate sent by the server, validated or not).
+>       agent.sources.ftps1.path.keystore = /paht/to/keystore
+>       agent.sources.ftps1.store.pass = the_keyStore_password 
 
 ###### Example configuration for SFTP source
 
