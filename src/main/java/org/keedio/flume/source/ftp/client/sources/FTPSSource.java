@@ -5,16 +5,19 @@ package org.keedio.flume.source.ftp.client.sources;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.net.ftp.FTP;
 import org.keedio.flume.source.ftp.client.KeedioSource;
 import org.apache.commons.net.ftp.FTPSClient;
-
+import java.io.File;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.util.TrustManagerUtils;
+import org.apache.commons.net.util.KeyManagerUtils;
+import javax.net.ssl.KeyManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,17 +30,20 @@ public class FTPSSource extends KeedioSource<FTPFile> {
     private static final Logger LOGGER = LoggerFactory.getLogger(FTPSSource.class);
 
     private boolean securityMode, securityCert;
-    private String protocolSec;
+    private String protocolSec, pathTokesytore, storePass;
     private FTPSClient ftpsClient;
 
     public FTPSSource() {
     }
 
-    public FTPSSource(boolean securityMode, String protocolSec, boolean securityCert) {
+    public FTPSSource(boolean securityMode, String protocolSec, boolean securityCert, String pathTokeystore,
+                      String storePass) {
         this.securityMode = securityMode;
         this.protocolSec = protocolSec;
         this.securityCert = securityCert;
         ftpsClient = new FTPSClient(protocolSec);
+        this.pathTokesytore = pathTokeystore;
+        this.storePass = storePass;
         checkIfCertificate();
     }
 
@@ -294,6 +300,15 @@ public class FTPSSource extends KeedioSource<FTPFile> {
     public void checkIfCertificate() {
         if (securityCert) {
             ftpsClient.setTrustManager(TrustManagerUtils.getValidateServerCertificateTrustManager());
+            KeyManager keyManager = null;
+            try {
+                keyManager = KeyManagerUtils.createClientKeyManager(new File(pathTokesytore), storePass);
+            } catch (IOException e) {
+                LOGGER.error("", e);
+            } catch (GeneralSecurityException e) {
+                LOGGER.error("",e);
+            }
+            ftpsClient.setKeyManager(keyManager);
         } else {
             ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
         }

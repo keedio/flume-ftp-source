@@ -61,7 +61,9 @@ public class SourceFactory {
                 FTPSSource ftpsSource = new FTPSSource(
                         context.getBoolean("security.enabled"),
                         context.getString("security.cipher"),
-                        context.getBoolean("security.certificate.enabled")
+                        context.getBoolean("security.certificate.enabled"),
+                        context.getString("path.keystore", FOLDER_DEFAULT),
+                        context.getString("store.pass")
                 );
                 keedioSource = ftpsSource;
                 initCommonParam(context);
