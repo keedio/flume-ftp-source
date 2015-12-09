@@ -27,7 +27,7 @@ located in parameter .folder of the config.
 
 >       agent.sources.ftp1.type = org.keedio.flume.source.ftp.source.Source
 
->       agent.sources.ftp1.client.sources = ftp
+>       agent.sources.ftp1.client.source = ftp
 
 >       agent.sources.ftp1.name.server = 127.0.0.1
 >       agent.sources.ftp1.user = username
@@ -39,7 +39,7 @@ located in parameter .folder of the config.
 
 >       agent.sources.ftps1.type = org.keedio.flume.source.ftp.source.Source
 
->       agent.sources.ftps1.client.sources = ftps
+>       agent.sources.ftps1.client.source = ftps
 
 >       agent.sources.ftps1.name.server = 127.0.0.1
 >       agent.sources.ftps1.user = username
@@ -57,7 +57,7 @@ located in parameter .folder of the config.
 
 >       agent.sources.sftp1.type = org.keedio.flume.source.ftp.source.Source
 
->       agent.sources.sftp1.client.sources = sftp
+>       agent.sources.sftp1.client.source = sftp
  
 >       agent.sources.sftp1.name.server = 127.0.0.1
 >       agent.sources.sftp1.user = username
@@ -94,6 +94,7 @@ Customizing this option is intended for particular cases.
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
 
 ### Version history #####
+- 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
 - 2.0.4 new package name convention, check for above examples. 
 - 2.0.1 new configurable parameters in flume's context.
