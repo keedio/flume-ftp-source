@@ -3,6 +3,7 @@
  */
 package org.keedio.flume.source.ftp.source;
 
+import java.io.*;
 import java.util.*;
 
 import org.apache.flume.Context;
@@ -15,17 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.flume.ChannelException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-
 import org.keedio.flume.source.ftp.source.utils.FTPSourceEventListener;
 
 import org.keedio.flume.source.ftp.metrics.SourceCounter;
 import java.util.List;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 import org.keedio.flume.source.ftp.client.factory.SourceFactory;
 import org.keedio.flume.source.ftp.client.KeedioSource;
@@ -49,7 +43,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private SourceCounter sourceCounter;
 
-    
+
     /**
      * Request keedioSource to the factory
      *
@@ -84,11 +78,11 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      */
     @Override
     public PollableSource.Status process() throws EventDeliveryException {
-        
-        try {            
+
+        try {
             LOGGER.info("Actual dir:  " + keedioSource.getDirectoryserver() + " files: "
                     + keedioSource.getFileList().size());
-            
+
             discoverElements(keedioSource, keedioSource.getDirectoryserver(), "", 0);
             keedioSource.cleanList(); //clean list according existing actual files
             keedioSource.getExistFileList().clear();
@@ -128,7 +122,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @return void
      */
     @Override
-    public synchronized void start() { 
+    public synchronized void start() {
         LOGGER.info("Starting Keedio source ...", this.getName());
         LOGGER.info("Source {} starting. Metrics: {}", getName(), sourceCounter);
         super.start();
@@ -167,7 +161,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         String dirToList = parentDir;
         if (!("").equals(currentDir)){
             dirToList += "/" + currentDir;
-        } 
+        }
         List<T> list = keedioSource.listElements(dirToList);
         if (!(list.isEmpty())) {
 
@@ -214,7 +208,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         inputStream = keedioSource.getInputStream(element);
                         listener.fileStreamRetrieved();
 
-                        if (!readStream(inputStream, position)) {
+                        if (!readStream(inputStream, position, elementName)) {
                             inputStream = null;
                         }
 
@@ -253,8 +247,8 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 }
                 keedioSource.changeToDirectory(parentDir);
 
-            } 
-        } 
+            }
+        }
     }
 
     /**
@@ -262,11 +256,15 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * flushlines is true the retrieved inputstream will be readed by lines. And
      * the type of file is set to ASCII from KeedioSource.
      *
+     * bylines:
+     * Reads a line of text. A line is considered to be terminated by any one of
+     * a line feed ('\n'), a carriage return ('\r'), or a carriage return followed immediately by a linefeed.
+     *
      * @return boolean
      * @param inputStream
      * @param position
      */
-    public boolean readStream(InputStream inputStream, long position) {
+    public boolean readStream(InputStream inputStream, long position, String fileName) {
         if (inputStream == null) {
             return false;
         }
@@ -278,9 +276,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 inputStream.skip(position);
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
                     String line = null;
-
+                    int offsetLine = 0;
+                    int counterLine = 0;
                     while ((line = in.readLine()) != null) {
-                        processMessage(line.getBytes());
+                        counterLine++;
+                        offsetLine += line.getBytes().length + 1;
+                        processMessage(line.getBytes(), fileName, offsetLine, counterLine );
                     }
 
                 }
@@ -290,7 +291,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 successRead = false;
             }
         } else {
-
             try {
                 inputStream.skip(position);
                 int chunkSize = keedioSource.getChunkSize();
@@ -300,7 +300,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(chunkSize)) {
                         baostream.write(bytesArray, 0, bytesRead);
                         byte[] data = baostream.toByteArray();
-                        processMessage(data);
+                        processMessage(data, fileName, bytesRead, 0);
                     }
                 }
 
@@ -315,14 +315,17 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     }
 
     /**
-     * @void process last appended data to files
+     * @void process last appended lines to files
      * @param lastInfo byte[]
      */
-    public void processMessage(byte[] lastInfo) {
+    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, Integer lineNumber) {
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
         headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
+        headers.put("fileName", fileName);
+        headers.put("offsetLine", String.valueOf(offsetLine));
+        headers.put("lineNumber", String.valueOf(lineNumber));
         event.setBody(message);
         event.setHeaders(headers);
         try {
@@ -333,6 +336,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         sourceCounter.incrementCountSizeProc(message.length);
         sourceCounter.incrementEventCount();
     }
+
 
     /**
      * @param listener
