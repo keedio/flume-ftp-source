@@ -3,6 +3,7 @@
  */
 package org.keedio.flume.source.ftp.source;
 
+import java.io.*;
 import java.util.*;
 
 import org.apache.flume.Context;
@@ -15,17 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.flume.ChannelException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-
 import org.keedio.flume.source.ftp.source.utils.FTPSourceEventListener;
 
 import org.keedio.flume.source.ftp.metrics.SourceCounter;
 import java.util.List;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 import org.keedio.flume.source.ftp.client.factory.SourceFactory;
 import org.keedio.flume.source.ftp.client.KeedioSource;
@@ -283,7 +277,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
                     String line = null;
                     int offsetLine = 0;
-                    long counterLine = 0;
+                    int counterLine = 0;
                     while ((line = in.readLine()) != null) {
                         counterLine++;
                         offsetLine += line.getBytes().length + 1;
@@ -324,7 +318,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @void process last appended lines to files
      * @param lastInfo byte[]
      */
-    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, long lineNumber) {
+    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, Integer lineNumber) {
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
