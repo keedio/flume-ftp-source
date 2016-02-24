@@ -295,14 +295,13 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 inputStream.skip(position);
                 int chunkSize = keedioSource.getChunkSize();
                 byte[] bytesArray = new byte[chunkSize];
-                int bytesRead = -1;
+                int bytesRead = 0;
+                ByteArrayOutputStream baostream = new ByteArrayOutputStream(chunkSize);
                 while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-                    try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(chunkSize)) {
                         baostream.write(bytesArray, 0, bytesRead);
-                        byte[] data = baostream.toByteArray();
-                        processMessage(data, fileName, bytesRead, 0);
-                    }
                 }
+                byte[] data = baostream.toByteArray();
+                processMessage(data, fileName, bytesRead, 0);
 
                 inputStream.close();
             } catch (IOException e) {
