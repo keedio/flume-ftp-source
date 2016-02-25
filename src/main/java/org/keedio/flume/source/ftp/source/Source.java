@@ -6,6 +6,7 @@ package org.keedio.flume.source.ftp.source;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDeliveryException;
@@ -283,7 +284,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         offsetLine += line.getBytes().length + 1;
                         processMessage(line.getBytes(), fileName, offsetLine, counterLine );
                     }
-
+                    processVerification(String.valueOf(counterLine).getBytes(), fileName);
                 }
                 inputStream.close();
             } catch (IOException e) {
@@ -322,19 +323,47 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
+        headers.put("type", "data");
         headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
         headers.put("fileName", fileName);
         headers.put("offsetLine", String.valueOf(offsetLine));
         headers.put("lineNumber", String.valueOf(lineNumber));
+        headers.put("md5Hex", DigestUtils.md5Hex(message));
         event.setBody(message);
         event.setHeaders(headers);
         try {
             getChannelProcessor().processEvent(event);
+            sourceCounter.incrementCountSizeProc(message.length);
+            sourceCounter.incrementEventCount();
         } catch (ChannelException e) {
-            LOGGER.error("ChannelException", e);
+            LOGGER.error("ChannelException: failed processing event of data with" +
+                    " filename: " + headers.get(fileName) +
+                    " lineNumber: " + headers.get(lineNumber) +
+                    " offsetLine: " + headers.get(offsetLine),
+                    e);
         }
-        sourceCounter.incrementCountSizeProc(message.length);
-        sourceCounter.incrementEventCount();
+
+    }
+
+   /**
+    * process a event of verification.
+    * @param lines
+    * @param fileName
+    */
+    public void processVerification(byte[] lines, String fileName){
+        Event event = new SimpleEvent();
+        Map<String, String> headers = new HashMap<>();
+        headers.put("type", "verify");
+        headers.put("fileName", fileName);
+        event.setBody(lines);
+        event.setHeaders(headers);
+        try {
+            getChannelProcessor().processEvent(event);
+        } catch (ChannelException e){
+            LOGGER.error("ChannelException: failed processing event of verification with " +
+                    " filename: " + headers.get(fileName),
+                    e);
+        }
     }
 
 
