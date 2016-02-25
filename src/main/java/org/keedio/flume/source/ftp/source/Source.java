@@ -328,7 +328,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         headers.put("fileName", fileName);
         headers.put("offsetLine", String.valueOf(offsetLine));
         headers.put("lineNumber", String.valueOf(lineNumber));
-        headers.put("md5Hex", DigestUtils.md5Hex(message));
+        headers.put("sha1Hex", DigestUtils.sha1Hex(message));
         event.setBody(message);
         event.setHeaders(headers);
         try {
