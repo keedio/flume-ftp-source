@@ -217,7 +217,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         if (success) {
                             keedioSource.getFileList().put(dirToList + "/" + elementName, keedioSource.getObjectSize(element));
                             keedioSource.saveMap();
-
                             if (position != 0) {
                                 sourceCounter.incrementCountModProc();
                             } else {
@@ -277,14 +276,18 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 inputStream.skip(position);
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
                     String line = null;
+                    long counterLine = 0;
                     int offsetLine = 0;
-                    int counterLine = 0;
+                    if (keedioSource.getFileLines().get(fileName) != null){
+                        counterLine = (long) keedioSource.getFileLines().get(fileName);
+                    }
                     while ((line = in.readLine()) != null) {
                         counterLine++;
                         offsetLine += line.getBytes().length + 1;
                         processMessage(line.getBytes(), fileName, offsetLine, counterLine );
                     }
                     processVerification(String.valueOf(counterLine).getBytes(), fileName);
+                    keedioSource.getFileLines().put(fileName, counterLine);
                 }
                 inputStream.close();
             } catch (IOException e) {
@@ -319,7 +322,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @void process last appended lines to files
      * @param lastInfo byte[]
      */
-    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, Integer lineNumber) {
+    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, long lineNumber) {
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
