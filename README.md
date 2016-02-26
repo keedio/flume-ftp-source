@@ -103,6 +103,10 @@ Customizing this option is intended for particular cases.
 - 1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing).
 - 1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls.
 
+### Dependecies ######
+- commons-net
+- jsch
+
 ### License ######
 
 Apache License, Version 2.0

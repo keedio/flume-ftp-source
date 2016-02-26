@@ -6,6 +6,7 @@ package org.keedio.flume.source.ftp.source;
 import java.io.*;
 import java.util.*;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.flume.Context;
 import org.apache.flume.Event;
 import org.apache.flume.EventDeliveryException;
@@ -216,7 +217,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         if (success) {
                             keedioSource.getFileList().put(dirToList + "/" + elementName, keedioSource.getObjectSize(element));
                             keedioSource.saveMap();
-
                             if (position != 0) {
                                 sourceCounter.incrementCountModProc();
                             } else {
@@ -276,14 +276,18 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                 inputStream.skip(position);
                 try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
                     String line = null;
+                    long counterLine = 0;
                     int offsetLine = 0;
-                    int counterLine = 0;
+                    if (keedioSource.getFileLines().get(fileName) != null){
+                        counterLine = (long) keedioSource.getFileLines().get(fileName);
+                    }
                     while ((line = in.readLine()) != null) {
                         counterLine++;
                         offsetLine += line.getBytes().length + 1;
                         processMessage(line.getBytes(), fileName, offsetLine, counterLine );
                     }
-
+                    processVerification(String.valueOf(counterLine).getBytes(), fileName);
+                    keedioSource.getFileLines().put(fileName, counterLine);
                 }
                 inputStream.close();
             } catch (IOException e) {
@@ -318,23 +322,51 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @void process last appended lines to files
      * @param lastInfo byte[]
      */
-    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, Integer lineNumber) {
+    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, long lineNumber) {
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
+        headers.put("type", "data");
         headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
         headers.put("fileName", fileName);
         headers.put("offsetLine", String.valueOf(offsetLine));
         headers.put("lineNumber", String.valueOf(lineNumber));
+        headers.put("sha1Hex", DigestUtils.sha1Hex(message));
         event.setBody(message);
         event.setHeaders(headers);
         try {
             getChannelProcessor().processEvent(event);
+            sourceCounter.incrementCountSizeProc(message.length);
+            sourceCounter.incrementEventCount();
         } catch (ChannelException e) {
-            LOGGER.error("ChannelException", e);
+            LOGGER.error("ChannelException: failed processing event of data with" +
+                    " filename: " + headers.get(fileName) +
+                    " lineNumber: " + headers.get(lineNumber) +
+                    " offsetLine: " + headers.get(offsetLine),
+                    e);
         }
-        sourceCounter.incrementCountSizeProc(message.length);
-        sourceCounter.incrementEventCount();
+
+    }
+
+   /**
+    * process a event of verification.
+    * @param lines
+    * @param fileName
+    */
+    public void processVerification(byte[] lines, String fileName){
+        Event event = new SimpleEvent();
+        Map<String, String> headers = new HashMap<>();
+        headers.put("type", "verify");
+        headers.put("fileName", fileName);
+        event.setBody(lines);
+        event.setHeaders(headers);
+        try {
+            getChannelProcessor().processEvent(event);
+        } catch (ChannelException e){
+            LOGGER.error("ChannelException: failed processing event of verification with " +
+                    " filename: " + headers.get(fileName),
+                    e);
+        }
     }
 
 
