@@ -43,6 +43,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     private int counterConnect = 0;
     private FTPSourceEventListener listener = new FTPSourceEventListener();
     private SourceCounter sourceCounter;
+    private String workdir;
 
 
     /**
@@ -71,6 +72,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         keedioSource.connect();
         sourceCounter = new SourceCounter("SOURCE." + getName());
         keedioSource.checkPreviousMap();
+        workdir = keedioSource.getWorkDir();
     }
 
     /**
@@ -81,10 +83,14 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     public PollableSource.Status process() throws EventDeliveryException {
 
         try {
-            LOGGER.info("Actual dir:  " + keedioSource.getDirectoryserver() + " files: "
+            if (workdir == null){
+                LOGGER.info("property workdir is null, setting to default");
+                workdir = keedioSource.getDirectoryserver();
+            }
+            LOGGER.info("Actual dir:  " + workdir + " files: "
                     + keedioSource.getFileList().size());
 
-            discoverElements(keedioSource, keedioSource.getDirectoryserver(), "", 0);
+            discoverElements(keedioSource, workdir, "", 0);
             keedioSource.cleanList(); //clean list according existing actual files
             keedioSource.getExistFileList().clear();
         } catch (IOException e) {
