@@ -223,6 +223,11 @@ public abstract class KeedioSource<T> {
             FileOutputStream fileOut = new FileOutputStream(getAbsolutePath().toString());
             try ( ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
                 out.writeObject((HashMap) getFileList());
+            }
+
+            FileOutputStream fileOut2 = new FileOutputStream( pathTohasmap + "/" + "lines.ser");
+            LOGGER.info("-------------------------------------------------- " + pathTohasmap);
+            try ( ObjectOutputStream out = new ObjectOutputStream(fileOut2)) {
                 out.writeObject((HashMap) getFileLines());
             }
 
@@ -272,7 +277,8 @@ public abstract class KeedioSource<T> {
         try {
             if (Files.exists(file1)) {
                 setFileList(loadMap(file1.toString()));
-                setFileLines(loadMap(file1.toString()));
+                setFileLines(loadMap(getFolder() + "/" + "lines.ser"));
+                LOGGER.info("------------------------------------------- " + getFolder());
                 LOGGER.info("Found previous map of files flumed: " + file1.toString());
             } else {
                 LOGGER.info("Not found preivous map of files flumed");
