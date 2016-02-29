@@ -71,7 +71,7 @@ located in parameter .folder of the config.
 
 ###### Working directory for searching for files:
 work.dir is under root directory server returned by FTP server.
->   agent.soures.<fpt1 | ftps1 | sftp1>.work.dir = /directoryName
+>     agent.soures.<fpt1 | ftps1 | sftp1>.work.dir = /directoryName
 
 
 ###### Discover delay, each configured milisecond directory will be explored.
