@@ -91,7 +91,9 @@ public abstract class KeedioSource<T> {
     /**
      *
      */
-    protected String workingDirectory; //working directory specified in config.
+    protected String workingDirectory; //for movin between directories
+
+    protected String workDir ; //working directory specified in config.
 
     /**
      *
@@ -223,6 +225,10 @@ public abstract class KeedioSource<T> {
             FileOutputStream fileOut = new FileOutputStream(getAbsolutePath().toString());
             try ( ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
                 out.writeObject((HashMap) getFileList());
+            }
+
+            FileOutputStream fileOut2 = new FileOutputStream( pathTohasmap + "/" + "lines.ser");
+            try ( ObjectOutputStream out = new ObjectOutputStream(fileOut2)) {
                 out.writeObject((HashMap) getFileLines());
             }
 
@@ -272,7 +278,7 @@ public abstract class KeedioSource<T> {
         try {
             if (Files.exists(file1)) {
                 setFileList(loadMap(file1.toString()));
-                setFileLines(loadMap(file1.toString()));
+                setFileLines(loadMap(getFolder() + "/" + "lines.ser"));
                 LOGGER.info("Found previous map of files flumed: " + file1.toString());
             } else {
                 LOGGER.info("Not found preivous map of files flumed");
@@ -571,5 +577,13 @@ public abstract class KeedioSource<T> {
 
     public void setFileNameLines(String fileNameLines) {
         this.fileNameLines = fileNameLines;
+    }
+
+    public String getWorkDir() {
+        return workDir;
+    }
+
+    public void setWorkDir(String workDir) {
+        this.workDir = workDir;
     }
 } //endclass

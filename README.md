@@ -69,6 +69,11 @@ located in parameter .folder of the config.
 
 ### Optional Parameters for flume ######
 
+###### Working directory for searching for files:
+work.dir is under root directory server returned by FTP server.
+>     agent.soures.<fpt1 | ftps1 | sftp1>.work.dir = /directoryName
+
+
 ###### Discover delay, each configured milisecond directory will be explored.
 If this parameter is omitted, default value will be set to 10000 ms.
 >     agent.sources.<fpt1 | ftps1 | sftp1>.run.discover.delay=5000
@@ -94,6 +99,7 @@ Customizing this option is intended for particular cases.
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
 
 ### Version history #####
+- 2.0.9 added new property work.dir for setting starting directory.
 - 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
 - 2.0.4 new package name convention, check for above examples. 

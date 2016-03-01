@@ -90,6 +90,8 @@ public class SourceFactory {
         keedioSource.setFileName(context.getString("file.name", FILENAME_DEFAULT));
         keedioSource.setFlushLines(context.getBoolean("flushlines", FLUSHLINE_DEFAULT));
         keedioSource.setChunkSize(context.getInteger("chunk.size", CHUNKSIZE_DEFAULT));
+        keedioSource.setWorkDir(context.getString("work.dir", null));
+
     }
 
    
