@@ -5,6 +5,7 @@ package org.keedio.flume.source.ftp.client.factory;
 
 import org.apache.flume.Context;
 import org.keedio.flume.source.ftp.client.KeedioSource;
+import org.keedio.flume.source.ftp.client.sources.FSLocalSource;
 import org.keedio.flume.source.ftp.client.sources.FTPSSource;
 import org.keedio.flume.source.ftp.client.sources.FTPSource;
 import org.keedio.flume.source.ftp.client.sources.SFTPSource;
@@ -66,6 +67,10 @@ public class SourceFactory {
                         context.getString("store.pass")
                 );
                 keedioSource = ftpsSource;
+                initCommonParam(context);
+                break;
+            case "fslocal":
+                keedioSource = new FSLocalSource(context.getString("work.dir"));
                 initCommonParam(context);
                 break;
             default:

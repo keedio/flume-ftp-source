@@ -66,12 +66,17 @@ located in parameter .folder of the config.
 >      
 >       agent.sources.sftp1.knownHosts = /home/<user launching flume>/.ssh/known_hosts
 
+##### Example configuration for Local source 
+
+>       agent.sources.fslocal1.type = org.keedio.flume.source.ftp.source.Source
+>       agent.sources.fslocal1.client.source = fslocal
+>       agent.sources.fslocal1.work.dir = /home/user/dataForFlume
 
 ### Optional Parameters for flume ######
 
 ###### Working directory for searching for files:
 work.dir is under root directory server returned by FTP server.
->     agent.soures.<fpt1 | ftps1 | sftp1>.work.dir = /directoryName
+>     agent.soures.<fpt1 | ftps1 | sftp1 | fslocal1>.work.dir = /directoryName
 
 
 ###### Discover delay, each configured milisecond directory will be explored.
@@ -99,6 +104,7 @@ Customizing this option is intended for particular cases.
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
 
 ### Version history #####
+- 2.0.10 added local source for processing files in local files system
 - 2.0.9 added new property work.dir for setting starting directory.
 - 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
