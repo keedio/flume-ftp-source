@@ -215,7 +215,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                         inputStream = keedioSource.getInputStream(element);
                         listener.fileStreamRetrieved();
 
-                        if (!readStream(inputStream, position, elementName)) {
+                        if (!readStream(inputStream, position, elementName,dirToList )) {
                             inputStream = null;
                         }
 
@@ -269,8 +269,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
      * @return boolean
      * @param inputStream
      * @param position
+     * @param dirToList
      */
-    public boolean readStream(InputStream inputStream, long position, String fileName) {
+    public boolean readStream(InputStream inputStream, long position, String fileName, String dirToList) {
         if (inputStream == null) {
             return false;
         }
@@ -290,9 +291,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     while ((line = in.readLine()) != null) {
                         counterLine++;
                         offsetLine += line.getBytes().length + 1;
-                        processMessage(line.getBytes(), fileName, offsetLine, counterLine );
+                        processMessage(line.getBytes(), fileName, offsetLine, counterLine,dirToList );
                     }
-                    processVerification(String.valueOf(counterLine).getBytes(), fileName);
+                    processVerification(String.valueOf(counterLine).getBytes(), fileName, dirToList);
                     keedioSource.getFileLines().put(fileName, counterLine);
                 }
                 inputStream.close();
@@ -310,7 +311,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
                     try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(chunkSize)) {
                         baostream.write(bytesArray, 0, bytesRead);
                         byte[] data = baostream.toByteArray();
-                        processMessage(data, fileName, bytesRead, 0);
+                        processMessage(data, fileName, bytesRead, 0,dirToList );
                     }
                 }
 
@@ -327,8 +328,9 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     /**
      * @void process last appended lines to files
      * @param lastInfo byte[]
+     * @param dirToList
      */
-    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, long lineNumber) {
+    public void processMessage(byte[] lastInfo, String fileName, Integer offsetLine, long lineNumber, String dirToList) {
         byte[] message = lastInfo;
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
@@ -338,6 +340,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         headers.put("offsetLine", String.valueOf(offsetLine));
         headers.put("lineNumber", String.valueOf(lineNumber));
         headers.put("sha1Hex", DigestUtils.sha1Hex(message));
+        headers.put("filePath", dirToList);
         event.setBody(message);
         event.setHeaders(headers);
         try {
@@ -359,11 +362,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     * @param lines
     * @param fileName
     */
-    public void processVerification(byte[] lines, String fileName){
+    public void processVerification(byte[] lines, String fileName, String dirToList){
         Event event = new SimpleEvent();
         Map<String, String> headers = new HashMap<>();
         headers.put("type", "verify");
         headers.put("fileName", fileName);
+        headers.put("filePath", dirToList);
         event.setBody(lines);
         event.setHeaders(headers);
         try {
