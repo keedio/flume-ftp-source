@@ -6,6 +6,7 @@ In main flume's agent configuration file must be specified if security for FTP i
 - FTP: File Transfer Protocol, normal plain text (insecure) but available for common use. Port 21.
 - FTPS: File Transfer Protocol that uses AUTH SSL o TLS cryptographic protocols. Port 21.
 - SFTP: File Transfer Protocol that uses SSH V3, via a single channel (layer transport) and sending/receiving in binary. Port 22.(Recommended).
+- Local: Local FileSystem. No networking, (it can be useful).
 
 Files can be proccesed int two ways:
 - by lines, as one event is a full line.(flushlines = true)
@@ -101,7 +102,7 @@ Customizing this option is intended for particular cases.
 >      agent.sources.ftp1.folder = /var/flume
 
 ###### For examples configs files, check:
- https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
+ https://github.com/keedio/flume-ftp-source/tree/feature/mra-localSource/src/main/resources/example-configs
 
 ### Version history #####
 - 2.0.10 added local source for processing files in local files system
