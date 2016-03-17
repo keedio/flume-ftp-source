@@ -115,12 +115,8 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      * @param current directory
      */
     public List<FTPFile> listElements(String dir) throws IOException {
-        List<FTPFile> list = new ArrayList<>();
-
         FTPFile[] subFiles = getFtpsClient().listFiles(dir);
-        list = Arrays.asList(subFiles);
-
-        return list;
+        return Arrays.asList(subFiles);
     }
 
     @Override
@@ -129,16 +125,13 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      * @return InputStream
      */
     public InputStream getInputStream(FTPFile file) throws IOException {
-        InputStream inputStream = null;
-
         if (isFlushLines()) {
             this.setFileType(FTP.ASCII_FILE_TYPE);
         } else {
             this.setFileType(FTP.BINARY_FILE_TYPE);
         }
-        inputStream = getFtpsClient().retrieveFileStream(file.getName());
 
-        return inputStream;
+        return getFtpsClient().retrieveFileStream(file.getName());
     }
 
     @Override
@@ -219,9 +212,7 @@ public class FTPSSource extends KeedioSource<FTPFile> {
      * @return String directory retrieved for server on connect
      */
     public String getDirectoryserver() throws IOException {
-        String printWorkingDirectory = "";
-        printWorkingDirectory = getFtpsClient().printWorkingDirectory();
-        return printWorkingDirectory;
+        return getFtpsClient().printWorkingDirectory();
     }
 
     /**
