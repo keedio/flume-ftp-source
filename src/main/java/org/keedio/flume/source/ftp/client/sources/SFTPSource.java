@@ -66,11 +66,19 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
                     sftpClient = (ChannelSftp) channel;
                 }
             }
+
+            if (getWorkingDirectory() != null) {
+                sftpClient.cd(getWorkingDirectory());
+            }
+
         } catch (JSchException e) {
             if (!(sessionSftp.isConnected())) {
                 LOGGER.info("JSchException ", e);
                 this.setConnected(false);
             }
+        } catch (SftpException e) {
+            this.setConnected(false);
+            LOGGER.error("", e);
         }
         return isConnected();
     }
