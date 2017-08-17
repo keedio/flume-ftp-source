@@ -312,7 +312,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
             throw new IOException(e.getMessage());
         }
         
-        if (getWorkingDirectory != null){
+        if (getWorkingDirectory() != null){
             return printWorkingDirectory + "/" + getWorkingDirectory();
         }
         
