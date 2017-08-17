@@ -298,11 +298,16 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     public String getDirectoryserver() throws IOException {
         String printWorkingDirectory = "";
         try {
-            printWorkingDirectory = sftpClient.pwd();
+            printWorkingDirectory = sftpClient.getHome();
         } catch (SftpException e) {
             LOGGER.error("Error getting printworkingdirectory for server -sftpsource",e);
             throw new IOException(e.getMessage());
         }
+        
+        if (getWorkingDirectory != null){
+            return printWorkingDirectory + "/" + getWorkingDirectory();
+        }
+        
         return printWorkingDirectory;
     }
 
