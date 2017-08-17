@@ -94,6 +94,7 @@ Customizing this option is intended for particular cases.
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
 
 ### Version history #####
+- 2.0.9 several fixes - check PRS
 - 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
 - 2.0.4 new package name convention, check for above examples. 
