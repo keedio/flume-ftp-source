@@ -16,12 +16,142 @@ located in parameter .folder of the config.
 
 ### Requirements ######
 
-- Apache-flume mayor to 1.4.0.
-- commons-net-3.3.jar (ftpClient and ftpsClient)
-- jsch-0.1.52.jar (channelSftp)
+- [Apache-flume mayor to 1.4.0.](http://archive.apache.org/dist/flume/)
+- [commons-net-3.3.jar](http://central.maven.org/maven2/commons-net/commons-net/3.3/commons-net-3.3.jar) (ftpClient and ftpsClient)
+- [jsch-0.1.52.jar](http://central.maven.org/maven2/com/jcraft/jsch/0.1.52/jsch-0.1.52.jar) (channelSftp)
+
+### Deployment and launching ###
+1. **[flume-ftp-source-X.Y.Z.jar](https://github.com/keedio/flume-ftp-source/tree/master)**
+2. **[Download Apache Flume](http://archive.apache.org/dist/flume/).**
+3. **[Create plugins.d directory](https://flume.apache.org/FlumeUserGuide.html#the-plugins-d-directory).**
+4. **[Directory layout for plugins](https://flume.apache.org/FlumeUserGuide.html#directory-layout-for-plugins):**
+
+    ```
+    $ cd plugins.d
+    $ mkdir flume-ftp
+    $ cd flume-ftp
+    $ mkdir lib libext
+    $ cp jsch-0.1.52.jar libext/
+    $ cp commons-net-3.3.jar libext/
+    $ cp flume-ftp-source-X.Y.Z.jar lib/
+     ```
+
+ 5. **[Create a config file, examples](https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs).**
+
+     ```
+     $ cp flume-ng-ftp-source-FTP.conf  apache-flume-1.4.0-bin/conf/
+     ```
+
+ 6. **Which files will be processed?**
+
+    Files in Ftp's user directory will be processed (Remote Directory).
+    For example, if sever and user :
+    agent.sources.ftp1.name.server = 192.168.0.2
+    agent.sources.ftp1.user = mortadelo
+
+    ```
+    host:~ root# ftp 192.168.0.2
+    Connected to 192.168.0.2.
+    220 (vsFTPd 3.0.2)
+    Name (192.168.0.2:root): mortadelo
+    331 Please specify the password.
+    Password:
+    230 Login successful.
+    Remote system type is UNIX.
+    Using binary mode to transfer files.
+    ftp> dir
+    229 Entering Extended Passive Mode (|||29730|).
+    150 Here comes the directory listing.
+    -rw-r--r--    1 0        0              60 Aug 18 06:48 file1.txt
+    -rw-r--r--    1 0        0              60 Aug 18 06:48 file2.txt
+    226 Directory send OK.
+    ftp> pwd
+    Remote directory: /
+    ftp>
+    ```
+    we want to process file1.txt and file2.txt
+
+ 7. **Launch flume binary:**
+     ```
+    $ ./bin/flume-ng agent -c conf -conf-file conf/flume-ng-ftp-source-FTP.conf --name agent -Dflume.root.logger=INFO,console
+     ```
+
+     ```
+      [...]
+      2017-08-18 09:07:33,471 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 0
+      2017-08-18 09:07:33,503 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:193)] Discovered: file1.txt ,size: 60
+      2017-08-18 09:07:33,516 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file1.txt ,total files: 1
+
+      2017-08-18 09:07:33,518 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:193)] Discovered: file2.txt ,size: 60
+      2017-08-18 09:07:33,521 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file2.txt ,total files: 2
+
+      2017-08-18 09:07:38,526 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
+      2017-08-18 09:07:43,535 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
+      2017-08-18 09:07:48,547 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
+      [...]
+      ```
+ 8.  **Data processed.**
+
+     For testing porposes set:
+     ```
+     agent.sinks.k1.type = file_roll
+     agent.sinks.k1.sink.directory = /var/log/flume-ftp
+     ```
+     in /var/log/flume-ftp, flume will create a file ( [file_roll](https://flume.apache.org/FlumeUserGuide.html#file-roll-sink) ) as 123456789...-
+     ```
+     [host]# ls -ll
+     -rw-r--r-- 1 root root 120 Aug 18 09:07 1503040052934-1
+     tail -f 1503040052934-1
+     line from file1.txt Fri_Aug_18_06:48:40.1503038920_UTC_2017
+     line from file2.txt Fri_Aug_18_06:48:51.1503038931_UTC_2017
+     ```
+ 9. **Stop and start processing files from the latest information unprocessed.**
+
+    In config file, parameters
+    ```
+    agent.sources.ftp1.folder = /var/log/flume-ftp
+    agent.sources.ftp1.file.name = status-ftp1-file.ser
+    ```
+    configure the path for the file that will keep a track status of files and
+    information processed.
+    For example, if stopping flume-ng and restarting,  file1.txt and file2.txt will not be
+    discovered again. With flume stopped i appended a new line to file1.txt.
+
+    ```
+    2017-08-18 09:48:50,633 (lifecycleSupervisor-1-0) [INFO - org.apache.flume.instrumentation.MonitoredCounterGroup.start(MonitoredCounterGroup.java:95)] Component type: SOURCE, name: SOURCE.ftp1 started
+    2017-08-18 09:48:50,638 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
+    2017-08-18 09:48:50,665 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:200)] Modified: file1.txt ,size: 60
+    2017-08-18 09:48:50,672 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file1.txt ,total files: 2
+    ```
 
 
-### Mandatory Parameters for flume ######
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Mandatory Parameters for flume ######
 
 ###### Example configuration for FTP source
 
@@ -94,6 +224,7 @@ Customizing this option is intended for particular cases.
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
 
 ### Version history #####
+- 2.0.10 upgrade to Apache Flume 1.7.0
 - 2.0.9 several fixes - check PRS
 - 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
@@ -117,6 +248,5 @@ https://github.com/keedio/flume-ftp-source/wiki/flume-ftp-source,-especificacion
 
 
 --
-Luis Lázaro <lalazaro@keedio.com>
 www.keedio.com
 
