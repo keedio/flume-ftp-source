@@ -31,6 +31,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     private Session sessionSftp;
     private Channel channel;
     private ChannelSftp sftpClient;
+    private String strictHostKeyChecking;
 
     /**
      *
@@ -42,8 +43,9 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      *
      * @param knownHosts
      */
-    public SFTPSource(String knownHosts) {
+    public SFTPSource(String knownHosts, String strictHostKeyChecking) {
         this.knownHosts = knownHosts;
+        this.strictHostKeyChecking = strictHostKeyChecking;
         jsch = new JSch();
     }
 
@@ -57,6 +59,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             jsch.setKnownHosts(knownHosts);
             sessionSftp = jsch.getSession(user, server, port);
+            sessionSftp.setConfig("StrictHostKeyChecking", strictHostKeyChecking);
             sessionSftp.setPassword(password);
             sessionSftp.connect();
             if (sessionSftp.isConnected()) {
@@ -66,11 +69,19 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
                     sftpClient = (ChannelSftp) channel;
                 }
             }
+
+            if (getWorkingDirectory() != null) {
+                sftpClient.cd(getWorkingDirectory());
+            }
+
         } catch (JSchException e) {
             if (!(sessionSftp.isConnected())) {
                 LOGGER.info("JSchException ", e);
                 this.setConnected(false);
             }
+        } catch (SftpException e) {
+            this.setConnected(false);
+            LOGGER.error("", e);
         }
         return isConnected();
     }
@@ -298,11 +309,16 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     public String getDirectoryserver() throws IOException {
         String printWorkingDirectory = "";
         try {
-            printWorkingDirectory = sftpClient.pwd();
+            printWorkingDirectory = sftpClient.getHome();
         } catch (SftpException e) {
             LOGGER.error("Error getting printworkingdirectory for server -sftpsource",e);
             throw new IOException(e.getMessage());
         }
+        
+        if (getWorkingDirectory() != null){
+            return printWorkingDirectory + "/" + getWorkingDirectory();
+        }
+        
         return printWorkingDirectory;
     }
 

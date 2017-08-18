@@ -364,4 +364,13 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         return keedioSource;
     }
 
+    @Override
+    public long getBackOffSleepIncrement() {
+        return 0;
+    }
+
+    @Override
+    public long getMaxBackOffSleepInterval() {
+        return 0;
+    }
 } //endclass
