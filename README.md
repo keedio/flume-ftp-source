@@ -193,7 +193,8 @@ located in parameter .folder of the config.
 >       agent.sources.sftp1.user = username
 >       agent.sources.sftp1.password = password
 >       agent.sources.sftp1.port = 22
->      
+>
+>       agent.sources.sftp1.strictHostKeyChecking = no // WARNING: for testing porposes only, default is yes
 >       agent.sources.sftp1.knownHosts = /home/<user launching flume>/.ssh/known_hosts
 
 
