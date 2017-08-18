@@ -18,7 +18,7 @@ located in parameter .folder of the config.
 
 - [Apache-flume mayor to 1.4.0.](http://archive.apache.org/dist/flume/)
 - [commons-net-3.3.jar](http://central.maven.org/maven2/commons-net/commons-net/3.3/commons-net-3.3.jar) (ftpClient and ftpsClient)
-- [jsch-0.1.52.jar](http://central.maven.org/maven2/com/jcraft/jsch/0.1.52/jsch-0.1.52.jar) (channelSftp)
+- [jsch-0.1.54.jar](http://central.maven.org/maven2/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar) (channelSftp)
 
 ### Deployment and launching ###
 1. **[flume-ftp-source-X.Y.Z.jar](https://github.com/keedio/flume-ftp-source/tree/master)**
@@ -31,7 +31,7 @@ located in parameter .folder of the config.
     $ mkdir flume-ftp
     $ cd flume-ftp
     $ mkdir lib libext
-    $ cp jsch-0.1.52.jar libext/
+    $ cp jsch-0.1.54.jar libext/
     $ cp commons-net-3.3.jar libext/
     $ cp flume-ftp-source-X.Y.Z.jar lib/
      ```
