@@ -47,176 +47,6 @@ public class SourceTest extends TestCase {
         super.tearDown();
     }
 
-    /**
-     * Test of readStream method, of class Source.
-     */
-//    public void testReadStream1() {
-//        System.out.println("readStream1");
-//        InputStream inputStream = null;
-//        long position = 0L;
-//        try {
-//            inputStream = new FileInputStream("/var/tmp/file.txt");
-//            assertNotNull(inputStream);
-//        } catch (FileNotFoundException e) {
-//            log.error("", e);
-//            fail();
-//        }
-//
-//        class DummyChannelProcessor extends ChannelProcessor {
-//
-//            public DummyChannelProcessor() {
-//                super(null);
-//            }
-//
-//            @Override
-//            public void processEvent(Event event) {
-//            }
-//        }
-//
-//        ChannelProcessor chanel = new DummyChannelProcessor();
-//
-//        try {
-//            inputStream.skip(0);
-//            byte[] bytesArray = new byte[1024];
-//            int bytesRead = -1;
-//            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-//                try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(1024)) {
-//                    baostream.write(bytesArray, 0, bytesRead);
-//                    byte[] data = baostream.toByteArray();
-//                    Event event = new SimpleEvent();
-//                    Map<String, String> headers = new HashMap<>();
-//                    headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
-//                    
-//                    event.setBody(data);
-//                    event.setHeaders(headers);
-//                    //chanel.processEvent(event);
-//                    System.out.println(new String(event.getBody()));
-//                    System.out.println("end of body");
-//                    data = null;
-//
-//                }
-//            }
-//           inputStream.close();
-//        } catch (IOException e) {
-//            log.error("", e);
-//        }
-//        
-//        
-//       
-//    }
-//    
-//    
-//    public void testReadStream2() {
-//        System.out.println("readStream2");
-//        InputStream inputStream = null;
-//        long position = 0L;
-//        try {
-//            inputStream = new FileInputStream("/var/tmp/file.txt");
-//            assertNotNull(inputStream);
-//        } catch (FileNotFoundException e) {
-//            log.error("", e);
-//            fail();
-//        }
-//
-//        class DummyChannelProcessor extends ChannelProcessor {
-//
-//            public DummyChannelProcessor() {
-//                super(null);
-//            }
-//
-//            @Override
-//            public void processEvent(Event event) {
-//            }
-//        }
-//
-//        ChannelProcessor chanel = new DummyChannelProcessor();
-//
-//       
-//        try {
-//            inputStream.skip(position);
-//            byte[] bytesArray = new byte[1024];
-//            int bytesRead = -1;
-//            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-//                byte[] data = bytesArray;
-//                Event event = new SimpleEvent();
-//                Map<String, String> headers = new HashMap<>();
-//                headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
-//                event.setBody(data);
-//                event.setHeaders(headers);
-//                //chanel.processEvent(event);
-//                System.out.println(new String(event.getBody()));
-//                System.out.println("end of body");
-//                data = null;
-//            }
-//
-//            inputStream.close();
-//        } catch (IOException e) {
-//            log.error("", e);
-//        }
-//        
-//        
-//       
-//    }
-//
-//public void testReadStream3() {
-//        System.out.println("readStream3");
-//        InputStream inputStream = null;
-//        long position = 0L;
-//        try {
-//            inputStream = new FileInputStream("/var/tmp/bep_minimal.log");
-//            assertNotNull(inputStream);
-//        } catch (FileNotFoundException e) {
-//            log.error("", e);
-//            fail();
-//        }
-//
-//        class DummyChannelProcessor extends ChannelProcessor {
-//
-//            public DummyChannelProcessor() {
-//                super(null);
-//            }
-//
-//            @Override
-//            public void processEvent(Event event) {
-//            }
-//        }
-//
-//        ChannelProcessor chanel = new DummyChannelProcessor();        
-//        
-//        try {
-//            inputStream.skip(position);
-//            byte[] bytesArray = new byte[1024];
-//            int bytesRead = -1;
-//            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
-//                try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(1024)) {
-//                    baostream.write(bytesArray, 0, bytesRead);
-//                    byte[] data = baostream.toByteArray();
-//                    Event event = new SimpleEvent();
-//                    Map<String, String> headers = new HashMap<>();
-//                    headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
-//                    //String carriage = "linea3"+ System.lineSeparator();
-//                   String carriage = System.lineSeparator()+"";
-//                    byte[] carriageB = carriage.getBytes();
-//                    String emptyString = "";
-//                    byte[] emptyB = emptyString.getBytes();
-//                    byte[] data_mutate = ByteArrayUtil.replace(data,  0,data.length,   carriageB, emptyB);
-//                    event.setBody(data_mutate);
-//                    event.setHeaders(headers);
-//                    //chanel.processEvent(event);
-//                    System.out.println(new String(event.getBody()));
-//                    System.out.println("end of body");
-////                    System.out.println("data.length: " + data.length);
-////                    System.out.println("bytesRead: " + bytesRead);
-////                    System.out.println("bytesArray.length: " + bytesArray.length);
-//                    data = null;
-//
-//                }
-//            }
-//            inputStream.close();
-//        } catch (IOException e) {
-//            log.error("", e);
-//        }
-//    }
     public void testReadStream4() {
         System.out.println("readStream4");
         InputStream inputStream = null;
@@ -256,8 +86,6 @@ public class SourceTest extends TestCase {
                     byteBuffer.compact();
                     event.setBody(byteBuffer.array());
                     event.setBody(data);
-                    System.out.println(new String(event.getBody()));
-                    System.out.println("end of body");
                 }
 
             }
@@ -304,9 +132,6 @@ public class SourceTest extends TestCase {
                 while ((line = in.readLine()) != null) {
                     //processMessage(line.getBytes());
                     event.setBody(line.getBytes());
-                    System.out.println(new String(event.getBody()));
-                    System.out.println("end of body");
-
                 }
             } else {
                 System.out.println("buffereader no ready");

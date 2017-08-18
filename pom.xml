@@ -7,19 +7,13 @@
     <version>2.0.10-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>flume-ftp-source</name>
-    
-    <!---<parent>
-        <groupId>org.keedio</groupId>
-        <artifactId>keedio-shaded-parent</artifactId>
-        <version>0.1.0</version>
-    </parent>-->    
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <scala.version>2.10.4</scala.version>
-        <flume.version>1.6.0</flume.version>
+        <flume.version>1.7.0</flume.version>
     </properties>
 
     <dependencies>
@@ -83,6 +77,6 @@
             <version>1.7.12</version>
             <scope>provided</scope>
         </dependency>
-       
     </dependencies>
+
 </project>
