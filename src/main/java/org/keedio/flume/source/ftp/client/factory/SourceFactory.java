@@ -52,7 +52,10 @@ public class SourceFactory {
                 break;
             case "sftp":
                 keedioSource = new SFTPSource();
-                SFTPSource sftpSource = new SFTPSource(context.getString("knownHosts"));
+                SFTPSource sftpSource = new SFTPSource(
+                  context.getString("knownHosts"),
+                  context.getString("strictHostKeyChecking", "yes")
+                );
                 keedioSource = sftpSource;
                 initCommonParam(context);
                 break;

@@ -31,6 +31,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     private Session sessionSftp;
     private Channel channel;
     private ChannelSftp sftpClient;
+    private String strictHostKeyChecking;
 
     /**
      *
@@ -42,8 +43,9 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
      *
      * @param knownHosts
      */
-    public SFTPSource(String knownHosts) {
+    public SFTPSource(String knownHosts, String strictHostKeyChecking) {
         this.knownHosts = knownHosts;
+        this.strictHostKeyChecking = strictHostKeyChecking;
         jsch = new JSch();
     }
 
@@ -57,6 +59,7 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
         try {
             jsch.setKnownHosts(knownHosts);
             sessionSftp = jsch.getSession(user, server, port);
+            sessionSftp.setConfig("StrictHostKeyChecking", strictHostKeyChecking);
             sessionSftp.setPassword(password);
             sessionSftp.connect();
             if (sessionSftp.isConnected()) {
