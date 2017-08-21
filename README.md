@@ -47,7 +47,7 @@ located in parameter .folder of the config.
     Files in Ftp's user directory will be processed (Remote Directory).
     For example, if sever and user :
     ```agent.sources.ftp1.name.server = 192.168.0.2```
-    ```agent.sources.ftp1.user = mortadelo``
+    ```agent.sources.ftp1.user = mortadelo```
 
     ```
     host:~ root# ftp 192.168.0.2
@@ -125,31 +125,6 @@ located in parameter .folder of the config.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Mandatory Parameters for flume ######
 
 ###### Example configuration for FTP source
@@ -224,7 +199,11 @@ Customizing this option is intended for particular cases.
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
 
 ### Version history #####
-- 2.0.10 upgrade to Apache Flume 1.7.0
+- 2.0.10
+    + Flume core: upgrade to Apache Flume 1.7.0
+    +  Source: add file's name and path to event header
+    +  Jsch: upgrade Jsch to 0.1.54 for new host key type (ecdsa-sha2-nistp256)
+    +  Jsch: add configurable parameter for testing: strictHostKeyChecking.
 - 2.0.9 several fixes - check PRS
 - 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
