@@ -20,6 +20,17 @@ located in parameter .folder of the config.
 - [commons-net-3.3.jar](http://central.maven.org/maven2/commons-net/commons-net/3.3/commons-net-3.3.jar) (ftpClient and ftpsClient)
 - [jsch-0.1.54.jar](http://central.maven.org/maven2/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar) (channelSftp)
 
+### Compilation and packaging###
+1.**Clone the project:**
+```
+git clone https://github.com/keedio/flume-ftp-source.git
+```
+
+2.**Build with Maven:**
+```
+mvn clean package
+```
+
 ### Deployment and launching ###
 1. **[flume-ftp-source-X.Y.Z.jar](https://github.com/keedio/flume-ftp-source/tree/master)**
 2. **[Download Apache Flume](http://archive.apache.org/dist/flume/).**
@@ -173,6 +184,9 @@ located in parameter .folder of the config.
 
 
 ### Optional Parameters for flume ######
+###### Working directory for searching for files.
+working.directory is under root directory server returned by FTP server:
+>     agent.soures.<fpt1 | ftps1 | sftp1>.working.directory = /directoryName
 
 ###### Discover delay, each configured milisecond directory will be explored.
 If this parameter is omitted, default value will be set to 10000 ms.
@@ -199,11 +213,13 @@ Customizing this option is intended for particular cases.
  https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
 
 ### Version history #####
+- 2.0.11
+    + property working.directory for searching for files, is now configurable.
 - 2.0.10
     + Flume core: upgrade to Apache Flume 1.7.0
-    +  Source: add file's name and path to event header
-    +  Jsch: upgrade Jsch to 0.1.54 for new host key type (ecdsa-sha2-nistp256)
-    +  Jsch: add configurable parameter for testing: strictHostKeyChecking.
+    + Source: add file's name and path to event header
+    + Jsch: upgrade Jsch to 0.1.54 for new host key type (ecdsa-sha2-nistp256)
+    + Jsch: add configurable parameter for testing: strictHostKeyChecking.
 - 2.0.9 several fixes - check PRS
 - 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
