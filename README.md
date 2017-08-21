@@ -46,8 +46,8 @@ located in parameter .folder of the config.
 
     Files in Ftp's user directory will be processed (Remote Directory).
     For example, if sever and user :
-    agent.sources.ftp1.name.server = 192.168.0.2
-    agent.sources.ftp1.user = mortadelo
+    ```agent.sources.ftp1.name.server = 192.168.0.2```
+    ```agent.sources.ftp1.user = mortadelo``
 
     ```
     host:~ root# ftp 192.168.0.2
@@ -108,10 +108,9 @@ located in parameter .folder of the config.
  9. **Stop and start processing files from the latest information unprocessed.**
 
     In config file, parameters
-    ```
-    agent.sources.ftp1.folder = /var/log/flume-ftp
-    agent.sources.ftp1.file.name = status-ftp1-file.ser
-    ```
+    ```agent.sources.ftp1.folder = /var/log/flume-ftp```
+    ```agent.sources.ftp1.file.name = status-ftp1-file.ser```
+
     configure the path for the file that will keep a track status of files and
     information processed.
     For example, if stopping flume-ng and restarting,  file1.txt and file2.txt will not be
