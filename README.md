@@ -186,7 +186,13 @@ mvn clean package
 ### Optional Parameters for flume ######
 ###### Working directory for searching for files.
 working.directory is under root directory server returned by FTP server:
->     agent.soures.<fpt1 | ftps1 | sftp1>.working.directory = /directoryName
+>     agent.soures.<fpt1 | ftps1 | sftp1>.working.directory = [remote_directory]/directoryName
+
+example 1:
+>     agent.soures.fpt1.working.directory = /directory_flume_files
+
+example 2:
+>     agent.soures.sftp1.working.directory = /home/user/directory_flume_files
 
 ###### Discover delay, each configured milisecond directory will be explored.
 If this parameter is omitted, default value will be set to 10000 ms.
@@ -206,14 +212,31 @@ Customizing this option is intended for particular cases.
  If omitted, a default one will be created.
 >      agent.sources.ftp1.file.name = status-ftp1-file.ser
 
+
 ###### Directory where to keep the file track status. If omitted, java.io.tmpdir will be used.
 >      agent.sources.ftp1.folder = /var/flume
 
+
+###### Match specific files's name according Java Regex or Glob Pattern Wilcards:
+ [Java Regular Expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)  for FTP and FTPS protocols.
+example 1:
+>      agent.sources.ftp1.filter.pattern = .+\\.csv ----> only process files ends with
+
+example 2:
+>      agent.sources.ftp1.filter.pattern = flume_file.* ----> only process files starts with
+
+[Glob Pattern Wilcards](http://tldp.org/LDP/GNU-Linux-Tools-Summary/html/x11655.htm) for SFTP ( [Jsch](http://epaul.github.io/jsch-documentation/simple.javadoc/com/jcraft/jsch/ChannelSftp.html#ls-java.lang.String-))
+>       agent.sources.sftp1.filter.pattern = *.csv ----> only process files ends with
+
+
 ###### For examples configs files, check:
- https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
+ https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs.
+
+
 
 ### Version history #####
-- 2.0.11
+- 2.1.0
+    + property filter.pattern for processing only the files which meet some criteria.
     + property working.directory for searching for files, is now configurable.
 - 2.0.10
     + Flume core: upgrade to Apache Flume 1.7.0

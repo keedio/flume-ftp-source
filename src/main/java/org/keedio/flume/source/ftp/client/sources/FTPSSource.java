@@ -18,6 +18,8 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.util.TrustManagerUtils;
 import org.apache.commons.net.util.KeyManagerUtils;
 import javax.net.ssl.KeyManager;
+
+import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -312,6 +314,14 @@ public class FTPSSource extends KeedioSource<FTPFile> {
         } else {
             ftpsClient.setTrustManager(TrustManagerUtils.getAcceptAllTrustManager());
         }
+    }
+
+    @Override
+    public List<FTPFile> listElements(String dirToList, KeedioFileFilter filter) throws IOException {
+        List<FTPFile> list = new ArrayList<>();
+        FTPFile[] subFiles = getFtpsClient().listFiles(dirToList, filter);
+        list = Arrays.asList(subFiles);
+        return list;
     }
 
 }
