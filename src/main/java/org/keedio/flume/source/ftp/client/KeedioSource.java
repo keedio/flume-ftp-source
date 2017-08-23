@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
@@ -108,7 +109,12 @@ public abstract class KeedioSource<T> {
     /**
      *
      */
-    protected Integer chunkSize;     
+    protected Integer chunkSize;
+
+  /**
+   *
+   */
+  private String keedioFilterRegex;
    
     /**
      *
@@ -538,6 +544,21 @@ public abstract class KeedioSource<T> {
         this.chunkSize = chunkSize;
     }
 
-      
-    
+    /**
+     *
+     * @param dirToList
+     * @param filter
+     * @return
+     *
+     * @throws IOException
+     */
+    public abstract List<T> listElements(String dirToList, KeedioFileFilter filter) throws IOException;
+
+    public String getKeedioFilterRegex() {
+        return keedioFilterRegex;
+    }
+
+    public void setKeedioFilterRegex(String keedioFilterRegex) {
+        this.keedioFilterRegex = keedioFilterRegex;
+    }
 } //endclass

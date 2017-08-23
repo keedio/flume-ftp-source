@@ -11,6 +11,7 @@ import org.apache.flume.EventDeliveryException;
 import org.apache.flume.PollableSource;
 import org.apache.flume.conf.Configurable;
 import org.apache.flume.event.SimpleEvent;
+import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.flume.ChannelException;
@@ -50,6 +51,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
   private FTPSourceEventListener listener = new FTPSourceEventListener();
   private SourceCounter sourceCounter;
   private String workingDirectory;
+  private KeedioFileFilter keedioFileFilter;
 
   /**
    * Request keedioSource to the factory
@@ -76,6 +78,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     keedioSource.connect();
     sourceCounter = new SourceCounter("SOURCE." + getName());
     workingDirectory = keedioSource.getWorkingDirectory();
+    keedioFileFilter = new KeedioFileFilter(keedioSource.getKeedioFilterRegex());
     keedioSource.checkPreviousMap();
   }
 
@@ -175,7 +178,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     if (!("").equals(currentDir)) {
       dirToList += "/" + currentDir;
     }
-    List<T> list = keedioSource.listElements(dirToList);
+    List<T> list = keedioSource.listElements(dirToList, keedioFileFilter);
     if (!(list.isEmpty())) {
 
       for (T element : list) {

@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import org.keedio.flume.source.ftp.client.KeedioSource;
+import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -334,6 +335,18 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     @Override
     public void setFileType(int fileType) throws IOException {
         //do nothing        
+    }
+
+    @Override
+    public List<ChannelSftp.LsEntry> listElements(String dirToList, KeedioFileFilter filter) throws IOException {
+        List<ChannelSftp.LsEntry> list = new ArrayList<>();
+        try {
+            list = sftpClient.ls(dirToList + "/" + this.getKeedioFilterRegex());
+        } catch (SftpException e) {
+            LOGGER.error("Could not list files from  " + dirToList, e);
+            throw new IOException(e.getMessage());
+        }
+        return list;
     }
     
   

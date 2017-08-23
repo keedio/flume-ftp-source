@@ -186,7 +186,13 @@ mvn clean package
 ### Optional Parameters for flume ######
 ###### Working directory for searching for files.
 working.directory is under root directory server returned by FTP server:
->     agent.soures.<fpt1 | ftps1 | sftp1>.working.directory = /directoryName
+>     agent.soures.<fpt1 | ftps1 | sftp1>.working.directory = [remote_directory]/directoryName
+
+example 1:
+>     agent.soures.fpt1.working.directory = /directory_flume_files
+
+example 2:
+>     agent.soures.sftp1.working.directory = /home/user/directory_flume_files
 
 ###### Discover delay, each configured milisecond directory will be explored.
 If this parameter is omitted, default value will be set to 10000 ms.
@@ -206,15 +212,60 @@ Customizing this option is intended for particular cases.
  If omitted, a default one will be created.
 >      agent.sources.ftp1.file.name = status-ftp1-file.ser
 
+
 ###### Directory where to keep the file track status. If omitted, java.io.tmpdir will be used.
 >      agent.sources.ftp1.folder = /var/flume
 
+
+###### Match specific files's name according Java Regex or Glob Pattern Wilcards:
+ [Java Regular Expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)  for FTP and FTPS protocols.
+example 1:
+>      agent.sources.ftp1.filter.pattern = .+\\.csv ----> only process files ends with
+
+example 2:
+>      agent.sources.ftp1.filter.pattern = flume_file.* ----> only process files starts with
+
+[Glob Pattern Wilcards](http://tldp.org/LDP/GNU-Linux-Tools-Summary/html/x11655.htm) for SFTP ( [Jsch](http://epaul.github.io/jsch-documentation/simple.javadoc/com/jcraft/jsch/ChannelSftp.html#ls-java.lang.String-))
+>       agent.sources.sftp1.filter.pattern = *.csv ----> only process files ends with
+
+
 ###### For examples configs files, check:
- https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs
+ https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs.
+
+### Mandatory parameters depending on the chosen source  ######
+m : stands for parameter is mandatory for above source
+
+o : optional
+
+x : not available
+
+|Parameter|Description|ftp|ftps|sftp|
+|------|-----------|---|----|----|
+|client.source|type of source from where get data|m|m|m|
+|name.server| hostname or ipaddress|m|m|m|
+|user|username allowed to connect|m|m|m|
+|password|usenames's pass|m|m|m|
+|port|server's port to connect|m|m|m|
+|security.enabled|cryptographic protocols|x|m|x|
+|security.cipher|Auth SSL or TLS|x|m|x|
+|security.certificate.enabled|accept or not server's certificate|x|o|x|
+|path.keystore|folder to keep keystory|x|o|x|
+|knownHosts|keys|x|x|m|
+|working.directory|custom directory to search for files|o|o|x|
+|folder|directory where to keep track status files|o|o|o|
+|discover.delay|polling time|o|o|o|
+|chunk.size|for binary files size of event|o|o|o|
+|file.name|file's name allocated in folder for track status|o|o|o|
+|flushlines|true or false|m|m|m|
+|filter.pattern| [Java Regular Expression](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html) |o|o|x|
+|filter.pattern| [Glob Pattern Wildcards](http://tldp.org/LDP/GNU-Linux-Tools-Summary/html/x11655.htm) |x|x|o|
+|strictHostKeyChecking| Disable verifying public key of the SSH protocol (for testing only)|x|x|o|
+
 
 ### Version history #####
-- 2.0.11
-    + property working.directory for searching for files, is now configurable.
+- 2.1.0
+    + property filter.pattern for processing only the files which meet some criteria.
+    + property working.directory for searching for files is now configurable.
 - 2.0.10
     + Flume core: upgrade to Apache Flume 1.7.0
     + Source: add file's name and path to event header
@@ -229,11 +280,6 @@ Customizing this option is intended for particular cases.
 - 1.1.5: flush lines from SFTPSource.
 - 1.1.4-rev4: added support to proccess lines instead of chunk of bytes, (standard tailing).
 - 1.1.4-rev1, 1.1.4-rev2, 1.1.4-rev3: solved problem with SSL connections on servers behind fire-walls.
-
-### License ######
-
-Apache License, Version 2.0
-http://www.apache.org/licenses/LICENSE-2.0
 
 
 ### Wiki ######
