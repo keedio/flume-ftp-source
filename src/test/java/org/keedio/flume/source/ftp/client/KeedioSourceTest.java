@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 import junit.framework.TestCase;
+import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -251,6 +252,11 @@ public class KeedioSourceTest extends TestCase {
         }
 
         public void setFileType(int fileType) throws IOException {
+        }
+
+        @Override
+        public List listElements(String dirToList, KeedioFileFilter filter) throws IOException {
+            return null;
         }
     }
 

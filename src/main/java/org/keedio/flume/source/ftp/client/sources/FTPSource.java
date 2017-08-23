@@ -8,6 +8,7 @@ import org.keedio.flume.source.ftp.client.KeedioSource;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
+import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.InputStream;
@@ -232,6 +233,14 @@ public class FTPSource extends KeedioSource<FTPFile> {
     @Override
     public void setFileType(int fileType) throws IOException {
         ftpClient.setFileType(fileType);
+    }
+
+    @Override
+    public List<FTPFile> listElements(String dirToList, KeedioFileFilter filter) throws IOException {
+        List<FTPFile> list = new ArrayList<>();
+        FTPFile[] subFiles = getFtpClient().listFiles(dirToList, filter);
+        list = Arrays.asList(subFiles);
+        return list;
     }
 
 } //endclass
