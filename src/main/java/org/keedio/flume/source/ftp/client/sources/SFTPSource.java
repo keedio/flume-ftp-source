@@ -13,6 +13,7 @@ import com.jcraft.jsch.SftpException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.keedio.flume.source.ftp.client.KeedioSource;
 import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
@@ -340,13 +341,20 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
     @Override
     public List<ChannelSftp.LsEntry> listElements(String dirToList, KeedioFileFilter filter) throws IOException {
         List<ChannelSftp.LsEntry> list = new ArrayList<>();
+        List<ChannelSftp.LsEntry> listFiltered = new ArrayList<>();
         try {
-            list = sftpClient.ls(dirToList + "/" + this.getKeedioFilterRegex());
+            list = sftpClient.ls(dirToList);
+            for (ChannelSftp.LsEntry element: list){
+                if (filter.accept(element)){
+                    listFiltered.add(element);
+                }
+            }
+
         } catch (SftpException e) {
             LOGGER.error("Could not list files from  " + dirToList, e);
             throw new IOException(e.getMessage());
         }
-        return list;
+        return listFiltered;
     }
     
   
