@@ -47,7 +47,7 @@ mvn clean package
     $ cp flume-ftp-source-X.Y.Z.jar lib/
      ```
 
- 5. **[Create a config file, examples](https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs).**
+ 5. **[Create a config file, examples](https://github.com/keedio/flume-ftp-source/tree/master/src/main/resources/example-configs).**
 
      ```
      $ cp flume-ng-ftp-source-FTP.conf  apache-flume-1.4.0-bin/conf/
@@ -217,20 +217,17 @@ Customizing this option is intended for particular cases.
 >      agent.sources.ftp1.folder = /var/flume
 
 
-###### Match specific files's name according Java Regex or Glob Pattern Wilcards:
- [Java Regular Expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)  for FTP and FTPS protocols.
+###### Match specific files's name according Java Regex:
+ [Java Regular Expressions](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html)  for FTP, FTPS and SFTP protocols.
+
 example 1:
 >      agent.sources.ftp1.filter.pattern = .+\\.csv ----> only process files ends with
 
 example 2:
->      agent.sources.ftp1.filter.pattern = flume_file.* ----> only process files starts with
-
-[Glob Pattern Wilcards](http://tldp.org/LDP/GNU-Linux-Tools-Summary/html/x11655.htm) for SFTP ( [Jsch](http://epaul.github.io/jsch-documentation/simple.javadoc/com/jcraft/jsch/ChannelSftp.html#ls-java.lang.String-))
->       agent.sources.sftp1.filter.pattern = *.csv ----> only process files ends with
-
+>      agent.sources.sftp1.filter.pattern = flume_file.* ----> only process files starts with
 
 ###### For examples configs files, check:
- https://github.com/keedio/flume-ftp-source/tree/flume_ftp_dev/src/main/resources/example-configs.
+ [example configurations](https://github.com/keedio/flume-ftp-source/tree/master/src/main/resources/example-configs)
 
 ### Mandatory parameters depending on the chosen source  ######
 m : stands for parameter is mandatory for above source
@@ -257,13 +254,15 @@ x : not available
 |chunk.size|for binary files size of event|o|o|o|
 |file.name|file's name allocated in folder for track status|o|o|o|
 |flushlines|true or false|m|m|m|
-|filter.pattern| [Java Regular Expression](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html) |o|o|x|
-|filter.pattern| [Glob Pattern Wildcards](http://tldp.org/LDP/GNU-Linux-Tools-Summary/html/x11655.htm) |x|x|o|
+|filter.pattern| [Java Regular Expression](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html) |o|o|o|
 |strictHostKeyChecking| Disable verifying public key of the SSH protocol (for testing only)|x|x|o|
 
 
 ### Version history #####
-- 2.1.0
+- 2.1.1
+    + Improvement: SFTP's filter.pattern parameter works now with Java Regex instead of Glob Pattern Wildcars.
+    + Fix bug sftp source: if setting sftp.filter.pattern to some value, walking subdirectory recursiverly does no work properly.
+  - 2.1.0
     + property filter.pattern for processing only the files which meet some criteria.
     + property working.directory for searching for files is now configurable.
 - 2.0.10
