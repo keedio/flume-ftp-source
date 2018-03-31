@@ -57,8 +57,8 @@ mvn clean package
 
     Files in Ftp's user directory will be processed (Remote Directory).
     For example, if sever and user :
-    ```agent.sources.ftp1.name.server = 192.168.0.2```
-    ```agent.sources.ftp1.user = mortadelo```
+    `agent.sources.ftp1.name.server = 192.168.0.2`
+    `agent.sources.ftp1.user = mortadelo`
 
     ```
     host:~ root# ftp 192.168.0.2
@@ -119,8 +119,8 @@ mvn clean package
  9. **Stop and start processing files from the latest information unprocessed.**
 
     In config file, parameters
-    ```agent.sources.ftp1.folder = /var/log/flume-ftp```
-    ```agent.sources.ftp1.file.name = status-ftp1-file.ser```
+    `agent.sources.ftp1.folder = /var/log/flume-ftp`
+    `agent.sources.ftp1.file.name = status-ftp1-file.ser`
 
     configure the path for the file that will keep a track status of files and
     information processed.
@@ -135,8 +135,34 @@ mvn clean package
     ```
   10. **Whether a recursive listing should be performed**
 
-  In config file, parameter `agent.sources.sftp1.search.recursive = true` (by default, this is `false`) specifies whether a recursive search should be performed within `agent.sources.sftp1.working.directory`.
-  ```
+    In config file, parameter `agent.sources.sftp1.search.recursive = false` (by default, this is `true`) specifies that a recursive search should not be performed in `agent.sources.sftp1.working.directory`.
+
+  11. **Wait for files to be finalized before reading**
+
+    This is useful when large files are being written to the source server, especially compressed files. To avoid reading them while they're still being written to, specify the parameter `agent.sources.sftp1.search.processInUse = false` in config file. This *must* be accompanied by another parameter - `agent.sources.sftp1.search.processInUseTimeout`, which is specified in seconds. To determine if a file is still being written to, the Flume agent will check the file's last modified timestamp. If the file was modified within `search.processInUseTimeout` seconds ago, it will be considered as still being written to. A value of 30 is usually sufficienly conservative.
+
+    ```
+    INFO	Source
+    File testfile.csv.gz is still being written. Will skip for now and re-read when write is completed.
+    INFO	Source
+    Actual dir:  /home/mydir files: 24
+    INFO	Source
+    Discovered: testfile.csv.gz ,size: 5441264
+    INFO	HDFSDataStream
+    Serializer = TEXT, UseRawLocalFileSystem = false
+    ```
+
+  12. **Decompress source files on the fly**
+
+    In many cases, source files may be compressed using a codec such as `GZIP`. Reading such files in chunks or lines may not be useful. To decompress such files on the fly, provide the parameter `agent.sources.sftp1.compressed` in the config file, with its value as the name of the compression codec used (e.g., `agent.sources.sftp1.compressed = gzip`). This will cause the Flume agent to read and decompress the source files on the fly and make the decompressed data available in a channel.
+
+    ```
+    Discovered: testfile.csv.gz ,size: 5441264
+    INFO	Source
+    File testfile.csv.gz is GZIP compressed, and decompression has been requested by user. Will attempt to decompress.
+    INFO	HDFSDataStream
+    Serializer = TEXT, UseRawLocalFileSystem = false
+    ```
 
 ## Mandatory Parameters for flume ######
 
@@ -267,10 +293,10 @@ x : not available
 ### Version history #####
 - 2.1.2
     + Improvement: Added configurable property - search.recursive - to search recursively
-    + Improvement: Added configurable properties - search.processInUse and search.processInUseTimeout - 
+    + Improvement: Added configurable properties - search.processInUse and search.processInUseTimeout -
     to allow user to specify whether files being written to should or should not be processed
     + Improvement: Added configurable property - compressed - to let user specify a compression format. This
-    enables decompression on-the-fly. 
+    enables decompression on-the-fly.
 - 2.1.1
     + Improvement: SFTP's filter.pattern parameter works now with Java Regex instead of Glob Pattern Wildcars.
     + Fix bug sftp source: if setting sftp.filter.pattern to some value, walking subdirectory recursiverly does no work properly.
