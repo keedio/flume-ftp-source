@@ -137,7 +137,7 @@ mvn clean package
 
 11. **Wait for files to be finalized before reading**
 
-    This is useful when large files are being written to the source server, especially compressed files. To avoid reading them while they're still being written to, specify the parameter `agent.sources.sftp1.search.processInUse = false` in config file. This *must* be accompanied by another parameter - `agent.sources.sftp1.search.processInUseTimeout`, which is specified in seconds. To determine if a file is still being written to, the Flume agent will check the file's last modified timestamp. If the file was modified within `search.processInUseTimeout` seconds ago, it will be considered as still being written to. A value of 30 is usually sufficienly conservative.
+    This is useful when large files are being written to the source server, especially compressed files. To avoid reading them while they're still being written to, specify the parameter `agent.sources.sftp1.search.processInUse = false` in config file. This *must* be accompanied by another parameter - `agent.sources.sftp1.search.processInUseTimeout`, which is specified in seconds. To determine if a file is still being written to, the Flume agent will check the file's last modified timestamp. If the file was modified within `search.processInUseTimeout` seconds ago, it will be considered as still being written to. A value of 30 is usually sufficiently conservative.
 
     ```
     INFO	Source
@@ -151,9 +151,10 @@ mvn clean package
     ```
 12. **Decompress source files on the fly**
 
-    In many cases, source files may be compressed using a codec such as `GZIP`. Reading such files in chunks or lines may not be useful. To decompress such files on the fly, provide the parameter `agent.sources.sftp1.compressed` in the config file, with its value as the name of the compression codec used (e.g., `agent.sources.sftp1.compressed = gzip`). This will cause the Flume agent to read and decompress the source files on the fly and make the decompressed data available in a channel.
+    In many cases, source files might be present in a compressed format using a codec such as `GZIP`. Reading such files in chunks or lines may not be useful. To decompress such files on the fly, provide the parameter `agent.sources.sftp1.compressed` in the config file, with its value as the name of the compression codec used (e.g., `agent.sources.sftp1.compressed = gzip`). This will cause the Flume agent to read and decompress the source files on the fly and make the decompressed data available in the specified channel.
 
     ```
+    INFO	Source
     Discovered: testfile.csv.gz ,size: 5441264
     INFO	Source
     File testfile.csv.gz is GZIP compressed, and decompression has been requested by user. Will attempt to decompress.
