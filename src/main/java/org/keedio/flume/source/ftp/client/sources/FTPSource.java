@@ -135,6 +135,13 @@ public class FTPSource extends KeedioSource<FTPFile> {
     @Override
     /**
      * @return boolean
+     * @param Object to check
+     */
+    public long getModifiedTime(FTPFile file) { return file.getTimestamp().getTimeInMillis(); }
+
+    @Override
+    /**
+     * @return boolean
      * @param FTPFile to check
      */
     public boolean isDirectory(FTPFile file) {

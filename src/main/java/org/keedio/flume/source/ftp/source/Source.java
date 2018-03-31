@@ -35,6 +35,7 @@ import org.keedio.flume.source.ftp.client.KeedioSource;
 import java.nio.charset.Charset;
 
 import org.apache.flume.source.AbstractSource;
+import java.util.zip.GZIPInputStream;
 
 /**
  * @author luislazaro lalazaro@keedio.com - KEEDIO
@@ -59,7 +60,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
    * @param context
    * @return KeedioSource
    */
-  public KeedioSource orderKeedioSource(Context context) {
+  private KeedioSource orderKeedioSource(Context context) {
     keedioSource = sourceFactory.createKeedioSource(context);
     return keedioSource;
   }
@@ -73,7 +74,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     if (keedioSource.existFolder()) {
       keedioSource.makeLocationFile();
     } else {
-      LOGGER.error("Folder " + keedioSource.getPathTohasmap().toString() + " not exists");
+      LOGGER.error("Folder " + keedioSource.getPathTohasmap().toString() + " does not exist");
     }
     keedioSource.connect();
     sourceCounter = new SourceCounter("SOURCE." + getName());
@@ -98,11 +99,11 @@ public class Source extends AbstractSource implements Configurable, PollableSour
       LOGGER.info("Actual dir:  " + workingDirectory + " files: "
         + keedioSource.getFileList().size());
 
-      discoverElements(keedioSource, workingDirectory, "", 0);
+      discoverElements(keedioSource, workingDirectory, "", 0, keedioSource.isRecursive());
       keedioSource.cleanList(); //clean list according existing actual files
       keedioSource.getExistFileList().clear();
     } catch (IOException e) {
-      LOGGER.error("Exception thrown in proccess, try to reconnect " + counterConnect, e);
+      LOGGER.error("Exception thrown in process, try to reconnect " + counterConnect, e);
 
       if (!keedioSource.connect()) {
         counterConnect++;
@@ -166,11 +167,12 @@ public class Source extends AbstractSource implements Configurable, PollableSour
    *                     connected
    * @param currentDir,  actual dir in the recursive method
    * @param level,       deep to search
+   * @param recursive    Whether to search sub-directories recursively
    * @throws IOException
    */
   // @SuppressWarnings("UnnecessaryContinue")
-  public <T> void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws
-    IOException {
+  private <T> void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level,
+                                   boolean recursive) throws IOException {
 
     long position = 0L;
 
@@ -188,12 +190,24 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         }
 
         if (keedioSource.isDirectory(element)) {
-          LOGGER.info("[" + elementName + "]");
-          keedioSource.changeToDirectory(parentDir);
-          discoverElements(keedioSource, dirToList, elementName, level + 1);
-
+          if(recursive) {
+            LOGGER.info("Traversing element recursively: " + "[" + elementName + "]");
+            keedioSource.changeToDirectory(parentDir);
+            discoverElements(keedioSource, dirToList, elementName, level + 1, recursive);
+          }
         } else if (keedioSource.isFile(element)) { //element is a regular file
           keedioSource.changeToDirectory(dirToList);
+
+          // Check whether user has specified that file is not to be processed while in use
+          if(!keedioSource.isProcessInUse()) {
+            // If file is currently being written to, skip this file until it is finalized
+            if(isBeingWritten(keedioSource.getModifiedTime(element), keedioSource.getProcessInUseTimeout())) {
+              LOGGER.info("File " + elementName + " is still being written. " +
+                      "Will skip for now and re-read when write is completed.");
+              continue;
+            }
+          }
+
           keedioSource.getExistFileList().add(dirToList + "/" + elementName);  //control of deleted files in server
 
           //test if file is new in collection
@@ -241,7 +255,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
               }
 
               LOGGER
-                .info("Processed:  " + elementName + " ,total files: " + this.keedioSource.getFileList().size() + "\n");
+                .info("Processed:  " + elementName + ", total files: " + this.keedioSource.getFileList().size() + "\n");
 
             } else {
               handleProcessError(elementName);
@@ -270,6 +284,22 @@ public class Source extends AbstractSource implements Configurable, PollableSour
   }
 
   /**
+   * Determine whether source file is currently being written to
+   * @param lastModifiedTime The last modified timestamp of the source file
+   * @param <T>
+   * @return True, is file is currently being written to. False otherwise.
+   */
+  public <T> boolean isBeingWritten(long lastModifiedTime, Integer timeout) {
+    Date dateModified = new Date(lastModifiedTime);
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(new Date());
+    cal.add(Calendar.SECOND, -timeout);
+    Date timeoutAgo = cal.getTime();
+
+    return (dateModified.compareTo(timeoutAgo) > 0);
+  }
+
+  /**
    * Read retrieved stream from ftpclient into byte[] and process. If
    * flushlines is true the retrieved inputstream will be readed by lines. And
    * the type of file is set to ASCII from KeedioSource.
@@ -278,7 +308,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
    * @param position
    * @return boolean
    */
-  public boolean readStream(InputStream inputStream, long position, String fileName, String filePath) {
+  private boolean readStream(InputStream inputStream, long position, String fileName, String filePath) {
     if (inputStream == null) {
       return false;
     }
@@ -288,13 +318,33 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     if (keedioSource.isFlushLines()) {
       try {
         inputStream.skip(position);
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
-          String line = null;
 
-          while ((line = in.readLine()) != null) {
-            processMessage(line.getBytes(), fileName, filePath);
+        if(keedioSource.getCompressionFormat() != null) {
+          switch(keedioSource.getCompressionFormat()) {
+            case "gzip":
+            LOGGER.info("File " + fileName + " is GZIP compressed, and decompression has been requested by user. " +
+                    "Will attempt to decompress.");
+            try (BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream),
+                    Charset.defaultCharset()))) {
+              String line = null;
+
+              while ((line = in.readLine()) != null) {
+                processMessage(line.getBytes(), fileName, filePath);
+              }
+            }
+            break;
+            default: throw new IOException("Unsupported compression format specified: " +
+                    keedioSource.getCompressionFormat());
           }
+        } else {
+          try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
+            String line = null;
 
+            while ((line = in.readLine()) != null) {
+              processMessage(line.getBytes(), fileName, filePath);
+            }
+
+          }
         }
         inputStream.close();
       } catch (IOException e) {
@@ -330,7 +380,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
    * @param lastInfo byte[]
    * @void process last appended data to files
    */
-  public void processMessage(byte[] lastInfo, String fileName, String filePath) {
+  private void processMessage(byte[] lastInfo, String fileName, String filePath) {
     byte[] message = lastInfo;
     Event event = new SimpleEvent();
     Map<String, String> headers = new HashMap<>();
@@ -359,7 +409,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
   /**
    * @param fileName
    */
-  public void handleProcessError(String fileName) {
+  private void handleProcessError(String fileName) {
     LOGGER.info("failed retrieving stream from file, will try in next poll :" + fileName);
     sourceCounter.incrementFilesProcCountError();
   }

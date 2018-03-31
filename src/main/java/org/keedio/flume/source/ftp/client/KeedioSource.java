@@ -69,6 +69,11 @@ public abstract class KeedioSource<T> {
     /**
      *
      */
+    protected boolean recursive;
+
+    /**
+     *
+     */
     protected String fileName;
 
     /**
@@ -104,9 +109,24 @@ public abstract class KeedioSource<T> {
     /**
      *
      */
-    protected String dirToList;    
+    protected boolean processInUse;
 
     /**
+     *
+     */
+    protected Integer processInUseTimeout;
+
+    /**
+     *
+     */
+    protected String dirToList;
+
+    /**
+     *
+     */
+    protected String compressionFormat;
+
+  /**
      *
      */
     protected Integer chunkSize;
@@ -170,6 +190,13 @@ public abstract class KeedioSource<T> {
      * @return
      */
     public abstract boolean isFile(T file);
+
+    /**
+     *
+     * @param file
+     * @return
+     */
+    public abstract long getModifiedTime(T file);
 
     /**
      *
@@ -464,10 +491,30 @@ public abstract class KeedioSource<T> {
 
     /**
      * 
-     * @return  path
+     * @return  recursive
+     */
+    public boolean isRecursive() {
+        return recursive;
+    }
+
+    /**
+     *
+     * @return  processInUse
+     */
+    public boolean isProcessInUse() { return processInUse; }
+
+    /**
+     *
+     * @return  processInUseTimeout
+     */
+    public Integer getProcessInUseTimeout() { return processInUseTimeout; }
+
+    /**
+     *
+     * @return
      */
     public Path getHasmap() {
-        return hasmap;
+      return hasmap;
     }
 
     /**
@@ -561,4 +608,22 @@ public abstract class KeedioSource<T> {
     public void setKeedioFilterRegex(String keedioFilterRegex) {
         this.keedioFilterRegex = keedioFilterRegex;
     }
+
+    public void setRecursive(boolean recursive) {
+      this.recursive = recursive;
+    }
+
+    public void setProcessInUse(boolean processInUse) {
+      this.processInUse = processInUse;
+    }
+
+    public void setProcessInUseTimeout(Integer processInUseTimeout) {
+      this.processInUseTimeout = processInUseTimeout;
+    }
+
+    public void setFileCompressed(String compressionFormat) {
+      this.compressionFormat = compressionFormat.toLowerCase().trim();
+    }
+
+    public String getCompressionFormat() { return compressionFormat; }
 } //endclass

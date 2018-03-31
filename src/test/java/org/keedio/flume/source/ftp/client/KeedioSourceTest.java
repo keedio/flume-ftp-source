@@ -215,6 +215,8 @@ public class KeedioSourceTest extends TestCase {
             return null;
         }
 
+        public long getModifiedTime(Object file) { return 0L; }
+
         public String getObjectName(Object file) {
             return "";
         }
