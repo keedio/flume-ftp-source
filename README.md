@@ -37,48 +37,48 @@ mvn clean package
 3. **[Create plugins.d directory](https://flume.apache.org/FlumeUserGuide.html#the-plugins-d-directory).**
 4. **[Directory layout for plugins](https://flume.apache.org/FlumeUserGuide.html#directory-layout-for-plugins):**
 
-  ```
-  $ cd plugins.d
-  $ mkdir flume-ftp
-  $ cd flume-ftp
-  $ mkdir lib libext
-  $ cp jsch-0.1.54.jar libext/
-  $ cp commons-net-3.3.jar libext/
-  $ cp flume-ftp-source-X.Y.Z.jar lib/
+   ```
+   $ cd plugins.d
+   $ mkdir flume-ftp
+   $ cd flume-ftp
+   $ mkdir lib libext
+   $ cp jsch-0.1.54.jar libext/
+   $ cp commons-net-3.3.jar libext/
+   $ cp flume-ftp-source-X.Y.Z.jar lib/
    ```
 5. **[Create a config file, examples](https://github.com/keedio/flume-ftp-source/tree/master/src/main/resources/example-configs).**
 
    ```
-   $ cp flume-ng-ftp-source-FTP.conf  apache-flume-1.4.0-bin/conf/
+   $ cp flume-ng-ftp-source-FTP.conf apache-flume-1.4.0-bin/conf/
    ```
 6. **Which files will be processed?**
 
-  Files in Ftp's user directory will be processed (Remote Directory).
-  For example, if sever and user :
-  `agent.sources.ftp1.name.server = 192.168.0.2`
-  `agent.sources.ftp1.user = mortadelo`
+    Files in Ftp's user directory will be processed (Remote Directory).
+    For example, if sever and user :
+    `agent.sources.ftp1.name.server = 192.168.0.2`
+    `agent.sources.ftp1.user = mortadelo`
 
-  ```
-  host:~ root# ftp 192.168.0.2
-  Connected to 192.168.0.2.
-  220 (vsFTPd 3.0.2)
-  Name (192.168.0.2:root): mortadelo
-  331 Please specify the password.
-  Password:
-  230 Login successful.
-  Remote system type is UNIX.
-  Using binary mode to transfer files.
-  ftp> dir
-  229 Entering Extended Passive Mode (|||29730|).
-  150 Here comes the directory listing.
-  -rw-r--r--    1 0        0              60 Aug 18 06:48 file1.txt
-  -rw-r--r--    1 0        0              60 Aug 18 06:48 file2.txt
-  226 Directory send OK.
-  ftp> pwd
-  Remote directory: /
-  ftp>
-  ```
-  we want to process file1.txt and file2.txt
+    ```
+    host:~ root# ftp 192.168.0.2
+    Connected to 192.168.0.2.
+    220 (vsFTPd 3.0.2)
+    Name (192.168.0.2:root): mortadelo
+    331 Please specify the password.
+    Password:
+    230 Login successful.
+    Remote system type is UNIX.
+    Using binary mode to transfer files.
+    ftp> dir
+    229 Entering Extended Passive Mode (|||29730|).
+    150 Here comes the directory listing.
+    -rw-r--r--    1 0        0              60 Aug 18 06:48 file1.txt
+    -rw-r--r--    1 0        0              60 Aug 18 06:48 file2.txt
+    226 Directory send OK.
+    ftp> pwd
+    Remote directory: /
+    ftp>
+    ```
+    we want to process file1.txt and file2.txt
 
 7. **Launch flume binary:**
    ```
