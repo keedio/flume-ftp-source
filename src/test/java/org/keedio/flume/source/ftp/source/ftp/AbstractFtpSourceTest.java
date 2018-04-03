@@ -39,13 +39,13 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
     String getFolder = System.getProperty("java.io.tmpdir");
     String getAbsoutePath = System.getProperty("java.io.tmpdir") + "/" + getFileName;
     String getSource = "ftp";
-    
-    
 
     @BeforeMethod
     public void beforeMethod() {
         MockitoAnnotations.initMocks(this);
 
+        when(mockContext.getBoolean("search.processInUse", true)).thenReturn(true);
+        when(mockContext.getBoolean("search.recursive", true)).thenReturn(true);
         when(mockContext.getString("client.source")).thenReturn(getSource);
         when(mockContext.getInteger("buffer.size")).thenReturn(0);
         when(mockContext.getString("name.server")).thenReturn(getHost);
@@ -57,8 +57,6 @@ public abstract class AbstractFtpSourceTest extends EmbeddedFTPServer{
         when(mockContext.getString("file.name", "default_file_track_status.ser")).thenReturn("hasmapFTP.ser");
         when(mockContext.getString("folder", System.getProperty("java.io.tmpdir"))).thenReturn(System.getProperty("java.io.tmpdir"));
         when(mockContext.getInteger("chunk.size", 1024)).thenReturn(1024);
-       
-        
 
         logger.info("Creating FTP source");
 

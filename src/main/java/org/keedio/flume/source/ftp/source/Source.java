@@ -89,7 +89,6 @@ public class Source extends AbstractSource implements Configurable, PollableSour
    */
   @Override
   public PollableSource.Status process() throws EventDeliveryException {
-
     try {
       if (workingDirectory == null) {
         LOGGER.info("property workdir is null, setting to default");

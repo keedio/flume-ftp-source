@@ -622,7 +622,9 @@ public abstract class KeedioSource<T> {
     }
 
     public void setFileCompressed(String compressionFormat) {
-      this.compressionFormat = compressionFormat.toLowerCase().trim();
+      if (compressionFormat != null) {
+        this.compressionFormat = compressionFormat.toLowerCase().trim();
+      }
     }
 
     public String getCompressionFormat() { return compressionFormat; }
