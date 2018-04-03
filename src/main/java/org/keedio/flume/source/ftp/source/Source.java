@@ -172,7 +172,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
   public <T> void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level) throws
     IOException {
 
-    long position = 0L;
+    long position;
 
     String dirToList = parentDir;
     if (!("").equals(currentDir)) {
@@ -289,7 +289,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
       try {
         inputStream.skip(position);
         try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
-          String line = null;
+          String line;
 
           while ((line = in.readLine()) != null) {
             processMessage(line.getBytes(), fileName, filePath);
@@ -307,7 +307,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         inputStream.skip(position);
         int chunkSize = keedioSource.getChunkSize();
         byte[] bytesArray = new byte[chunkSize];
-        int bytesRead = -1;
+        int bytesRead;
         while ((bytesRead = inputStream.read(bytesArray)) != -1) {
           try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(chunkSize)) {
             baostream.write(bytesArray, 0, bytesRead);
