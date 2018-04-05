@@ -7,9 +7,9 @@ In main flume's agent configuration file must be specified if security for FTP i
 - FTPS: File Transfer Protocol that uses AUTH SSL o TLS cryptographic protocols. Port 21.
 - SFTP: File Transfer Protocol that uses SSH V3, via a single channel (layer transport) and sending/receiving in binary. Port 22.(Recommended).
 
-Files can be proccesed int two ways:
+Files can be processed in two ways:
 - by lines, as one event is a full line.(flushlines = true)
-- by chunk of bytes, exactly 1 KB is the size of one event by default. (flushlines = false) 
+- by chunk of bytes, exactly 1 KB is the size of one event by default. (flushlines = false)
 
 Proccesed files's name and size will be tracked into a Map, this one will be "saved" into an external file (file.name),
 located in parameter .folder of the config.
@@ -21,12 +21,12 @@ located in parameter .folder of the config.
 - [jsch-0.1.54.jar](http://central.maven.org/maven2/com/jcraft/jsch/0.1.54/jsch-0.1.54.jar) (channelSftp)
 
 ### Compilation and packaging###
-1.**Clone the project:**
+1. **Clone the project:**
 ```
 git clone https://github.com/keedio/flume-ftp-source.git
 ```
 
-2.**Build with Maven:**
+2. **Build with Maven:**
 ```
 mvn clean package
 ```
@@ -37,28 +37,26 @@ mvn clean package
 3. **[Create plugins.d directory](https://flume.apache.org/FlumeUserGuide.html#the-plugins-d-directory).**
 4. **[Directory layout for plugins](https://flume.apache.org/FlumeUserGuide.html#directory-layout-for-plugins):**
 
-    ```
-    $ cd plugins.d
-    $ mkdir flume-ftp
-    $ cd flume-ftp
-    $ mkdir lib libext
-    $ cp jsch-0.1.54.jar libext/
-    $ cp commons-net-3.3.jar libext/
-    $ cp flume-ftp-source-X.Y.Z.jar lib/
-     ```
+   ```
+   $ cd plugins.d
+   $ mkdir flume-ftp
+   $ cd flume-ftp
+   $ mkdir lib libext
+   $ cp jsch-0.1.54.jar libext/
+   $ cp commons-net-3.3.jar libext/
+   $ cp flume-ftp-source-X.Y.Z.jar lib/
+   ```
+5. **[Create a config file, examples](https://github.com/keedio/flume-ftp-source/tree/master/src/main/resources/example-configs).**
 
- 5. **[Create a config file, examples](https://github.com/keedio/flume-ftp-source/tree/master/src/main/resources/example-configs).**
-
-     ```
-     $ cp flume-ng-ftp-source-FTP.conf  apache-flume-1.4.0-bin/conf/
-     ```
-
- 6. **Which files will be processed?**
+   ```
+   $ cp flume-ng-ftp-source-FTP.conf apache-flume-1.4.0-bin/conf/
+   ```
+6. **Which files will be processed?**
 
     Files in Ftp's user directory will be processed (Remote Directory).
     For example, if sever and user :
-    ```agent.sources.ftp1.name.server = 192.168.0.2```
-    ```agent.sources.ftp1.user = mortadelo```
+    `agent.sources.ftp1.name.server = 192.168.0.2`
+    `agent.sources.ftp1.user = mortadelo`
 
     ```
     host:~ root# ftp 192.168.0.2
@@ -82,45 +80,45 @@ mvn clean package
     ```
     we want to process file1.txt and file2.txt
 
- 7. **Launch flume binary:**
-     ```
+7. **Launch flume binary:**
+    ```
     $ ./bin/flume-ng agent -c conf -conf-file conf/flume-ng-ftp-source-FTP.conf --name agent -Dflume.root.logger=INFO,console
-     ```
+    ```
 
-     ```
-      [...]
-      2017-08-18 09:07:33,471 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 0
-      2017-08-18 09:07:33,503 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:193)] Discovered: file1.txt ,size: 60
-      2017-08-18 09:07:33,516 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file1.txt ,total files: 1
+    ```
+    [...]
+    2017-08-18 09:07:33,471 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 0
+    2017-08-18 09:07:33,503 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:193)] Discovered: file1.txt ,size: 60
+    2017-08-18 09:07:33,516 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file1.txt ,total files: 1
 
-      2017-08-18 09:07:33,518 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:193)] Discovered: file2.txt ,size: 60
-      2017-08-18 09:07:33,521 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file2.txt ,total files: 2
+    2017-08-18 09:07:33,518 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:193)] Discovered: file2.txt ,size: 60
+    2017-08-18 09:07:33,521 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file2.txt ,total files: 2
 
-      2017-08-18 09:07:38,526 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
-      2017-08-18 09:07:43,535 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
-      2017-08-18 09:07:48,547 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
-      [...]
-      ```
- 8.  **Data processed.**
+    2017-08-18 09:07:38,526 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
+    2017-08-18 09:07:43,535 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
+    2017-08-18 09:07:48,547 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.process(Source.java:89)] Actual dir:  / files: 2
+    [...]
+    ```
+8. **Data processed.**
 
-     For testing porposes set:
-     ```
-     agent.sinks.k1.type = file_roll
-     agent.sinks.k1.sink.directory = /var/log/flume-ftp
-     ```
-     in /var/log/flume-ftp, flume will create a file ( [file_roll](https://flume.apache.org/FlumeUserGuide.html#file-roll-sink) ) as 123456789...-
-     ```
-     [host]# ls -ll
-     -rw-r--r-- 1 root root 120 Aug 18 09:07 1503040052934-1
-     tail -f 1503040052934-1
-     line from file1.txt Fri_Aug_18_06:48:40.1503038920_UTC_2017
-     line from file2.txt Fri_Aug_18_06:48:51.1503038931_UTC_2017
-     ```
- 9. **Stop and start processing files from the latest information unprocessed.**
+    For testing purposes set:
+    ```
+    agent.sinks.k1.type = file_roll
+    agent.sinks.k1.sink.directory = /var/log/flume-ftp
+    ```
+    in /var/log/flume-ftp, flume will create a file ( [file_roll](https://flume.apache.org/FlumeUserGuide.html#file-roll-sink) ) as 123456789...-
+    ```
+    [host]# ls -ll
+    -rw-r--r-- 1 root root 120 Aug 18 09:07 1503040052934-1
+    tail -f 1503040052934-1
+    line from file1.txt Fri_Aug_18_06:48:40.1503038920_UTC_2017
+    line from file2.txt Fri_Aug_18_06:48:51.1503038931_UTC_2017
+    ```
+9. **Stop and start processing files from the latest information unprocessed.**
 
     In config file, parameters
-    ```agent.sources.ftp1.folder = /var/log/flume-ftp```
-    ```agent.sources.ftp1.file.name = status-ftp1-file.ser```
+    `agent.sources.ftp1.folder = /var/log/flume-ftp`
+    `agent.sources.ftp1.file.name = status-ftp1-file.ser`
 
     configure the path for the file that will keep a track status of files and
     information processed.
@@ -133,8 +131,36 @@ mvn clean package
     2017-08-18 09:48:50,665 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:200)] Modified: file1.txt ,size: 60
     2017-08-18 09:48:50,672 (PollableSourceRunner-Source-ftp1) [INFO - org.keedio.flume.source.ftp.source.Source.discoverElements(Source.java:232)] Processed:  file1.txt ,total files: 2
     ```
+10. **Whether a recursive listing should be performed**
 
+    In config file, parameter `agent.sources.sftp1.search.recursive = false` (by default, this is `true`) specifies that a recursive search should not be performed in `agent.sources.sftp1.working.directory`.
 
+11. **Wait for files to be finalized before reading**
+
+    This is useful when large files are being written to the source server, especially compressed files. To avoid reading them while they're still being written to, specify the parameter `agent.sources.sftp1.search.processInUse = false` in config file. This *must* be accompanied by another parameter - `agent.sources.sftp1.search.processInUseTimeout`, which is specified in seconds. To determine if a file is still being written to, the Flume agent will check the file's last modified timestamp. If the file was modified within `search.processInUseTimeout` seconds ago, it will be considered as still being written to. A value of 30 is usually sufficiently conservative.
+
+    ```
+    INFO	Source
+    File testfile.csv.gz is still being written. Will skip for now and re-read when write is completed.
+    INFO	Source
+    Actual dir:  /home/mydir files: 24
+    INFO	Source
+    Discovered: testfile.csv.gz ,size: 5441264
+    INFO	HDFSDataStream
+    Serializer = TEXT, UseRawLocalFileSystem = false
+    ```
+12. **Decompress source files on the fly**
+
+    In many cases, source files might be present in a compressed format using a codec such as `GZIP`. Reading such files in chunks or lines may not be useful. To decompress such files on the fly, provide the parameter `agent.sources.sftp1.compressed` in the config file, with its value as the name of the compression codec used (e.g., `agent.sources.sftp1.compressed = gzip`). This will cause the Flume agent to read and decompress the source files on the fly and make the decompressed data available in the specified channel.
+
+    ```
+    INFO	Source
+    Discovered: testfile.csv.gz ,size: 5441264
+    INFO	Source
+    File testfile.csv.gz is GZIP compressed, and decompression has been requested by user. Will attempt to decompress.
+    INFO	HDFSDataStream
+    Serializer = TEXT, UseRawLocalFileSystem = false
+    ```
 
 ## Mandatory Parameters for flume ######
 
@@ -161,19 +187,19 @@ mvn clean package
 >       agent.sources.ftps1.password = password
 >       agent.sources.ftps1.port = 21
 >       
->       agent.sources.ftps1.security.enabled = true 
+>       agent.sources.ftps1.security.enabled = true
 >       agent.sources.ftps1.security.cipher = TLS
->       agent.sources.ftps1.security.certificate.enabled = (false | true)  (if false the plugin will accept any 
+>       agent.sources.ftps1.security.certificate.enabled = (false | true)  (if false the plugin will accept any
 >       certificate sent by the server, validated or not).
 >       agent.sources.ftps1.path.keystore = /paht/to/keystore
->       agent.sources.ftps1.store.pass = the_keyStore_password 
+>       agent.sources.ftps1.store.pass = the_keyStore_password
 
 ###### Example configuration for SFTP source
 
 >       agent.sources.sftp1.type = org.keedio.flume.source.ftp.source.Source
 
 >       agent.sources.sftp1.client.source = sftp
- 
+
 >       agent.sources.sftp1.name.server = 127.0.0.1
 >       agent.sources.sftp1.user = username
 >       agent.sources.sftp1.password = password
@@ -254,11 +280,21 @@ x : not available
 |chunk.size|for binary files size of event|o|o|o|
 |file.name|file's name allocated in folder for track status|o|o|o|
 |flushlines|true or false|m|m|m|
+|search.recursive|true or false|o|o|o|
+|search.processInUse|true or false|o|o|o|
+|search.processInUseTimeout|time in seconds to determine busyness of files|o|o|o|
+|sftp1.compressed|if source files are compressed, compression format|o|o|o|
 |filter.pattern| [Java Regular Expression](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html) |o|o|o|
 |strictHostKeyChecking| Disable verifying public key of the SSH protocol (for testing only)|x|x|o|
 
 
 ### Version history #####
+- 2.1.2
+    + Improvement: Added configurable property - search.recursive - to search recursively
+    + Improvement: Added configurable properties - search.processInUse and search.processInUseTimeout -
+    to allow user to specify whether files being written to should or should not be processed
+    + Improvement: Added configurable property - compressed - to let user specify a compression format. This
+    enables decompression on-the-fly.
 - 2.1.1
     + Improvement: SFTP's filter.pattern parameter works now with Java Regex instead of Glob Pattern Wildcars.
     + Fix bug sftp source: if setting sftp.filter.pattern to some value, walking subdirectory recursiverly does no work properly.
@@ -273,7 +309,7 @@ x : not available
 - 2.0.9 several fixes - check PRS
 - 2.0.8 fix on readme file.
 - 2.0.5 fixes minor bugs of 2.0.4.
-- 2.0.4 new package name convention, check for above examples. 
+- 2.0.4 new package name convention, check for above examples.
 - 2.0.1 new configurable parameters in flume's context.
 - 2.0.0: sources integration.
 - 1.1.5: flush lines from SFTPSource.
@@ -289,4 +325,3 @@ https://github.com/keedio/flume-ftp-source/wiki/flume-ftp-source,-especificacion
 
 --
 www.keedio.com
-

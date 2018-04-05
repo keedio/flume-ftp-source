@@ -3,14 +3,10 @@
  */
 package org.keedio.flume.source.ftp.source;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.InputStream;
+import java.io.*;
+
 import junit.framework.TestCase;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import org.apache.flume.Event;
 import org.apache.flume.channel.ChannelProcessor;
 
@@ -19,11 +15,14 @@ import org.slf4j.LoggerFactory;
 
 import static org.mockito.Mockito.mock;
 
-import java.io.IOException;
-
 import org.apache.flume.event.SimpleEvent;
 
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.zip.GZIPInputStream;
 
 /**
  *
@@ -45,6 +44,65 @@ public class SourceTest extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
+    }
+
+    public void testReadStream6() {
+        System.out.println("readStream6-gzip decompression");
+        InputStream inputStream = null;
+        long position = 0L;
+        try {
+            inputStream = new GZIPInputStream(new FileInputStream("src/test/resources/gzippedcsvfile.gz"));
+            assertNotNull(inputStream);
+        } catch (FileNotFoundException e) {
+            log.error("", e);
+            fail();
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        class DummyChannelProcessor extends ChannelProcessor {
+
+            public DummyChannelProcessor() {
+                super(null);
+            }
+
+            @Override
+            public void processEvent(Event event) {
+            }
+        }
+
+        ChannelProcessor chanel = new DummyChannelProcessor();
+
+        Event event = new SimpleEvent();
+        try {
+            inputStream.skip(0);
+            byte[] bytesArray = new byte[1024];
+            int bytesRead = -1;
+
+            while ((bytesRead = inputStream.read(bytesArray)) != -1) {
+                try (ByteArrayOutputStream baostream = new ByteArrayOutputStream(1024)) {
+                    baostream.write(bytesArray, 0, bytesRead);
+                    byte[] data = baostream.toByteArray();
+                    ByteBuffer byteBuffer = ByteBuffer.wrap(data);
+                    byteBuffer.compact();
+                    event.setBody(byteBuffer.array());
+                    event.setBody(data);
+                }
+
+            }
+
+            inputStream.close();
+        } catch (IOException e) {
+            log.error("", e);
+        }
+        try {
+            assertEquals(new String(event.getBody(), "UTF-8"), "field1,field2,field3");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            fail();
+        }
+
     }
 
     public void testReadStream4() {
@@ -142,9 +200,26 @@ public class SourceTest extends TestCase {
         } catch (IOException e) {
             log.error(e.getMessage(), e);
                 //successRead = false;
-
         }
+    }
 
+    public void testIsBeingWritten() {
+        Source source = new Source();
+        int timeout = 30;
+        try {
+            File file = TestFileUtils.createTmpFile(TestFileUtils.ROOT_TMP_DIR).toFile();
+            assertTrue(source.isBeingWritten(file.lastModified(), timeout));
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            cal.add(Calendar.SECOND, -timeout-1);
+            Long timeoutAgo = cal.getTime().getTime();
+
+            assertTrue(file.setLastModified(timeoutAgo)); // make sure new lastmodified was successfully applied
+            assertFalse(source.isBeingWritten(file.lastModified(), timeout));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     public void testCounterFiles() {
@@ -159,7 +234,6 @@ public class SourceTest extends TestCase {
         }
 
         log.info("reached " + filesCount);
-
     }
 
     public void discover(int filesCount) {
