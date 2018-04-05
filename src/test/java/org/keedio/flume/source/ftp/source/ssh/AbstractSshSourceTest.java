@@ -49,6 +49,8 @@ public abstract class AbstractSshSourceTest extends EmbeddedSSHDServer {
     public void beforeMethod() {
         MockitoAnnotations.initMocks(this);
 
+        when(mockContext.getBoolean("search.processInUse", true)).thenReturn(true);
+        when(mockContext.getBoolean("search.recursive", true)).thenReturn(true);
         when(mockContext.getString("client.source")).thenReturn(getSource);
         when(mockContext.getInteger("buffer.size")).thenReturn(1024);
         when(mockContext.getString("name.server")).thenReturn(getServer);
