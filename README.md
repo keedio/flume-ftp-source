@@ -289,7 +289,7 @@ x : not available
 
 
 ### Version history #####
-- 2.1.2
+- 2.2.0
     + Improvement: Added configurable property - search.recursive - to search recursively
     + Improvement: Added configurable properties - search.processInUse and search.processInUseTimeout -
     to allow user to specify whether files being written to should or should not be processed

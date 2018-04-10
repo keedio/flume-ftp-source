@@ -35,6 +35,7 @@ import org.keedio.flume.source.ftp.client.KeedioSource;
 import java.nio.charset.Charset;
 
 import org.apache.flume.source.AbstractSource;
+
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -171,7 +172,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
    */
   // @SuppressWarnings("UnnecessaryContinue")
   private <T> void discoverElements(KeedioSource keedioSource, String parentDir, String currentDir, int level,
-                                   boolean recursive) throws IOException {
+                                    boolean recursive) throws IOException {
 
     long position = 0L;
 
@@ -189,7 +190,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
         }
 
         if (keedioSource.isDirectory(element)) {
-          if(recursive) {
+          if (recursive) {
             LOGGER.info("Traversing element recursively: " + "[" + elementName + "]");
             keedioSource.changeToDirectory(parentDir);
             discoverElements(keedioSource, dirToList, elementName, level + 1, recursive);
@@ -198,11 +199,17 @@ public class Source extends AbstractSource implements Configurable, PollableSour
           keedioSource.changeToDirectory(dirToList);
 
           // Check whether user has specified that file is not to be processed while in use
-          if(!keedioSource.isProcessInUse()) {
-            // If file is currently being written to, skip this file until it is finalized
-            if(isBeingWritten(keedioSource.getModifiedTime(element), keedioSource.getProcessInUseTimeout())) {
-              LOGGER.info("File " + elementName + " is still being written. " +
-                      "Will skip for now and re-read when write is completed.");
+          if (!keedioSource.isProcessInUse()) {
+
+            //We are supposing that file is being currently written by the origin system, so skip actual iteration.
+            if (lastModifiedTimeExceededTimeout(
+              keedioSource.getModifiedTime(element),
+              keedioSource.getProcessInUseTimeout())) {
+              if (LOGGER.isDebugEnabled()) {
+                LOGGER
+                  .debug("Attribute lastModifiedTime for file " + elementName + " did not exceeded property " +
+                    "'processInUseTimeout',  file could be still being written or timeout may too high ");
+              }
               continue;
             }
           }
@@ -283,12 +290,16 @@ public class Source extends AbstractSource implements Configurable, PollableSour
   }
 
   /**
-   * Determine whether source file is currently being written to
-   * @param lastModifiedTime The last modified timestamp of the source file
-   * @param <T>
-   * @return True, is file is currently being written to. False otherwise.
+   * Determine whether the attribute 'lastModifiedTime' exceeded argument threshold(timeout).
+   * If 'timeout' seconds have passed since the last modification of the file, file can be discovered
+   * and processed.
+   *
+   * @param lastModifiedTime
+   * @param timeout,         configurable by user via property processInUseTimeout (seconds)
+   * @return
    */
-  public <T> boolean isBeingWritten(long lastModifiedTime, Integer timeout) {
+  public boolean lastModifiedTimeExceededTimeout(long lastModifiedTime, int timeout) {
+
     Date dateModified = new Date(lastModifiedTime);
     Calendar cal = Calendar.getInstance();
     cal.setTime(new Date());
@@ -318,22 +329,23 @@ public class Source extends AbstractSource implements Configurable, PollableSour
       try {
         inputStream.skip(position);
 
-        if(keedioSource.getCompressionFormat() != null) {
-          switch(keedioSource.getCompressionFormat()) {
+        if (keedioSource.getCompressionFormat() != null) {
+          switch (keedioSource.getCompressionFormat()) {
             case "gzip":
-            LOGGER.info("File " + fileName + " is GZIP compressed, and decompression has been requested by user. " +
-                    "Will attempt to decompress.");
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream),
-                    Charset.defaultCharset()))) {
-              String line = null;
+              LOGGER.info("File " + fileName + " is GZIP compressed, and decompression has been requested by user. " +
+                "Will attempt to decompress.");
+              try (BufferedReader in = new BufferedReader(new InputStreamReader(new GZIPInputStream(inputStream),
+                Charset.defaultCharset()))) {
+                String line = null;
 
-              while ((line = in.readLine()) != null) {
-                processMessage(line.getBytes(), fileName, filePath);
+                while ((line = in.readLine()) != null) {
+                  processMessage(line.getBytes(), fileName, filePath);
+                }
               }
-            }
-            break;
-            default: throw new IOException("Unsupported compression format specified: " +
-                    keedioSource.getCompressionFormat());
+              break;
+            default:
+              throw new IOException("Unsupported compression format specified: " +
+                keedioSource.getCompressionFormat());
           }
         } else {
           try (BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, Charset.defaultCharset()))) {
@@ -383,23 +395,23 @@ public class Source extends AbstractSource implements Configurable, PollableSour
     byte[] message = lastInfo;
     Event event = new SimpleEvent();
     Map<String, String> headers = new HashMap<>();
-      headers.put("fileName", fileName);
-      headers.put("filePath", filePath);
-      headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
-      event.setBody(message);
-      event.setHeaders(headers);
-      try {
-        getChannelProcessor().processEvent(event);
-      } catch (ChannelException e) {
-        LOGGER.error("ChannelException", e);
-      }
-      sourceCounter.incrementCountSizeProc(message.length);
-      sourceCounter.incrementEventCount();
+    headers.put("fileName", fileName);
+    headers.put("filePath", filePath);
+    headers.put("timestamp", String.valueOf(System.currentTimeMillis()));
+    event.setBody(message);
+    event.setHeaders(headers);
+    try {
+      getChannelProcessor().processEvent(event);
+    } catch (ChannelException e) {
+      LOGGER.error("ChannelException", e);
     }
+    sourceCounter.incrementCountSizeProc(message.length);
+    sourceCounter.incrementEventCount();
+  }
 
-    /**
-     * @param listener
-     */
+  /**
+   * @param listener
+   */
 
   public void setListener(FTPSourceEventListener listener) {
     this.listener = listener;
