@@ -11,17 +11,17 @@ import org.apache.flume.instrumentation.MonitoredCounterGroup;
  */
 public class SourceCounter extends MonitoredCounterGroup implements SourceCounterMBean {
     
-    private static long files_count;    
+    private static long filesCount;
     private static long filesProcCount ;  
     private static long filesProcCountError;
     private static long eventCount;
     private static long sendThroughput;
-    private static long start_time;
-    private static long last_sent;
+    private static long startTime;
+    private static long lastSent;
     private static long countModProc;
     private static long bytesProcessed;
-    private static long KbProcessed;
-    private static long MbProcessed;
+    private static long kbProcessed;
+    private static long mbProcessed;
             
    
     
@@ -35,17 +35,17 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
      */
     public SourceCounter(String name){
        super(MonitoredCounterGroup.Type.SOURCE, name, ATTRIBUTES);
-       files_count = 0;
+       filesCount = 0;
        filesProcCount = 0;
        filesProcCountError = 0;
        eventCount = 0;
-       last_sent = 0;
-       start_time = System.currentTimeMillis();
+       lastSent = 0;
+       startTime = System.currentTimeMillis();
        sendThroughput = 0;
        countModProc = 0;
        bytesProcessed = 0;
-       KbProcessed = 0;
-       MbProcessed = 0;
+       kbProcessed = 0;
+       mbProcessed = 0;
     }
             
     /**
@@ -53,7 +53,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
     */
     @Override
     public long getFilesCount(){
-        return files_count;
+        return filesCount;
     }
     
     /**
@@ -61,7 +61,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
     */
     @Override
     public void  incrementFilesCount(){
-        files_count++;
+        filesCount++;
     }
     
     /**
@@ -101,10 +101,10 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
      */
     @Override
     public void incrementEventCount(){
-        last_sent = System.currentTimeMillis();
+        lastSent = System.currentTimeMillis();
         eventCount++;
-       if (last_sent - start_time >= 1000) {
-           long secondsElapsed = (last_sent - start_time) / 1000;
+       if (lastSent - startTime >= 1000) {
+           long secondsElapsed = (lastSent - startTime) / 1000;
            sendThroughput = eventCount / secondsElapsed;
         }
     }
@@ -150,7 +150,7 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
      */
     @Override
     public long getLastSent(){
-        return last_sent;
+        return lastSent;
     }
     
     /**
@@ -177,8 +177,8 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
      */
     @Override
     public long getCountSizeProcKb(){
-        KbProcessed = getCountSizeProc() / 1024;
-        return KbProcessed;
+        kbProcessed = getCountSizeProc() / 1024;
+        return kbProcessed;
     }
     
     /**
@@ -187,8 +187,8 @@ public class SourceCounter extends MonitoredCounterGroup implements SourceCounte
      */
     @Override
     public long getCountSizeProcMb(){
-        MbProcessed = getCountSizeProc() / (1024 * 1024);
-        return MbProcessed;
+        mbProcessed = getCountSizeProc() / (1024 * 1024);
+        return mbProcessed;
     }
        
     

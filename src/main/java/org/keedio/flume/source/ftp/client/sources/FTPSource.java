@@ -99,10 +99,8 @@ public class FTPSource extends KeedioSource<FTPFile> {
      * @param current directory
      */
     public List<FTPFile> listElements(String dir) throws IOException {
-        List<FTPFile> list = new ArrayList<>();
         FTPFile[] subFiles = getFtpClient().listFiles(dir);
-        list = Arrays.asList(subFiles);
-        return list;
+        return Arrays.asList(subFiles);
     }
 
     @Override
@@ -111,16 +109,12 @@ public class FTPSource extends KeedioSource<FTPFile> {
      * @return InputStream
      */
     public InputStream getInputStream(FTPFile file) throws IOException {
-        InputStream inputStream = null;
-
         if (isFlushLines()) {
             this.setFileType(FTP.ASCII_FILE_TYPE);
         } else {
             this.setFileType(FTP.BINARY_FILE_TYPE);
         }
-        inputStream = getFtpClient().retrieveFileStream(file.getName());
-
-        return inputStream;
+        return getFtpClient().retrieveFileStream(file.getName());
     }
 
     @Override
@@ -131,6 +125,13 @@ public class FTPSource extends KeedioSource<FTPFile> {
     public String getObjectName(FTPFile file) {
         return file.getName();
     }
+
+    @Override
+    /**
+     * @return boolean
+     * @param Object to check
+     */
+    public long getModifiedTime(FTPFile file) { return file.getTimestamp().getTimeInMillis(); }
 
     @Override
     /**
@@ -202,9 +203,7 @@ public class FTPSource extends KeedioSource<FTPFile> {
      */
     @Override
     public String getDirectoryserver() throws IOException {
-        String printWorkingDirectory = "";
-        printWorkingDirectory = getFtpClient().printWorkingDirectory();
-        return printWorkingDirectory;
+        return getFtpClient().printWorkingDirectory();
     }
 
     /**

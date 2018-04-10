@@ -3,22 +3,16 @@
  */
 package org.keedio.flume.source.ftp.client.sources;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.*;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.keedio.flume.source.ftp.client.KeedioSource;
 import org.keedio.flume.source.ftp.client.filters.KeedioFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -238,13 +232,20 @@ public class SFTPSource extends KeedioSource<ChannelSftp.LsEntry> {
 
     @Override
     /**
+     * @return boolean
+     * @param Object to check
+     */
+    public long getModifiedTime(ChannelSftp.LsEntry file) { return file.getAttrs().getMTime() * 1000L; }
+
+    @Override
+    /**
      * There is no attribute to check isfile in SftpATTRS
      *
      * @return boolean
      * @param file to check
      */
     public boolean isFile(ChannelSftp.LsEntry file) {
-        boolean isfile = false;
+        boolean isfile;
         if ((!isDirectory(file)) && (!isLink(file))) {
             isfile = true;
         } else {

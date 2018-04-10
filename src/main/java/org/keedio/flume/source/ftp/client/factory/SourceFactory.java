@@ -24,6 +24,10 @@ public class SourceFactory {
     private static final String FOLDER_DEFAULT = System.getProperty("java.io.tmpdir");
     private static final Integer CHUNKSIZE_DEFAULT = 1024;
     private static final String FILENAME_DEFAULT = "default_file_track_status.ser";
+    private static final boolean RECURSIVE_DEFAULT = true;
+    private static final boolean PROCESSINUSE = true;
+    private static final Integer PROCESSINUSE_TIMEOUT = 60;
+    private static final String FILE_COMPRESSION_FORMAT = null;
     
 
     /**
@@ -94,7 +98,10 @@ public class SourceFactory {
         keedioSource.setFlushLines(context.getBoolean("flushlines", FLUSHLINE_DEFAULT));
         keedioSource.setChunkSize(context.getInteger("chunk.size", CHUNKSIZE_DEFAULT));
         keedioSource.setKeedioFilterRegex(context.getString("filter.pattern", ""));
+        keedioSource.setRecursive(context.getBoolean("search.recursive", RECURSIVE_DEFAULT));
+        keedioSource.setProcessInUse(context.getBoolean("search.processInUse", PROCESSINUSE));
+        keedioSource.setProcessInUseTimeout(context.getInteger("search.processInUseTimeout", PROCESSINUSE_TIMEOUT));
+        keedioSource.setFileCompressed(context.getString("compressed", FILE_COMPRESSION_FORMAT));
     }
 
-   
 }
