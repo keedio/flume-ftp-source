@@ -207,8 +207,7 @@ public class Source extends AbstractSource implements Configurable, PollableSour
               keedioSource.getProcessInUseTimeout())) {
               if (LOGGER.isDebugEnabled()) {
                 LOGGER
-                  .debug("Attribute lastModifiedTime for file " + elementName + " did not exceeded property " +
-                    "'processInUseTimeout',  file could be still being written or timeout may too high ");
+                  .debug("File " + elementName + " could be still being written or timeout may too high ");
               }
               continue;
             }
